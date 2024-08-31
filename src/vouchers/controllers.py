@@ -1,36 +1,14 @@
-import os
-from pathlib import Path
 from typing import Literal, Any
 
 from playwright.sync_api import sync_playwright, Page
 from selectolax.parser import HTMLParser
-import xlwings as xw
 from xlwings import Sheet
 from rich.progress import track
 
 from src import utils as src_utils
 
 
-def get_salaries_filepath() -> Path:
-  
-    BASE_DIR = Path().resolve(__file__)
-    
-    home = BASE_DIR.home()
-    desktop_path = home / 'Desktop'
-    onedrive_path = Path('D:\\OneDrive\\financial\\In_Progress')
-
-    glob = list(desktop_path.glob('[Salaries|Partial]*.xlsb'))
-
-    if len(glob):
-        filepath = glob[0]
-    else:
-        glob = list(onedrive_path.glob('[Salaries|Partial]*.xlsb'))
-        filepath = glob[0]
-
-    return filepath
-
-
-def get_cost_center(
+def _get_cost_center(
     faculty: str, account_id: str, chapter: Literal['1', '2', '3'] = '1'
 ) -> str:
     
@@ -51,11 +29,11 @@ def get_cost_center(
     return cost_centers.get(faculty, '11') + chapter
 
 
-def get_voucher_data(
+def _get_voucher_data(
     filepath, account_id, chapter: Literal['1', '2', '3'] = '1', 
 ) -> list[list[str]]:
   
-    wb = xw.Book(filepath, password=os.environ.get('EXCEL_PASSWORD'))
+    wb = src_utils.get_salaries_workbook(filepath)
     ws: Sheet = wb.sheets['Journal Entry Template']
     
     lr = ws.range('C1').end('down').row
@@ -73,7 +51,7 @@ def get_voucher_data(
         
         notes = f'{string_account} | {faculty or ""} \n{notes or ""}'
         
-        cost_center = get_cost_center(faculty, account_id, chapter)
+        cost_center = _get_cost_center(faculty, account_id, chapter)
         
         row = [debit, credit, account_id, cost_center, notes]
         
@@ -81,7 +59,8 @@ def get_voucher_data(
     
     return data
 
-def navigate_to_add_new_voucher(page: Page) -> Page:
+
+def _navigate_to_add_new_voucher(page: Page) -> Page:
     
     page.goto('http://edu/RAS/?sc=500#/_FIN/ACT/vouchers.php?id=JOV')
     page.wait_for_selector('#addVoucher')
@@ -104,7 +83,7 @@ def _fill_field(
         page.press('body', 'Enter')
 
 
-def fill_row(
+def _fill_row(
   page: Page,
   debit: dict,
   credit: dict,
@@ -132,7 +111,7 @@ def _parse_ids(
     return ids
 
 
-def parse_additional_data(parser: HTMLParser) -> list[list[Any]]:
+def _parse_additional_data(parser: HTMLParser) -> list[list[Any]]:
     
     data: list = []
     
@@ -155,7 +134,7 @@ def parse_additional_data(parser: HTMLParser) -> list[list[Any]]:
     return data
 
 
-def merge_two_lists(list_of_ids, list_of_data) -> list[dict]:
+def _merge_two_lists(list_of_ids, list_of_data) -> list[dict]:
 
     if len(list_of_ids) != len(list_of_data):
         raise Exception('two lists must be the same length')
@@ -177,8 +156,8 @@ def merge_two_lists(list_of_ids, list_of_data) -> list[dict]:
 
 def main(timeout: int, chapter: Literal['1', '2', '3'] = '1'):
   
-    filepath = get_salaries_filepath()
-    data = get_voucher_data(filepath, chapter)
+    filepath = src_utils.get_salaries_filepath()
+    data = _get_voucher_data(filepath, chapter)
     
     with sync_playwright() as p:
         
@@ -186,7 +165,7 @@ def main(timeout: int, chapter: Literal['1', '2', '3'] = '1'):
         
         page.wait_for_timeout(timeout)
         
-        page = navigate_to_add_new_voucher(page)
+        page = _navigate_to_add_new_voucher(page)
         
         page.wait_for_timeout(timeout)
         
@@ -197,13 +176,13 @@ def main(timeout: int, chapter: Literal['1', '2', '3'] = '1'):
         
         parser = HTMLParser(page.content())
         
-        additional_data = parse_additional_data(parser)
+        additional_data = _parse_additional_data(parser)
         
-        data = merge_two_lists(additional_data, data)
+        data = _merge_two_lists(additional_data, data)
         
         total = len(data)
         
         for row in track(data, total=total):
-            fill_row(page, **row)
+            _fill_row(page, **row)
             
-        input('Press any key to close ...')
+        input('Press any key to close ... ')

@@ -1,6 +1,13 @@
 import os
+from pathlib import Path
 
+import xlwings as xw
 from playwright.sync_api import Page
+
+
+def get_salaries_workbook(filepath: Path) -> xw.Book:
+    
+    return xw.Book(filepath, password=os.environ.get('EXCEL_PASSWORD'))
 
 
 def get_authenticated_page(p) -> Page:
@@ -14,3 +21,22 @@ def get_authenticated_page(p) -> Page:
     page.click('#loginBtn')
     
     return page
+
+
+def get_salaries_filepath() -> Path:
+  
+    BASE_DIR = Path().resolve(__file__)
+    
+    home = BASE_DIR.home()
+    desktop_path = home / 'Desktop'
+    onedrive_path = Path('D:\\OneDrive\\financial\\In_Progress')
+
+    glob = list(desktop_path.glob('[Salaries|Partial]*.xlsb'))
+
+    if len(glob):
+        filepath = glob[0]
+    else:
+        glob = list(onedrive_path.glob('[Salaries|Partial]*.xlsb'))
+        filepath = glob[0]
+
+    return filepath

@@ -1,3 +1,5 @@
+import math
+from pathlib import Path
 from typing import Literal, Any
 
 from playwright.sync_api import sync_playwright, Page
@@ -11,7 +13,12 @@ from src import utils as src_utils
 def _get_cost_center(
     faculty: str, account_id: str, chapter: Literal['1', '2', '3'] = '1'
 ) -> str:
-    
+    """
+    get cost center from string e.g.:  
+    - account_id = 4111, faculty = 'Management', chapter = 1 -> '131'  
+    - account_id = 4111, faculty = 'Pharmacy', chapter = 3 -> '163'  
+    - account_id = 15322, faculty = 'Management', chapter = 1 -> ''  
+    """
     if account_id.startswith('1') or account_id.startswith('2'):
         return ''
     
@@ -29,10 +36,12 @@ def _get_cost_center(
     return cost_centers.get(faculty, '11') + chapter
 
 
-def _get_voucher_data(
-    filepath, account_id, chapter: Literal['1', '2', '3'] = '1', 
+def get_salaries_voucher_data(
+    filepath: Path, chapter: Literal['1', '2', '3'] = '1', 
 ) -> list[list[str]]:
-  
+    """
+    read voucher data from salaries/partial `Journal Entry Template` file
+    """
     wb = src_utils.get_salaries_workbook(filepath)
     ws: Sheet = wb.sheets['Journal Entry Template']
     
@@ -60,8 +69,43 @@ def _get_voucher_data(
     return data
 
 
-def _navigate_to_add_new_voucher(page: Page) -> Page:
+def get_voucher_data(
+    filepath: Path, 
+    chapter: Literal['1', '2', '3'] = '1', 
+    sheet_name: str = 'voucher'
+) -> list[list[str]]:
+    """
+    read voucher data from salaries/partial `voucher` file
+    """
+    wb = src_utils.get_salaries_workbook(filepath)
+    ws: Sheet = wb.sheets[sheet_name]
     
+    lr = ws.range('A1').end('down').row
+    rg = ws.range(f'A2:E{lr}').value
+    
+    data: list[list[str]] = []
+    
+    for r in rg:
+
+        debit, credit, account_id, faculty, notes = r
+        
+        debit = str(int(debit or 0))
+        credit = str(int(credit or 0))
+        account_id = str(int(account_id or 15322))
+        
+        cost_center = _get_cost_center(faculty, account_id, chapter)
+        
+        row = [debit, credit, account_id, cost_center, notes]
+        
+        data.append(row)
+    
+    return data
+
+
+def _navigate_to_add_new_voucher(page: Page) -> Page:
+    """
+    navigate to add new voucher playwright
+    """
     page.goto('http://edu/RAS/?sc=500#/_FIN/ACT/vouchers.php?id=JOV')
     page.wait_for_selector('#addVoucher')
     page.click('#addVoucher')
@@ -72,7 +116,9 @@ def _navigate_to_add_new_voucher(page: Page) -> Page:
 def _fill_field(
     page: Page, field: dict, type_: Literal['select', 'input'] = 'input'
 ) -> None:
-  
+    """
+    fill field
+    """
     if field['value'] == '':
         return
   
@@ -91,7 +137,9 @@ def _fill_row(
   cost_center: dict,
   notes: dict,
 ) -> None:
-    
+    """
+    fill voucher row
+    """
     _fill_field(page, debit)
     _fill_field(page, credit)
     _fill_field(page, account, type_='select')
@@ -104,7 +152,9 @@ def _parse_ids(
         id_start_with: str, 
         type_: Literal['input', 'textarea'] = 'input',
     ) -> list[str]:
-    
+    """
+    parse all ids from range of fields
+    """
     ids = parser.css(f'{type_}[id^="{id_start_with}"]')
     ids = [el.attributes.get('id') for el in ids][1:]
     
@@ -112,7 +162,9 @@ def _parse_ids(
 
 
 def _parse_additional_data(parser: HTMLParser) -> list[list[Any]]:
-    
+    """
+    parse all ids from all fields
+    """
     data: list = []
     
     debits = _parse_ids(parser, 'sumDebitId_show')
@@ -154,10 +206,10 @@ def _merge_two_lists(list_of_ids, list_of_data) -> list[dict]:
     return data
 
 
-def main(timeout: int, chapter: Literal['1', '2', '3'] = '1'):
-  
-    filepath = src_utils.get_salaries_filepath()
-    data = _get_voucher_data(filepath, chapter)
+def add_voucher(
+    timeout: int, 
+    data: list[list[str]], 
+):
     
     with sync_playwright() as p:
         
@@ -171,8 +223,10 @@ def main(timeout: int, chapter: Literal['1', '2', '3'] = '1'):
         
         for _ in range(len(data) - 1):
             page.press('body', 'Shift+N')
-            
-        page.wait_for_timeout(timeout * 10)
+        
+        timeout_factor = math.ceil(len(data) / 10)
+        
+        page.wait_for_timeout(timeout * timeout_factor)
         
         parser = HTMLParser(page.content())
         

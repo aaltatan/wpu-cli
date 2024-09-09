@@ -113,6 +113,14 @@ def _navigate_to_add_new_voucher(page: Page) -> Page:
     return page
 
 
+def _navigate_to_general_accounting(page: Page) -> Page:
+    """
+    navigate to general accounting to select the current year playwright
+    """
+    page.goto('http://edu/RAS/?sc=500#/_FIN/ACT/menu.php')
+    return page
+
+
 def _fill_field(
     page: Page, field: dict, type_: Literal['select', 'input'] = 'input'
 ) -> None:
@@ -216,6 +224,9 @@ def add_voucher(
         page = src_utils.get_authenticated_page(p)
         
         page.wait_for_timeout(timeout)
+        
+        page = _navigate_to_general_accounting(page)
+        input('after selecting target year, press any key to continue ... ')
         
         page = _navigate_to_add_new_voucher(page)
         

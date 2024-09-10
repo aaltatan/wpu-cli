@@ -1,14 +1,13 @@
 import os
 import time
 from pathlib import Path
-from urllib.parse import urlencode
 
 from playwright.sync_api import sync_playwright
 from rich.progress import track
 import xlwings as xw
 
 
-def get_messages_from_excel_file(filepath: Path) -> list[list]:
+def get_messages_from_excel_file(filepath: Path):
     """
     read messages data from salaries/partial file from `whatsapp` sheet
     """
@@ -37,19 +36,13 @@ def send_messages(messages: list[list]) -> None:
         for message in track(messages, description="📩 Sending", total=total):
 
             _, phone, text = message
-            params = {"phone": f"+{phone}", "text": text}
-            query = urlencode(params)
-
-            try:
-                page.goto(
-                    f"https://web.whatsapp.com/send?" + query, timeout=60000
-                )
-                page.is_visible(
-                    'button[aria-label="Send"] span[data-icon="send"]'
-                )
-                page.click(
-                    'button[aria-label="Send"] span[data-icon="send"]'
-                )
-                time.sleep(2)
-            except:
-                continue
+            
+            url: str = f"https://web.whatsapp.com/send?phone={phone}&text={text}"
+            page.goto(url, timeout=60_000)
+            
+            btn_selector: str = 'button[aria-label="Send"] span[data-icon="send"]'
+            
+            page.is_visible(btn_selector)
+            page.click(btn_selector)
+            
+            time.sleep(2)

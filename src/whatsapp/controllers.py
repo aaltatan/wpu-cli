@@ -38,11 +38,11 @@ def send_messages(messages: list[list]) -> None:
             _, phone, text = message
             
             url: str = f"https://web.whatsapp.com/send?phone={phone}&text={text}"
-            page.goto(url, timeout=60_000)
-            
-            btn_selector: str = 'button[aria-label="Send"] span[data-icon="send"]'
-            
-            page.is_visible(btn_selector)
-            page.click(btn_selector)
-            
-            time.sleep(2)
+            try:
+                page.goto(url, timeout=60_000)
+                btn_selector: str = 'button[aria-label="Send"] span[data-icon="send"]'
+                page.is_visible(btn_selector)
+                page.click(btn_selector)
+                time.sleep(2)
+            except:
+                continue

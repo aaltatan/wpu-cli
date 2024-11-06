@@ -37,12 +37,12 @@ def _get_cost_center(
 
 
 def get_salaries_voucher_data(
-    filepath: Path, chapter: Literal['1', '2', '3'] = '1', 
+    filepath: Path, password: str,  chapter: Literal['1', '2', '3'] = '1', 
 ) -> list[list[str]]:
     """
     read voucher data from salaries/partial `Journal Entry Template` file
     """
-    wb = src_utils.get_salaries_workbook(filepath)
+    wb = src_utils.get_salaries_workbook(filepath, password)
     ws: Sheet = wb.sheets['Journal Entry Template']
     
     lr = ws.range('C1').end('down').row
@@ -71,13 +71,14 @@ def get_salaries_voucher_data(
 
 def get_voucher_data(
     filepath: Path, 
+    password: str,
     chapter: Literal['1', '2', '3'] = '1', 
-    sheet_name: str = 'voucher'
+    sheet_name: str = 'voucher',
 ) -> list[list[str]]:
     """
     read voucher data from salaries/partial `voucher` file
     """
-    wb = src_utils.get_salaries_workbook(filepath)
+    wb = src_utils.get_salaries_workbook(filepath, password)
     ws: Sheet = wb.sheets[sheet_name]
     
     lr = ws.range('A1').end('down').row
@@ -217,11 +218,13 @@ def _merge_two_lists(list_of_ids, list_of_data) -> list[dict]:
 def add_voucher(
     timeout: int, 
     data: list[list[str]], 
+    username: str,
+    password: str,
 ):
     
     with sync_playwright() as p:
         
-        page = src_utils.get_authenticated_page(p)
+        page = src_utils.get_authenticated_page(p, username, password)
         
         page.wait_for_timeout(timeout)
         

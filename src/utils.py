@@ -1,23 +1,26 @@
-import os
 from pathlib import Path
 
 import xlwings as xw
 from playwright.sync_api import Page
 
 
-def get_salaries_workbook(filepath: Path) -> xw.Book:
-    
-    return xw.Book(filepath, password=os.environ.get('EXCEL_PASSWORD'))
+def get_salaries_workbook(filepath: Path, password: str) -> xw.Book:
+    """
+    read salaries workbook
+    """
+    return xw.Book(filepath, password=password)
 
 
-def get_authenticated_page(p) -> Page:
+def get_authenticated_page(
+    p, username: str, password: str
+) -> Page:
     
     browser = p.chromium.launch(slow_mo=10, headless=False)
     page = browser.new_page()
     page.goto("http://edu/")
     
-    page.fill('#user_id', os.environ.get('AUTOMATA_USERNAME'))
-    page.fill('#password', os.environ.get('AUTOMATA_PASSWORD'))
+    page.fill('#user_id', username)
+    page.fill('#password', password)
     page.click('#loginBtn')
     
     return page

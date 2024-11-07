@@ -8,7 +8,7 @@ if __name__ == "__main__":
     # typers
     from src import vouchers, whatsapp
     
-    app.add_typer(vouchers.app, name='vouchers')
-    app.add_typer(whatsapp.app, name='whatsapp')
+    app.add_typer(vouchers.typer, name='vouchers')
+    app.add_typer(whatsapp.typer, name='whatsapp')
     
     app()

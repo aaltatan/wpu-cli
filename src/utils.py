@@ -1,14 +1,6 @@
 from pathlib import Path
 
-import xlwings as xw
 from playwright.sync_api import Page
-
-
-def get_salaries_workbook(filepath: Path, password: str) -> xw.Book:
-    """
-    read salaries workbook
-    """
-    return xw.Book(filepath, password=password)
 
 
 def get_authenticated_page(

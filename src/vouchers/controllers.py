@@ -2,9 +2,9 @@ import math
 from pathlib import Path
 from typing import Literal, Any
 
+import xlwings as xw
 from playwright.sync_api import sync_playwright, Page
 from selectolax.parser import HTMLParser
-from xlwings import Sheet
 from rich.progress import track
 
 from src import utils as src_utils
@@ -22,8 +22,8 @@ def get_voucher_from_excel(
     """
     read voucher data from excel file
     """
-    wb = src_utils.get_salaries_workbook(filepath, password)
-    ws: Sheet = wb.sheets[sheet_name]
+    wb = xw.Book(filepath, password=password)
+    ws: xw.Sheet = wb.sheets[sheet_name]
 
     last_row: int = ws.range(start_cell).end("down").row
 

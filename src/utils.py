@@ -2,6 +2,7 @@ from pathlib import Path
 
 from playwright.sync_api import Page
 
+BASE_DIR = Path().resolve(__file__).parent.parent
 
 def get_authenticated_page(
     p, username: str, password: str

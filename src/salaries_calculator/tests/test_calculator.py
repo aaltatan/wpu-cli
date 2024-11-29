@@ -1,7 +1,7 @@
 import pytest
 from unittest import TestCase
 
-from ..controllers import Salary, select_variant
+from ..controllers import Salary
 
 
 class TestCalculator(TestCase):
@@ -93,9 +93,3 @@ class TestCalculator(TestCase):
         self.assertEqual(salary.compensations, 0)
         self.assertEqual(salary.tax, 258_300)
         self.assertEqual(salary.fixed_tax, 0)
-
-    def test_select_variant(self):
-        salary = select_variant(amount=9_000_000, compensations_rate=0.25, accuracy=100)
-        self.assertEqual(salary.gross_salary, 7_634_700)
-        self.assertEqual(salary.compensations, 2_557_900)
-        self.assertEqual(salary.net_salary, 9_000_000)

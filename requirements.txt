@@ -1,6 +1,0 @@
-playwright
-selectolax
-python-dotenv
-icecream
-typer
-xlwings

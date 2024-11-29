@@ -1,13 +1,14 @@
 import typer
-from rich.table import Table
 from rich.console import Console
+from rich.table import Table
 
-from ..db import LayersTaxesDatabase, NotFoundError
+from src.db import Database, NotFoundError
+
 from ..schemas import Layer
 
 app = typer.Typer()
 
-db = LayersTaxesDatabase()
+db = Database()
 
 table = Table(show_header=True, header_style="bold magenta")
 table.add_column("#", style="blue", justify="right")

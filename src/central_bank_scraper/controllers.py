@@ -61,6 +61,6 @@ async def get_exchange_rates(pages: 1) -> list[ExchangeRate]:
                 html = response.text
                 results += parse_page(html)
 
-            asyncio.sleep(3)
+            await asyncio.sleep(3)
 
         return results

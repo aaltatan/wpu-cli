@@ -1,8 +1,8 @@
 import typer
 from rich.console import Console
 
-from src.db import Database
 from .utils import Wb
+from ..models import Setting
 
 from .controllers import (
     Salary,
@@ -12,7 +12,6 @@ from .controllers import (
 from .tables import table
 
 console = Console()
-db = Database()
 app = typer.Typer()
 
 
@@ -41,7 +40,7 @@ def calculate() -> None:
     if social_security:
         social_security_minimum_salary: int = typer.prompt(
             "social security salary",
-            default=db.get_setting("social_security_minimum_salary"),
+            default=Setting.get(key="social_security_minimum_salary").value,
             type=int,
         )
 
@@ -71,7 +70,7 @@ def _generate_sequence_range(
     """
     min_amount = min_amount or typer.prompt(
         "Min amount",
-        default=db.get_setting("social_security_minimum_salary"),
+        default=Setting.get(key="social_security_minimum_salary").value,
         type=int,
     )
     max_amount = max_amount or typer.prompt(

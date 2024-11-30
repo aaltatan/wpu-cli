@@ -2,13 +2,10 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from src.db import Database, NotFoundError
-
-from ..schemas import Tax
+from src.models import Tax as DBTax
 
 app = typer.Typer()
 
-db = Database()
 
 table = Table(show_header=True, header_style="bold magenta")
 table.add_column("#", style="blue", justify="right")
@@ -23,7 +20,7 @@ def list_taxes():
     """
     List all taxes
     """
-    taxes = db.get_taxes()
+    taxes = DBTax.select()
     for tax in taxes:
         table.add_row(
             str(tax.id),
@@ -40,7 +37,7 @@ def add():
     """
     name = typer.prompt("Name", default="Syrian Layers Tax")
     description = typer.prompt("Description", default="Default taxes")
-    db.add_tax(Tax(name, description))
+    DBTax.create(name=name, description=description)
     console.print(f"{name} tax added successfully")
 
 
@@ -49,15 +46,14 @@ def update(id: int):
     """
     Update a tax
     """
-    try:
-        tax = db.get_tax(id)
-    except NotFoundError:
-        console.print("Tax not found")
-        return
+    tax = DBTax.get_by_id(id)
 
     name = typer.prompt("Name", default=tax.name)
     description = typer.prompt("Description", default=tax.description)
-    db.update_tax(id, Tax(name, description))
+
+    tax.name = name
+    tax.description = description
+    tax.save()
     console.print(f"{name} tax updated successfully")
 
 
@@ -66,5 +62,5 @@ def delete(id: int):
     """
     Delete a tax
     """
-    db.delete_layer(id)
+    DBTax.delete(id=id)
     print("Layer deleted successfully")

@@ -1,10 +1,10 @@
 import math
 from dataclasses import InitVar, dataclass, field, asdict
+from typing import Iterable
 
-from src.db import Database
+from ..models import Setting, TaxLayer
 
-
-db = Database()
+ss_minium_salary = int(Setting.get(key="social_security_minimum_salary").value)
 
 
 @dataclass
@@ -28,7 +28,7 @@ class Salary:
     def __post_init__(
         self, amount: int, as_net: bool, compensations_rate: float, social_security: int
     ) -> None:
-        self.ss_minium_salary = int(db.get_setting("social_security_minimum_salary"))
+        self.ss_minium_salary = ss_minium_salary
 
         if amount < self.ss_minium_salary:
             raise ValueError(
@@ -45,7 +45,7 @@ class Salary:
                 )
 
         self.ss_deduction_rate: float = float(
-            db.get_setting("social_security_deduction_rate")
+            float(Setting.get(key="social_security_deduction_rate").value)
         )
         self.compensations_rate: float = compensations_rate
 
@@ -84,11 +84,11 @@ class Salary:
         )
 
     @property
-    def layers(self):
-        return db.get_layers()
+    def layers(self) -> Iterable[TaxLayer]:
+        return TaxLayer.select()
 
     def _calculate_as_net(self, amount: int) -> None:
-        deduction_rate = float(db.get_setting("compensation_tax_rate"))
+        deduction_rate = float(Setting.get(key="compensation_tax_rate").value)
 
         gross_salary = self.round(amount * (1 - self.compensations_rate))
         if gross_salary < self.ss_minium_salary:
@@ -133,7 +133,7 @@ class Salary:
                 tax += layer_tax
                 return self.round(tax)
             else:
-                tax += layer.tax
+                tax += (layer.to_ - layer.from_) * layer.rate
 
         return self.round(tax)
 
@@ -163,7 +163,7 @@ def generate_sequence_range(
     as_net: bool,
     compensations_rate: float,
 ) -> list[Salary]:
-    ss_minium_salary = int(db.get_setting("social_security_minimum_salary"))
+    ss_minium_salary = int(Setting.get(key="social_security_minimum_salary").value)
 
     if min_amount < ss_minium_salary:
         raise ValueError(f"min amount must be greater or equal to {ss_minium_salary}")
@@ -187,7 +187,8 @@ def generate_sequence_range(
 
 
 def generate_salary_variants(amount: int, accuracy: int = 400) -> list[Salary]:
-    ss_minium_salary = int(db.get_setting("social_security_minimum_salary"))
+    ss_minium_salary = int(Setting.get(key="social_security_minimum_salary").value)
+
     if amount < ss_minium_salary:
         raise ValueError(f"amount must be greater or equal to {ss_minium_salary}")
 

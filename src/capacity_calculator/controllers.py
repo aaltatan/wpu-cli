@@ -34,6 +34,8 @@ class Capacity:
 
     locality_difference: int = field(init=False)
 
+    id: int | None = None
+
     def model_dump(self) -> dict:
         return asdict(self)
 
@@ -42,9 +44,7 @@ class Capacity:
             raise ValueError("Locality percentage must be between 0 and 1")
 
         if self.teacher_to_student_ratio < 35 or self.teacher_to_student_ratio > 50:
-            raise ValueError(
-                "Teacher to student ratio must be between 35 and 50"
-            )
+            raise ValueError("Teacher to student ratio must be between 35 and 50")
 
         self.fulltime_specialist_count = (
             self.local_fulltime_specialist_count
@@ -86,9 +86,12 @@ class Capacity:
 
         self.required_local_count = math.ceil(
             (
-                self.fulltime_specialist_count
-                + self.fulltime_supportive_count
-                + self.allowed_parttime_count
+                self.local_fulltime_specialist_count
+                + self.local_fulltime_supportive_count
+                + self.foreign_fulltime_specialist_count
+                + self.foreign_fulltime_supportive_count
+                + self.parttime_specialist_count
+                + self.parttime_supportive_count
             )
             * locality_percentage
         )

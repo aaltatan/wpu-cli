@@ -1,21 +1,18 @@
+from typing import Iterable
+
 import typer
 from rich.console import Console
 from rich.table import Table
 
-from src.db import Database, NotFoundError
-
-from ..schemas import Layer
+from ...models import TaxLayer
 
 app = typer.Typer()
-
-db = Database()
 
 table = Table(show_header=True, header_style="bold magenta")
 table.add_column("#", style="blue", justify="right")
 table.add_column("from", style="white", justify="right")
 table.add_column("to", style="white", justify="right")
 table.add_column("rate", style="white", justify="right")
-table.add_column("tax name", style="white", justify="right")
 
 console = Console()
 
@@ -25,14 +22,13 @@ def list_layers(tax_id: int = 1):
     """
     List all layers
     """
-    layers = db.get_layers(tax_id)
+    layers: Iterable[TaxLayer] = TaxLayer.select().where(TaxLayer.tax_id == tax_id)
     for layer in layers:
         table.add_row(
             str(layer.id),
             f"{layer.from_:,}",
             f"{layer.to_:,}",
             f"{layer.rate:.2%}",
-            layer.tax_name,
         )
     console.print(table)
 
@@ -47,9 +43,7 @@ def add():
     rate = typer.prompt("Rate", default=0, type=float)
     taxes_id = typer.prompt("Taxes ID", default=1, type=int)
 
-    layer = Layer(from_, to, rate, taxes_id)
-
-    db.add_layer(layer, taxes_id)
+    layer = TaxLayer.create(from_, to, rate, taxes_id)
 
     console.print(layer)
     console.print("Layer added successfully")
@@ -60,21 +54,19 @@ def update(id: int):
     """
     Update a layer
     """
-
-    try:
-        layer = db.get_layer(id)
-    except NotFoundError:
-        console.print("Layer not found")
-        return
+    layer: TaxLayer = TaxLayer.get_by_id(id)
 
     from_ = typer.prompt("From", default=layer.from_, type=int)
     to = typer.prompt("To", default=layer.to_, type=int)
     rate = typer.prompt("Rate", default=layer.rate, type=float)
     taxes_id = typer.prompt("Taxes ID", default=1, type=int)
 
-    layer = Layer(from_, to, rate, taxes_id)
+    layer.from_ = from_
+    layer.to_ = to
+    layer.rate = rate
+    layer.tax_id = taxes_id
 
-    db.update_layer(id, layer)
+    layer.save()
 
     console.print(layer)
 
@@ -84,5 +76,5 @@ def delete(id: int):
     """
     Delete a layer
     """
-    db.delete_layer(id)
+    TaxLayer.delete_by_id(id)
     console.print("Layer deleted successfully")

@@ -1,4 +1,4 @@
-# edu-cli
+# wpu-cli
 
 
-CLI application for make some automation tasks on EduTech application
+CLI application for make some automation tasks.

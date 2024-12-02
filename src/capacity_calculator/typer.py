@@ -1,11 +1,10 @@
 import typer
-
 from rich.console import Console
 
+from ..models import Faculty, Setting
 from .controllers import Capacity
 from .tables import table
 from .utils import Wb
-from ..models import Faculty, Setting
 
 console = Console()
 app = typer.Typer()
@@ -14,7 +13,7 @@ app = typer.Typer()
 @app.command(name="list")
 def list_faculties(
     locality_percentage: float | None = None,
-    excel: bool = True,
+    excel: bool = False,
 ):
     """
     List all faculties

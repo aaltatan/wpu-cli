@@ -8,6 +8,7 @@ if __name__ == "__main__":
         capacity_calculator,
         central_bank_scraper,
         salaries_calculator,
+        syrian_exchange_scraper,
         taxes,
         vouchers,
         whatsapp,
@@ -20,5 +21,6 @@ if __name__ == "__main__":
     app.add_typer(salaries_calculator.typer, name="salaries")
     app.add_typer(central_bank_scraper.typer, name="cb")
     app.add_typer(capacity_calculator.typer, name="capacity")
+    app.add_typer(syrian_exchange_scraper.typer, name="bm")
 
     app()

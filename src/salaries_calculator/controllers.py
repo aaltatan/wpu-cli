@@ -90,16 +90,16 @@ class Salary:
     def _calculate_as_net(self, amount: int) -> None:
         deduction_rate = float(Setting.get(key="compensation_tax_rate").value)
 
-        gross_salary = self.round(amount * (1 - self.compensations_rate))
+        gross_salary_before = self.round(amount * (1 - self.compensations_rate))
 
-        if gross_salary < self.ss_minium_salary:
-            gross_salary = self.ss_minium_salary
+        if gross_salary_before < self.ss_minium_salary:
+            gross_salary_before = self.ss_minium_salary
 
-        compensations = amount - gross_salary
+        compensations_before = amount - gross_salary_before
 
-        self.gross_salary = self._calculate_gross_fixed_salary(gross_salary)
+        self.gross_salary = self._calculate_gross_fixed_salary(gross_salary_before)
         self.compensations = self._calculate_gross_compensation(
-            compensations, deduction_rate
+            compensations_before, deduction_rate
         )
 
         ss_deduction: int = self.round(

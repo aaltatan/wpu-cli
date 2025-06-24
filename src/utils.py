@@ -12,9 +12,10 @@ def get_authenticated_page(
     page = browser.new_page()
     page.goto("http://edu/")
     
-    page.fill('#user_id', username)
+    page.click("#login")
+    page.fill('input[name="user_id"]', username)
     page.fill('#password', password)
-    page.click('#loginBtn')
+    page.click('button[type="submit"]')
     
     return page
 

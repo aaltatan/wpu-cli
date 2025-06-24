@@ -28,26 +28,31 @@ class ExchangeRate:
 
 def parse_page(html: str) -> list[ExchangeRate]:
     parser = HTMLParser(html)
-    elements = parser.css('.law > div[class^="bd"]')
+
+    selector_root: str = "div[class^=bd]:not(:first-of-type)"
+
+    dates = parser.css(f"{selector_root} > div:first-of-type")
+    rates = parser.css(f"{selector_root} > div:nth-of-type(2)")
 
     results: list[ExchangeRate] = []
 
-    for element in elements:
-        date_str = element.css_first(".w2.floatRight").text(strip=True)
-        rate_str = element.css_first(".w4.floatRight").text(strip=True)
+    for date, rate in zip(dates, rates):
+        date_str = date.text(strip=True)
+        rate_str = rate.text(strip=True)
         results.append(ExchangeRate(date_str=date_str, rate_str=rate_str))
 
     return results
 
 
-async def get_exchange_rates(pages: 1) -> list[ExchangeRate]:
-    base_url = "https://cb.gov.sy/index.php?Last=3427&CurrentPage={}&First=0&page=list&ex=2&dir=exchangerate&lang=1&service=2&sorc=0&lt=0&act=1206"
-
+async def get_exchange_rates(
+    url: str,
+    pages: int = 1,
+) -> list[ExchangeRate]:
     requests: list = []
 
     async with httpx.AsyncClient(timeout=30) as client:
         for page in range(pages):
-            url = base_url.format(page)
+            url = url.format(page)
             requests.append(client.get(url))
 
         results: list[ExchangeRate] = []

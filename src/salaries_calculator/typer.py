@@ -87,7 +87,6 @@ def _generate_sequence_range(
         "calculate as net salary?",
         default=True,
     )
-    compensations_rate: float = 0.0
     if as_net:
         compensations_rate: float = compensations_rate or typer.prompt(
             "compensations rate",

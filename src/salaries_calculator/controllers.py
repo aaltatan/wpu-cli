@@ -91,19 +91,23 @@ class Salary:
         deduction_rate = float(Setting.get(key="compensation_tax_rate").value)
 
         gross_salary = self.round(amount * (1 - self.compensations_rate))
+
         if gross_salary < self.ss_minium_salary:
             gross_salary = self.ss_minium_salary
+
         compensations = amount - gross_salary
 
-        self.gross_salary = self._get_gross_fixed_salary(gross_salary)
-        self.compensations = self._get_gross_compensation(compensations, deduction_rate)
+        self.gross_salary = self._calculate_gross_fixed_salary(gross_salary)
+        self.compensations = self._calculate_gross_compensation(
+            compensations, deduction_rate
+        )
 
         ss_deduction: int = self.round(
             self.social_security_salary * self.ss_deduction_rate, 0
         )
         self.social_security_deduction = ss_deduction
 
-        self.tax = self._get_layers_tax(self.gross_salary - ss_deduction)
+        self.tax = self._calculate_layers_tax(self.gross_salary - ss_deduction)
         self.fixed_tax = self.round(self.compensations * deduction_rate)
 
     def _calculate_as_gross(self, amount: int) -> None:
@@ -112,7 +116,7 @@ class Salary:
             self.social_security_salary * self.ss_deduction_rate, 0
         )
         self.social_security_deduction = ss_deduction
-        self.tax = self._get_layers_tax(amount - ss_deduction)
+        self.tax = self._calculate_layers_tax(amount - ss_deduction)
 
     @staticmethod
     def round(amount: int | float, to: int = 2) -> int | float:
@@ -121,10 +125,10 @@ class Salary:
         factor: int = 1 if to == 0 else int("1" + "0" * to)
         return math.ceil(amount / factor) * factor
 
-    def _get_gross_compensation(self, amount: int, deduction_rate: float) -> int:
+    def _calculate_gross_compensation(self, amount: int, deduction_rate: float) -> int:
         return self.round(amount / (1 - deduction_rate))
 
-    def _get_layers_tax(self, amount: int) -> int:
+    def _calculate_layers_tax(self, amount: int) -> int:
         tax: int = 0
 
         for layer in self.layers:
@@ -137,8 +141,8 @@ class Salary:
 
         return self.round(tax)
 
-    def _get_gross_fixed_salary(self, amount: int) -> int:
-        if self._get_layers_tax(amount) == 0:
+    def _calculate_gross_fixed_salary(self, amount: int) -> int:
+        if self._calculate_layers_tax(amount) == 0:
             return int(round(amount, 0))
 
         min_amount = amount
@@ -146,7 +150,7 @@ class Salary:
 
         while True:
             mid_amount = round((min_amount + max_amount) / 2, 0)
-            mid_net = mid_amount - self._get_layers_tax(mid_amount)
+            mid_net = mid_amount - self._calculate_layers_tax(mid_amount)
 
             if mid_net > amount:
                 max_amount = mid_amount

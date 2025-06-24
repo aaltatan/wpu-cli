@@ -1,4 +1,4 @@
-from .typer import typer
+from .typer import app
 
 
-__all__ = [typer]
+__all__ = [app]

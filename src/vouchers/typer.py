@@ -5,11 +5,11 @@ from . import controllers
 from src import utils as src_utils
 
 
-typer = typer.Typer()
+app = typer.Typer()
 filepath = src_utils.get_salaries_filepath()
 
 
-@typer.command()
+@app.command()
 def add_salaries(
     timeout: int = 5_000, 
     chapter: str = '1', 
@@ -42,7 +42,7 @@ def add_salaries(
     )
 
 
-@typer.command()
+@app.command()
 def add(
     timeout: int = 5_000, chapter: str = '1', sheet_name = 'voucher'
 ):

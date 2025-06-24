@@ -13,12 +13,12 @@ if __name__ == "__main__":
         whatsapp,
     )
 
-    app.add_typer(vouchers.typer, name="vouchers")
-    app.add_typer(whatsapp.typer, name="whatsapp")
-    app.add_typer(taxes.taxes_typer, name="taxes")
-    app.add_typer(taxes.layers_typer, name="layers")
-    app.add_typer(salaries_calculator.typer, name="salaries")
-    app.add_typer(central_bank_scraper.typer, name="cb")
-    app.add_typer(capacity_calculator.typer, name="capacity")
+    app.add_typer(vouchers.app, name="vouchers")
+    app.add_typer(whatsapp.app, name="whatsapp")
+    app.add_typer(taxes.taxes_app, name="taxes")
+    app.add_typer(taxes.layers_app, name="layers")
+    app.add_typer(salaries_calculator.app, name="salaries")
+    app.add_typer(central_bank_scraper.app, name="cb")
+    app.add_typer(capacity_calculator.app, name="capacity")
 
     app()

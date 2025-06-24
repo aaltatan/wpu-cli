@@ -5,10 +5,10 @@ from . import controllers
 from src import utils as src_utils
 
 
-typer = typer.Typer()
+app = typer.Typer()
 
 
-@typer.command()
+@app.command()
 def send(
     filename: str = "sheet1",
     extension: str = "xlsx",
@@ -42,7 +42,7 @@ def send(
     controllers.send_messages(messages)
 
 
-@typer.command()
+@app.command()
 def send_salaries(
     sheet_name: str = "whatsapp",
     first_cell: tuple[int, int] = (1, 2),

@@ -93,11 +93,17 @@ class Salary:
         gross_salary_before = self.round(amount * (1 - self.compensations_rate))
 
         if gross_salary_before < self.ss_minium_salary:
-            gross_salary_before = self.ss_minium_salary
+            self.gross_salary = self.ss_minium_salary
+            ss_minium_salary_tax = self._calculate_layers_tax(
+                self.ss_minium_salary,
+            )
+            compensations_before = amount - self.ss_minium_salary + ss_minium_salary_tax
+        else:
+            self.gross_salary = self._calculate_gross_fixed_salary(
+                gross_salary_before,
+            )
+            compensations_before = amount - gross_salary_before
 
-        compensations_before = amount - gross_salary_before
-
-        self.gross_salary = self._calculate_gross_fixed_salary(gross_salary_before)
         self.compensations = self._calculate_gross_compensation(
             compensations_before, deduction_rate
         )

@@ -60,13 +60,12 @@ def send_messages(messages: list[Message]) -> None:
         input("After scanning QR code, Press any key to Continue ... ")
 
         for message in track(messages, description="📩 Sending", total=total):
-
             url: str = f"https://web.whatsapp.com/send?phone={message.phone}&text={message.text}"
             try:
                 page.goto(url, timeout=60_000)
-                btn_selector: str = 'button[aria-label="Send"] span[data-icon="send"]'
+                btn_selector: str = 'button[aria-label="Send"]'
                 page.is_visible(btn_selector)
                 page.click(btn_selector)
                 time.sleep(2)
-            except:
+            except Exception:
                 continue

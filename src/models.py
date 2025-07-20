@@ -43,15 +43,13 @@ db.create_tables([Faculty, Tax, TaxLayer, Setting])
 
 if Setting.select().count() == 0:
     Setting.create(key="social_security_deduction_rate", value=0.07)
-    Setting.create(key="social_security_minimum_salary", value=279000)
+    Setting.create(key="social_security_minimum_salary", value=750_000)
     Setting.create(key="locality_percentage", value=0.5)
     Setting.create(key="compensation_tax_rate", value=0.05)
 
 if Tax.select().count() == 0:
     Tax.create(name="Syrian Layers Tax", description="Default taxes")
-    TaxLayer.create(from_=0, to_=279_000, rate=0, tax_id=1)
-    TaxLayer.create(from_=279_001, to_=450_000, rate=0.07, tax_id=1)
-    TaxLayer.create(from_=450_001, to_=650_000, rate=0.09, tax_id=1)
-    TaxLayer.create(from_=650_001, to_=850_000, rate=0.11, tax_id=1)
+    TaxLayer.create(from_=0, to_=750_000, rate=0, tax_id=1)
+    TaxLayer.create(from_=750_001, to_=850_000, rate=0.11, tax_id=1)
     TaxLayer.create(from_=850_001, to_=1_100_000, rate=0.13, tax_id=1)
     TaxLayer.create(from_=1_100_001, to_=50_000_000, rate=0.15, tax_id=1)

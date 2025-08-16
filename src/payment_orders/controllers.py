@@ -4,6 +4,7 @@ from pathlib import Path
 import xlwings as xw
 from docxtpl import DocxTemplate
 
+from .constants import MONTHS
 from .schemas import PaymentOrder
 
 
@@ -13,7 +14,7 @@ def get_orders_from_excel(
     start_cell: tuple[int, int] = (2, 1),
     last_column: int = 5,
     sheet_name: str = "orders",
-) -> list[PaymentOrder]:
+) -> list[list[str]]:
     """
     read orders data from excel file
     """
@@ -31,40 +32,66 @@ def get_orders_from_excel(
 
     rg = ws.range(*rg_values).value
 
-    orders = []
-
-    for row in rg:
-        serial, name, gender, amount, national_id = row
-        order = PaymentOrder(
-            serial=serial,
-            name=name,
-            gender=gender,
-            amount=amount,
-            national_id=national_id,
-        )
-        orders.append(order)
-
-    return orders
+    return rg
 
 
-def generate_order_template(order: PaymentOrder) -> None:
-    """
-    generate order template
-    """
-    template = DocxTemplate("templates/order.docx")
+def _generate_order_template(
+    order: PaymentOrder,
+    month: int,
+    year: int,
+    *,
+    template_name: str = "order",
+    foldername: str = "orders",
+) -> None:
+    if month not in MONTHS:
+        raise ValueError(f"Invalid month: {month}")
+
+    if year not in range(1900, 2100):
+        raise ValueError(f"Invalid year: {year}")
+
+    template = DocxTemplate(f"templates/{template_name}.docx")
     context = {
         "order": order,
+        "month": MONTHS[month],
+        "year": str(year),
         "today": datetime.now().strftime("%d/%m/%Y"),
     }
     template.render(context)
 
     home_path = Path.home().resolve()
 
-    output_path = home_path / "Desktop" / "orders"
+    output_path = home_path / "Desktop" / foldername
 
     if not output_path.exists():
         output_path.mkdir(parents=True)
 
-    output_path = output_path / f"{order.name}.docx"
+    filename = f"{order.serial} - {template_name} - {order.name}.docx"
+    output_path = output_path / filename
 
     template.save(output_path)
+
+
+def generate_order(order: PaymentOrder, month: int, year: int) -> None:
+    """
+    generate order template
+    """
+    _generate_order_template(
+        order=order,
+        month=month,
+        year=year,
+        template_name="order",
+        foldername="orders",
+    )
+
+
+def generate_order_voucher(order: PaymentOrder, month: int, year: int) -> None:
+    """
+    generate order voucher template
+    """
+    _generate_order_template(
+        order=order,
+        month=month,
+        year=year,
+        template_name="order-voucher",
+        foldername="orders-vouchers",
+    )

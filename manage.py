@@ -3,6 +3,7 @@ import typer
 from src import (
     capacity_calculator,
     dollar_scrapper,
+    payment_orders,
     salaries_calculator,
     taxes,
     vouchers,
@@ -19,5 +20,6 @@ if __name__ == "__main__":
     app.add_typer(taxes.taxes_app, name="taxes")
     app.add_typer(taxes.layers_app, name="layers")
     app.add_typer(capacity_calculator.app, name="capacity")
+    app.add_typer(payment_orders.app, name="orders")
 
     app()

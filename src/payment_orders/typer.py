@@ -42,4 +42,4 @@ def generate_orders(
             national_id=national_id,
         )
         controllers.generate_order(order, month=month, year=year)
-        controllers.generate_order_voucher(order, month=month, year=year)
+        # controllers.generate_order_voucher(order, month=month, year=year)

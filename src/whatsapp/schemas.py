@@ -1,11 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import re
 
 
 @dataclass
 class Message:
     phone: str
-    text: str
+    texts: list[str] = field(default_factory=list)
 
     def __post_init__(self):
         full_number: re.Pattern = re.compile(r"^\+963\d{9}$")

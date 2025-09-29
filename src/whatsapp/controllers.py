@@ -1,9 +1,9 @@
 import time
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright
-from rich.progress import track
 import xlwings as xw
+from playwright.sync_api import Page, sync_playwright
+from rich.progress import track
 
 from .schemas import Message
 
@@ -28,22 +28,30 @@ def get_messages_from_excel(
     rg_values = (next_row, first_col), (last_row, last_column)
     rg: list[list] = ws.range(*rg_values).value
 
-    messages: list[Message] = [Message(phone, text) for phone, text in rg]
+    messages_dict: dict[str, list[str]] = {}
+
+    for row in rg:
+        phone, text = row
+        if phone in messages_dict:
+            messages_dict[phone].append(text)
+        else:
+            messages_dict[phone] = [text]
+
+    messages: list[Message] = [
+        Message(phone, texts) for phone, texts in messages_dict.items()
+    ]
 
     return messages
 
 
-def get_filepath(filename: str = "sheet1", extension: str = "xlsx") -> Path:
+def _send_message(
+    page: Page, message: str, send_btn_selector: str = '[aria-label="Send"]'
+) -> None:
     """
-    get filepath for excel file
+    emulating sending single message
     """
-    filename = filename + "." + extension
-    filepath = Path().resolve(__file__) / "data" / filename
-
-    if not filepath.exists():
-        raise FileNotFoundError(f"File `{filename}` not found")
-
-    return filepath
+    page.fill("footer .lexical-rich-text-input > div", message)
+    page.click(send_btn_selector)
 
 
 def send_messages(messages: list[Message]) -> None:
@@ -54,18 +62,20 @@ def send_messages(messages: list[Message]) -> None:
 
     with sync_playwright() as p:
         browser = p.chromium.launch(slow_mo=50, headless=False)
-        page = browser.new_page()
+        page: Page = browser.new_page()
         page.goto("https://web.whatsapp.com", timeout=60000)
 
         input("After scanning QR code, Press any key to Continue ... ")
 
         for message in track(messages, description="📩 Sending", total=total):
-            url: str = f"https://web.whatsapp.com/send?phone={message.phone}&text={message.text}"
+            url = f"https://web.whatsapp.com/send?phone={message.phone}"
             try:
                 page.goto(url, timeout=60_000)
-                btn_selector: str = 'button[aria-label="Send"]'
-                page.is_visible(btn_selector)
-                page.click(btn_selector)
+
+                for text in message.texts:
+                    _send_message(page, text)
+
                 time.sleep(2)
+
             except Exception:
                 continue

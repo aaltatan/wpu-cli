@@ -1,3 +1,5 @@
+import asyncio
+
 import typer
 
 from src import utils as src_utils
@@ -12,6 +14,7 @@ def send_salaries(
     sheet_name: str = "whatsapp",
     first_cell: tuple[int, int] = (1, 2),
     last_column: int = 3,
+    method: str = "sync",
 ):
     """
     send whatsapp messages from `whatsapp` sheet in [Salaries|Partials]_[Wages|Overtime]_20****.xlsb file
@@ -25,4 +28,7 @@ def send_salaries(
         first_cell=first_cell,
         last_column=last_column,
     )
-    controllers.send_messages(messages)
+    if method == "sync":
+        controllers.send_messages_sync(messages)
+    else:
+        asyncio.run(controllers.send_messages_async(messages))

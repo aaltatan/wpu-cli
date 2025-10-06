@@ -1,8 +1,10 @@
+import asyncio
 import time
 from pathlib import Path
 
 import xlwings as xw
-from playwright.sync_api import Page, sync_playwright
+from playwright.async_api import BrowserContext, async_playwright
+from playwright.sync_api import sync_playwright
 from rich.progress import track
 
 from .schemas import Message
@@ -44,28 +46,21 @@ def get_messages_from_excel(
     return messages
 
 
-def _send_message(
-    page: Page, message: str, send_btn_selector: str = '[aria-label="Send"]'
-) -> None:
+def send_messages_sync(messages: list[Message]) -> None:
     """
-    emulating sending single message
-    """
-    page.fill("footer .lexical-rich-text-input > div", message)
-    page.click(send_btn_selector)
-
-
-def send_messages(messages: list[Message]) -> None:
-    """
-    send messages by playwright
+    send messages by playwright sync version
     """
     total = len(messages)
 
     with sync_playwright() as p:
         browser = p.chromium.launch(slow_mo=50, headless=False)
-        page: Page = browser.new_page()
+        context = browser.new_context()
+        page = context.new_page()
         page.goto("https://web.whatsapp.com", timeout=60000)
 
         input("After scanning QR code, Press any key to Continue ... ")
+
+        page.context
 
         for message in track(messages, description="📩 Sending", total=total):
             url = f"https://web.whatsapp.com/send?phone={message.phone}"
@@ -73,9 +68,50 @@ def send_messages(messages: list[Message]) -> None:
                 page.goto(url, timeout=60_000)
 
                 for text in message.texts:
-                    _send_message(page, text)
+                    page.fill("footer .lexical-rich-text-input > div", text)
+                    page.click('[aria-label="Send"]')
 
                 time.sleep(2)
 
             except Exception:
                 continue
+
+
+async def send_message_async(message: Message, context: BrowserContext):
+    url = f"https://web.whatsapp.com/send?phone={message.phone}"
+    try:
+        page = await context.new_page()
+        await page.goto(url, timeout=60_000)
+
+        for text in message.texts:
+            await page.wait_for_selector("footer .lexical-rich-text-input > div")
+            await page.fill("footer .lexical-rich-text-input > div", text)
+            await page.wait_for_selector('[aria-label="Send"]')
+            await page.click('[aria-label="Send"]')
+            await page.wait_for_timeout(100)
+
+    except Exception:
+        return
+
+
+async def send_messages_async(messages: list[Message]) -> None:
+    """
+    send messages by playwright async version
+    """
+    total = len(messages)
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(slow_mo=50, headless=False)
+        context = await browser.new_context()
+        page = await context.new_page()
+        await page.goto("https://web.whatsapp.com", timeout=60000)
+
+        input("After scanning QR code, Press any key to Continue ... ")
+
+        tasks = []
+
+        for message in track(messages, description="📩 Sending", total=total):
+            tasks.append(send_message_async(message, context))
+
+        if tasks:
+            await asyncio.gather(*tasks)

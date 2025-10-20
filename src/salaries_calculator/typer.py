@@ -1,56 +1,52 @@
 import typer
 from rich.console import Console
 
-from .utils import Wb
 from ..models import Setting
-
-from .controllers import (
-    Salary,
-    generate_salary_variants,
-    generate_sequence_range,
-)
+from .services import Calculator
 from .tables import table
+from .utils import ExcelWriter, Rounder, SocialSecurity
 
 console = Console()
 app = typer.Typer()
 
 
+tax_rounder = Rounder(method="ceil", to_nearest=100)
+ss_rounder = Rounder(method="ceil", to_nearest=1)
+
+
 @app.command(name="calc")
-def calculate() -> None:
+def calculate(gross_salary: int, compensations: int, ss_joined: bool):
     """
     Calculate individual salary
     """
-    amount = typer.prompt("Amount", default=1_000_000, type=int)
-    as_net: bool = typer.confirm(
-        "calculate as net salary?",
-        default=True,
-    )
-    compensations_rate: float = 0.0
-    if as_net:
-        compensations_rate: float = typer.prompt(
-            "compensations rate",
-            default=0.25,
-            type=float,
-        )
-    social_security: bool = typer.confirm(
-        "social security?",
-        default=False,
-    )
-    social_security_minimum_salary: int = 0
-    if social_security:
-        social_security_minimum_salary: int = typer.prompt(
+    gross_salary = typer.prompt("Gross Salary", default=0, type=int)
+    compensations = typer.prompt("Compensations", default=0, type=int)
+    ss_joined: bool = typer.confirm("social security?", default=False)
+
+    ss_obj: SocialSecurity | None = None
+    if ss_joined:
+        ss_salary: int = typer.prompt(
             "social security salary",
             default=Setting.get(key="social_security_minimum_salary").value,
             type=int,
         )
+        ss_obj = SocialSecurity(
+            salary=ss_salary,
+            min=ss_minimum_salary,
+            deduction_rate=ss_deduction_rate,
+            rounder=ss_rounder,
+        )
 
-    salary = Salary(
-        amount,
-        as_net,
-        compensations_rate,
-        social_security,
-        social_security_minimum_salary,
+    calculator = Calculator(
+        brackets=brackets,
+        fixed_tax_rate=fixed_tax_rate,
+        compensations_rate=compensations_rate,
+        min_salary_allowed=min_salary_allowed,
+        rounder=tax_rounder,
+        ss=ss_obj,
     )
+
+    salary = calculator.calculate(gross_salary, compensations)
 
     table.add_row(*salary.to_rich_table())
     console.print(table)
@@ -106,7 +102,7 @@ def _generate_sequence_range(
         table.add_row(*salary.to_rich_table())
 
     if excel:
-        Wb().save_table(salaries, f"{min_amount}-to-{max_amount}-salaries.xlsx")
+        ExcelWriter().write(salaries, f"{min_amount}-to-{max_amount}-salaries.xlsx")
         console.print(
             f"Excel file saved to {min_amount}-to-{max_amount}-salaries.xlsx at your Desktop"
         )
@@ -130,7 +126,7 @@ def _generate_salary_variants(
         table.add_row(*salary.to_rich_table())
 
     if excel:
-        Wb().save_table(salaries, f"{amount}-variants.xlsx")
+        ExcelWriter().write(salaries, f"{amount}-variants.xlsx")
         console.print(f"Excel file saved to {amount}-variants.xlsx at your Desktop")
     else:
         console.print(table)

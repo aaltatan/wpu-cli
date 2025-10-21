@@ -1,15 +1,15 @@
 import math
 from pathlib import Path
-from typing import Literal, Any
+from typing import Any, Literal
 
 import xlwings as xw
-from playwright.sync_api import sync_playwright, Page
-from selectolax.parser import HTMLParser
+from playwright.sync_api import Page, sync_playwright
 from rich.progress import track
+from selectolax.parser import HTMLParser
 
-from src import utils as src_utils
+from cli.utils import get_authenticated_page
 
-from .schemas import Row, AutomataRow
+from .schemas import AutomataRow, Row
 
 
 def get_voucher_from_excel(
@@ -177,7 +177,7 @@ def add_voucher(
     password: str,
 ):
     with sync_playwright() as p:
-        page = src_utils.get_authenticated_page(p, username, password)
+        page = get_authenticated_page(p, username, password)
 
         page.wait_for_timeout(timeout)
 

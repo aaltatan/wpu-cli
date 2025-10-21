@@ -1,25 +1,15 @@
 import typer
+from dotenv import load_dotenv
 
-from src import (
-    capacity_calculator,
-    dollar_scrapper,
-    payment_orders,
-    salaries_calculator,
-    taxes,
-    vouchers,
-    whatsapp,
-)
+from cli import taxes, vouchers, whatsapp
 
 if __name__ == "__main__":
-    app = typer.Typer(name="edu@tech")
+    load_dotenv()
 
-    app.add_typer(salaries_calculator.app, name="salaries")
-    app.add_typer(dollar_scrapper.app, name="dollar")
+    app = typer.Typer(name="Al-Wataniya Private University CLI")
+
+    app.add_typer(taxes.app, name="taxes")
     app.add_typer(vouchers.app, name="vouchers")
     app.add_typer(whatsapp.app, name="whatsapp")
-    app.add_typer(taxes.taxes_app, name="taxes")
-    app.add_typer(taxes.layers_app, name="layers")
-    app.add_typer(capacity_calculator.app, name="capacity")
-    app.add_typer(payment_orders.app, name="orders")
 
     app()

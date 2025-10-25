@@ -40,8 +40,9 @@ class Salary(BaseModel):
     def from_bulk_response(cls, response: dict) -> list["Salary"]:
         return [cls(**salary) for salary in response["data"]]
 
-    def to_list(self) -> list[float]:
+    def to_list(self, idx: int = 1) -> list[float]:
         return [
+            idx,
             self.gross.salary,
             self.gross.compensations,
             self.gross.total,
@@ -53,8 +54,9 @@ class Salary(BaseModel):
             self.gross.compensations_rate_of_total,
         ]
 
-    def to_rich_table_row(self) -> tuple[str, ...]:
+    def to_rich_table_row(self, idx: int = 1) -> tuple[str, ...]:
         return (
+            f"{idx}",
             f"{self.gross.salary:,}",
             f"{self.gross.compensations:,}",
             f"{self.gross.total:,}",

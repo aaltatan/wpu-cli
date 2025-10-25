@@ -3,6 +3,7 @@ import os
 import httpx
 from dotenv import load_dotenv
 
+from .exceptions import NotFoundError, ServerError
 from .schemas import Salary
 
 load_dotenv()
@@ -83,25 +84,55 @@ def generate_salaries_by_rate_range(
     amount: int,
     tax_id: int | None = None,
     start: int = 0,
-    end: int = 100,
+    stop: int = 100,
     step: int = 1,
 ) -> list[Salary]:
-    """
-    generate salaries by rate range
-    """
-    data = {"amount": amount, "start": start, "end": end, "step": step}
+    data = {"amount": amount, "start": start, "stop": stop, "step": step}
 
     if tax_id is not None:
         data["taxId"] = tax_id
 
     response = httpx.get(TAXES_ENDPOINT + "rate-sequence-generator", params=data)
 
-    if response.status_code in [404, 422]:
-        raise ValueError(
-            "❌ "
-            + str(response.status_code)
-            + " - "
-            + response.json()["detail"][0]["msg"]
-        )
+    if response.status_code == 500:
+        raise ServerError("❌ 500 - Server error")
+
+    if response.status_code == 404:
+        raise NotFoundError("❌ 404 - " + response.json()["detail"][0]["msg"])
+
+    if response.status_code == 422:
+        raise ValueError("❌ 422 - " + response.json()["detail"][0]["msg"])
+
+    return Salary.from_bulk_response(response.json())
+
+
+def generate_salaries_by_amount_range(
+    compensations_rate: float,
+    start: int,
+    stop: int | None = None,
+    step: int | None = None,
+    tax_id: int | None = None,
+) -> list[Salary]:
+    data = {"compensationsRate": compensations_rate, "start": start}
+
+    if stop is not None:
+        data["stop"] = stop
+
+    if step is not None:
+        data["step"] = step
+
+    if tax_id is not None:
+        data["taxId"] = tax_id
+
+    response = httpx.get(TAXES_ENDPOINT + "amount-sequence-generator", params=data)
+
+    if response.status_code == 500:
+        raise ServerError("❌ 500 - Server error")
+
+    if response.status_code == 404:
+        raise NotFoundError("❌ 404 - " + response.json()["detail"][0]["msg"])
+
+    if response.status_code == 422:
+        raise ValueError("❌ 422 - " + response.json()["detail"][0]["msg"])
 
     return Salary.from_bulk_response(response.json())

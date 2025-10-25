@@ -6,6 +6,7 @@ from typing import Any, Callable
 
 import openpyxl
 
+from .constants import TABLE_HEADERS
 from .services import Salary
 
 type ExporterFn = Callable[[str, list[Salary], Path], Path]
@@ -66,23 +67,9 @@ def export_to_excel(filename: str, salaries: list[Salary], path: Path) -> Path:
     if ws is None:
         return
 
-    if ws.max_row == 1:
-        ws.append(
-            (
-                "Gross salary",
-                "Compensations",
-                "Total",
-                "Social security",
-                "Brackets tax",
-                "Fixed tax",
-                "Total",
-                "Net",
-                "Compensations rate",
-            )
-        )
-
-    for salary in salaries:
-        ws.append(salary.to_list())
+    ws.append(TABLE_HEADERS)
+    for idx, salary in enumerate(salaries):
+        ws.append(salary.to_list(idx + 1))
 
     wb.save(path)
 

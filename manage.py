@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     app = typer.Typer(name="Al-Wataniya Private University CLI")
 
-    app.add_typer(taxes.app, name="taxes")
+    app.add_typer(taxes.app, name="tax")
     app.add_typer(vouchers.app, name="vouchers")
     app.add_typer(whatsapp.app, name="whatsapp")
 

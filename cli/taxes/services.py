@@ -8,11 +8,12 @@ from .schemas import Salary
 
 load_dotenv()
 
-BASE_URL = os.getenv("BASE_URL")
-TAXES_ENDPOINT = BASE_URL + "financial/salaries-calculator/"
+API_BASE_URL = os.getenv("API_BASE_URL")
+API_VERSION = os.getenv("API_VERSION")
+TAXES_ENDPOINT = API_BASE_URL + f"v{API_VERSION}" + "/financial/salaries-calculator/"
 
 
-def calculate_salary(
+def calculate_net_salary(
     gross_salary: int,
     compensations: int | None = None,
     tax_id: int | None = None,
@@ -46,7 +47,7 @@ def calculate_salary(
     return Salary.from_response(response.json())
 
 
-def generate_salary(
+def calculate_gross_salary(
     amount: int,
     compensations_rate: int | None = None,
     tax_id: int | None = None,
@@ -92,7 +93,7 @@ def generate_salaries_by_rate_range(
     if tax_id is not None:
         data["taxId"] = tax_id
 
-    response = httpx.get(TAXES_ENDPOINT + "rate-sequence-generator", params=data)
+    response = httpx.get(TAXES_ENDPOINT + "rate-range-generator", params=data)
 
     if response.status_code == 500:
         raise ServerError("❌ 500 - Server error")
@@ -124,7 +125,7 @@ def generate_salaries_by_amount_range(
     if tax_id is not None:
         data["taxId"] = tax_id
 
-    response = httpx.get(TAXES_ENDPOINT + "amount-sequence-generator", params=data)
+    response = httpx.get(TAXES_ENDPOINT + "amount-range-generator", params=data)
 
     if response.status_code == 500:
         raise ServerError("❌ 500 - Server error")

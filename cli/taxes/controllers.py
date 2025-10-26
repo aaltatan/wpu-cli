@@ -7,12 +7,12 @@ from typing_extensions import Annotated
 
 from .exporters import ExportType, get_exporters
 from .services import (
-    calculate_salary,
+    calculate_net_salary,
     generate_salaries_by_amount_range,
     generate_salaries_by_rate_range,
-    generate_salary,
+    calculate_gross_salary,
 )
-from .tables import table
+from .tables import get_salaries_table
 
 SSSalaryTyperParam = Annotated[
     int | None, typer.Option("--socialsecurity", "-s", help="Social security salary")
@@ -24,8 +24,8 @@ console = Console()
 app = typer.Typer()
 
 
-@app.command(name="calc", help="Calculate individual salary")
-def calculate(
+@app.command(name="net", help="Calculate net salary from gross inputs")
+def calculate_net(
     gross_salary: Annotated[
         float,
         typer.Option(
@@ -44,21 +44,22 @@ def calculate(
     ss_id: SsIdTyperParam = None,
 ):
     try:
-        salary = calculate_salary(
+        salary = calculate_net_salary(
             gross_salary=gross_salary,
             compensations=compensations,
             tax_id=tax_id,
             ss_salary=ss_salary,
             ss_id=ss_id,
         )
+        table = get_salaries_table()
         table.add_row(*salary.to_rich_table_row())
         console.print(table)
     except ConnectError:
         console.print("❌ [red]Connection error[/red]. Please try again later.")
 
 
-@app.command(name="gen", help="Generate salary.")
-def generate(
+@app.command(name="gross", help="Calculate gross salary from net inputs")
+def calculate_gross(
     amount: Annotated[
         float,
         typer.Option(
@@ -83,13 +84,14 @@ def generate(
     ss_id: SsIdTyperParam = None,
 ):
     try:
-        salary = generate_salary(
+        salary = calculate_gross_salary(
             amount=amount,
             compensations_rate=compensations_rate,
             tax_id=tax_id,
             ss_salary=ss_salary,
             ss_id=ss_id,
         )
+        table = get_salaries_table()
         table.add_row(*salary.to_rich_table_row())
         console.print(table)
     except ConnectError:
@@ -160,6 +162,7 @@ def generate_by_rate_range(
             console.print(f"💾 file saved successfully to [green]{path}[/green]")
             return
 
+        table = get_salaries_table()
         for idx, salary in enumerate(salaries):
             table.add_row(*salary.to_rich_table_row(idx + 1))
 
@@ -245,6 +248,7 @@ def generate_by_amount_range(
             console.print(f"💾 file saved successfully to [green]{path}[/green]")
             return
 
+        table = get_salaries_table()
         for idx, salary in enumerate(salaries):
             table.add_row(*salary.to_rich_table_row(idx + 1))
 

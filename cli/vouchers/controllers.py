@@ -1,7 +1,7 @@
 from enum import StrEnum
+from typing import Annotated
 
 import typer
-from typing_extensions import Annotated
 
 from cli.utils import get_salaries_filepath
 
@@ -18,7 +18,7 @@ app = typer.Typer()
 
 
 @app.command()
-def add_salaries(
+def add_salaries(  # noqa: PLR0913
     timeout: Annotated[
         int,
         typer.Option(
@@ -70,20 +70,22 @@ def add_salaries(
     ] = Chapter.ONE,
     start_cell: Annotated[
         tuple[int, int],
-        typer.Option("--start-cell", "-f", help="Start cell in Salaries.xlsb file"),
+        typer.Option(
+            "--start-cell", "-f", help="Start cell in Salaries.xlsb file"
+        ),
     ] = (1, 2),
     last_column: Annotated[
         int,
-        typer.Option("--last-column", "-l", help="Last column in Salaries.xlsb file"),
+        typer.Option(
+            "--last-column", "-l", help="Last column in Salaries.xlsb file"
+        ),
     ] = 7,
     sheet_name: Annotated[
         str,
         typer.Option("--sheet", "-s", help="Sheet name in Salaries.xlsb file"),
     ] = "Journal Entry Template",
 ):
-    """
-    add from `Journal Entry Template` sheet in [Salaries|Partials]_[Wages|Overtime]_20****.xlsb file
-    """
+    """Add from `Journal Entry Template` sheet in [Salaries|Partials]_[Wages|Overtime]_20****.xlsb file."""  # noqa: E501
     filepath = get_salaries_filepath()
     data = get_salaries_voucher_data(
         filepath,

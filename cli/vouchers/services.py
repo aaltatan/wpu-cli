@@ -19,9 +19,6 @@ def get_voucher_from_excel(
     last_column: int = 6,
     sheet_name: str = "voucher",
 ) -> list[list[str]]:
-    """
-    read voucher data from excel file
-    """
     wb = xw.Book(filepath, password=password)
     ws: xw.Sheet = wb.sheets[sheet_name]
 
@@ -35,12 +32,10 @@ def get_voucher_from_excel(
         (last_row, last_column),
     )
 
-    rg = ws.range(*rg_values).value
-
-    return rg
+    return ws.range(*rg_values).value
 
 
-def get_salaries_voucher_data(
+def get_salaries_voucher_data(  # noqa: PLR0913
     filepath: Path,
     password: str,
     start_cell: tuple[int, int],
@@ -48,9 +43,6 @@ def get_salaries_voucher_data(
     sheet_name: str,
     chapter: Literal["1", "2", "3"],
 ) -> list[Row]:
-    """
-    read voucher data from salaries/partial `Journal Entry Template` file
-    """
     rg: list[list[str]] = get_voucher_from_excel(
         filepath=filepath,
         password=password,
@@ -82,9 +74,6 @@ def get_salaries_voucher_data(
 
 
 def _navigate_to_add_new_voucher(page: Page) -> Page:
-    """
-    navigate to add new voucher playwright
-    """
     page.goto("http://edu/RAS/?sc=500#/_FIN/ACT/vouchers.php?id=JOV")
     page.wait_for_selector("#addVoucher")
     page.click("#addVoucher")
@@ -93,9 +82,6 @@ def _navigate_to_add_new_voucher(page: Page) -> Page:
 
 
 def _navigate_to_general_accounting(page: Page) -> Page:
-    """
-    navigate to general accounting to select the current year playwright
-    """
     page.goto("http://edu/RAS/?sc=500#/_FIN/ACT/menu.php")
     return page
 
@@ -106,9 +92,6 @@ def _fill_field(
     automata_value: Any,
     type_: Literal["select", "input"] = "input",
 ) -> None:
-    """
-    fill field
-    """
     if value == "":
         return
 
@@ -120,9 +103,6 @@ def _fill_field(
 
 
 def _fill_row(page: Page, row: Row, automata_row: AutomataRow) -> None:
-    """
-    fill voucher row
-    """
     _fill_field(page, row.debit, automata_row.debit)
     _fill_field(page, row.credit, automata_row.credit)
     _fill_field(page, row.account_id, automata_row.account_id, type_="select")
@@ -135,31 +115,23 @@ def _parse_ids(
     id_start_with: str,
     type_: Literal["input", "textarea"] = "input",
 ) -> list[str]:
-    """
-    parse all ids from range of fields
-    """
     ids = parser.css(f'{type_}[id^="{id_start_with}"]')
-    ids = [el.attributes.get("id") for el in ids][1:]
-
-    return ids
+    return [el.attributes.get("id") for el in ids][1:]
 
 
 def _parse_additional_data(parser: HTMLParser) -> list[AutomataRow]:
-    """
-    parse all ids from all fields
-    """
     data: list[AutomataRow] = []
 
-    debits = _parse_ids(parser, "sumDebitId_show")
-    credits = _parse_ids(parser, "sumCreditId_show")
+    debit_inputs = _parse_ids(parser, "sumDebitId_show")
+    credit_inputs = _parse_ids(parser, "sumCreditId_show")
     accounts = _parse_ids(parser, "accountId__label")
     cost_centers = _parse_ids(parser, "costCenterId__label")
     notes = _parse_ids(parser, "detailNote_", type_="textarea")
 
-    for idx in range(len(debits)):
+    for idx in range(len(debit_inputs)):
         row = {
-            "debit": debits[idx],
-            "credit": credits[idx],
+            "debit": debit_inputs[idx],
+            "credit": credit_inputs[idx],
             "account_id": accounts[idx],
             "cost_center": cost_centers[idx],
             "notes": notes[idx],
@@ -202,7 +174,9 @@ def add_voucher(
 
         total = len(data)
 
-        for row, automata_row in track(zip(data, additional_data), total=total):
+        for row, automata_row in track(
+            zip(data, additional_data, strict=True), total=total
+        ):
             _fill_row(page, row, automata_row)
 
         input("Press any key to close ... ")

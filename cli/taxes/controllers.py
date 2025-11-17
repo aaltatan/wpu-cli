@@ -1,21 +1,22 @@
 from pathlib import Path
+from typing import Annotated
 
 import typer
 from httpx import ConnectError
 from rich.console import Console
-from typing_extensions import Annotated
 
 from .exporters import ExportType, get_exporters
 from .services import (
+    calculate_gross_salary,
     calculate_net_salary,
     generate_salaries_by_amount_range,
     generate_salaries_by_rate_range,
-    calculate_gross_salary,
 )
 from .tables import get_salaries_table
 
 SSSalaryTyperParam = Annotated[
-    int | None, typer.Option("--socialsecurity", "-s", help="Social security salary")
+    int | None,
+    typer.Option("--socialsecurity", "-s", help="Social security salary"),
 ]
 TaxIdTyperParam = Annotated[int | None, typer.Option("--taxid", help="Tax id")]
 SsIdTyperParam = Annotated[int | None, typer.Option("--ssid", help="SS id")]
@@ -37,7 +38,8 @@ def calculate_net(
         ),
     ],
     compensations: Annotated[
-        float | None, typer.Option("--compensations", "-c", help="Compensations")
+        float | None,
+        typer.Option("--compensations", "-c", help="Compensations"),
     ] = None,
     ss_salary: SSSalaryTyperParam = None,
     tax_id: TaxIdTyperParam = None,
@@ -99,7 +101,7 @@ def calculate_gross(
 
 
 @app.command(name="rr", help="Generate salary by rate range.")
-def generate_by_rate_range(
+def generate_by_rate_range(  # noqa: PLR0913
     amount: Annotated[
         float,
         typer.Option(
@@ -142,13 +144,16 @@ def generate_by_rate_range(
     ] = None,
 ):
     if start > stop:
-        raise ValueError("❌ Start must be less than stop")
+        message = "❌ Start must be less than stop"
+        raise ValueError(message)
 
     if step > stop:
-        raise ValueError("❌ Step must be less than stop")
+        message = "❌ Step must be less than stop"
+        raise ValueError(message)
 
     if (stop - start) < step:
-        raise ValueError("❌ Stop - Start must be greater than step")
+        message = "❌ Stop - Start must be greater than step"
+        raise ValueError(message)
 
     try:
         salaries = generate_salaries_by_rate_range(
@@ -159,7 +164,9 @@ def generate_by_rate_range(
             filename = f"rate-range-{amount}-{start}-{stop}-{step}"
             save_path = Path().home().resolve() / "Desktop"
             path = get_exporters()[export](filename, salaries, save_path)
-            console.print(f"💾 file saved successfully to [green]{path}[/green]")
+            console.print(
+                f"💾 file saved successfully to [green]{path}[/green]"
+            )
             return
 
         table = get_salaries_table()
@@ -173,7 +180,7 @@ def generate_by_rate_range(
 
 
 @app.command(name="ar", help="Generate salary by amount range.")
-def generate_by_amount_range(
+def generate_by_amount_range(  # noqa: PLR0913
     compensations_rate: Annotated[
         float,
         typer.Option(
@@ -218,13 +225,16 @@ def generate_by_amount_range(
     ] = None,
 ):
     if stop and start > stop:
-        raise ValueError("❌ Start must be less than stop")
+        message = "❌ Start must be less than stop"
+        raise ValueError(message)
 
     if all([step, stop]) and step > stop:
-        raise ValueError("❌ Step must be less than stop")
+        message = "❌ Step must be less than stop"
+        raise ValueError(message)
 
     if all([step, stop]) and (stop - start) < step:
-        raise ValueError("❌ Stop - Start must be greater than step")
+        message = "❌ Stop - Start must be greater than step"
+        raise ValueError(message)
 
     if stop is None:
         stop = start * 10
@@ -245,7 +255,9 @@ def generate_by_amount_range(
             filename = f"amount-range-{start}-{stop}-{step}"
             save_path = Path().home().resolve() / "Desktop"
             path = get_exporters()[export](filename, salaries, save_path)
-            console.print(f"💾 file saved successfully to [green]{path}[/green]")
+            console.print(
+                f"💾 file saved successfully to [green]{path}[/green]"
+            )
             return
 
         table = get_salaries_table()

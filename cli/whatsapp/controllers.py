@@ -1,5 +1,6 @@
+from typing import Annotated
+
 import typer
-from typing_extensions import Annotated
 
 from cli.utils import get_salaries_filepath
 
@@ -27,16 +28,18 @@ def send_salaries(
     ] = "whatsapp",
     first_cell: Annotated[
         tuple[int, int],
-        typer.Option("--first-cell", "-f", help="Start cell in Salaries.xlsb file"),
+        typer.Option(
+            "--first-cell", "-f", help="Start cell in Salaries.xlsb file"
+        ),
     ] = (1, 2),
     last_column: Annotated[
         int,
-        typer.Option("--last-column", "-l", help="Last column in Salaries.xlsb file"),
+        typer.Option(
+            "--last-column", "-l", help="Last column in Salaries.xlsb file"
+        ),
     ] = 3,
 ):
-    """
-    send whatsapp messages from `whatsapp` sheet in [Salaries|Partials]_[Wages|Overtime]_20****.xlsb file
-    """
+    """Send whatsapp messages from `whatsapp` sheet in [Salaries|Partials]_[Wages|Overtime]_20****.xlsb file."""  # noqa: E501
     filepath = get_salaries_filepath()
     messages = get_messages_from_excel(
         filepath,

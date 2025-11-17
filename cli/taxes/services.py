@@ -10,7 +10,9 @@ load_dotenv()
 
 API_BASE_URL = os.getenv("API_BASE_URL")
 API_VERSION = os.getenv("API_VERSION")
-TAXES_ENDPOINT = API_BASE_URL + f"v{API_VERSION}" + "/financial/salaries-calculator/"
+TAXES_ENDPOINT = (
+    API_BASE_URL + f"v{API_VERSION}" + "/financial/salaries-calculator/"
+)
 
 
 def calculate_net_salary(
@@ -95,14 +97,17 @@ def generate_salaries_by_rate_range(
 
     response = httpx.get(TAXES_ENDPOINT + "rate-range-generator", params=data)
 
-    if response.status_code == 500:
-        raise ServerError("❌ 500 - Server error")
+    if response.status_code == httpx.codes.BAD_REQUEST:
+        message = "❌ 500 - Server error"
+        raise ServerError(message)
 
-    if response.status_code == 404:
-        raise NotFoundError("❌ 404 - " + response.json()["detail"][0]["msg"])
+    if response.status_code == httpx.codes.NOT_FOUND:
+        message = "❌ 404 - " + response.json()["detail"][0]["msg"]
+        raise NotFoundError(message)
 
-    if response.status_code == 422:
-        raise ValueError("❌ 422 - " + response.json()["detail"][0]["msg"])
+    if response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+        message = "❌ 422 - " + response.json()["detail"][0]["msg"]
+        raise ValueError(message)
 
     return Salary.from_bulk_response(response.json())
 
@@ -127,13 +132,16 @@ def generate_salaries_by_amount_range(
 
     response = httpx.get(TAXES_ENDPOINT + "amount-range-generator", params=data)
 
-    if response.status_code == 500:
-        raise ServerError("❌ 500 - Server error")
+    if response.status_code == httpx.codes.BAD_REQUEST:
+        message = "❌ 500 - Server error"
+        raise ServerError(message)
 
-    if response.status_code == 404:
-        raise NotFoundError("❌ 404 - " + response.json()["detail"][0]["msg"])
+    if response.status_code == httpx.codes.NOT_FOUND:
+        message = "❌ 404 - " + response.json()["detail"][0]["msg"]
+        raise NotFoundError(message)
 
-    if response.status_code == 422:
-        raise ValueError("❌ 422 - " + response.json()["detail"][0]["msg"])
+    if response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+        message = "❌ 422 - " + response.json()["detail"][0]["msg"]
+        raise ValueError(message)
 
     return Salary.from_bulk_response(response.json())

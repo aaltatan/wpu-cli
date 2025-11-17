@@ -1,6 +1,6 @@
 from dataclasses import InitVar, dataclass, field
 from inspect import signature
-from typing import Literal, Self
+from typing import Any, Literal, Self
 
 
 @dataclass
@@ -23,7 +23,7 @@ class Row:
     cost_center: str = field(init=False)
     notes: str = ""
 
-    def __post_init__(self, faculty: str, chapter: str):
+    def __post_init__(self, faculty: str, chapter: str) -> None:
         self.debit = str(int(self.debit or 0))
         self.credit = str(int(self.credit or 0))
         self.account_id = str(int(self.account_id or 15322))
@@ -34,7 +34,7 @@ class Row:
             self.cost_center = self.cost_centers.get(faculty, "11") + chapter
 
     @classmethod
-    def from_kwargs(cls, **kwargs) -> Self:
+    def from_kwargs(cls, **kwargs: dict[str, Any]) -> Self:
         params = signature(cls).parameters
 
         class_params = {k: v for k, v in kwargs.items() if k in params}

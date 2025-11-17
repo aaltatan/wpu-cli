@@ -16,9 +16,6 @@ def get_messages_from_excel(
     first_cell: tuple[int, int],
     last_column: int,
 ) -> list[Message]:
-    """
-    read messages data from excel file
-    """
     wb: xw.Book = xw.Book(fullname, password=password)
     ws = wb.sheets(sheet_name)
 
@@ -46,9 +43,6 @@ def get_messages_from_excel(
 
 
 def send_messages(messages: list[Message]) -> None:
-    """
-    send messages by playwright sync version
-    """
     total = len(messages)
 
     with sync_playwright() as p:
@@ -58,8 +52,6 @@ def send_messages(messages: list[Message]) -> None:
         page.goto("https://web.whatsapp.com", timeout=60_000)
 
         input("After scanning QR code, Press any key to Continue ... ")
-
-        page.context
 
         for message in track(messages, description="📩 Sending", total=total):
             url = f"https://web.whatsapp.com/send?phone={message.phone}"
@@ -72,5 +64,5 @@ def send_messages(messages: list[Message]) -> None:
 
                 time.sleep(2)
 
-            except Exception:
+            except Exception:  # noqa: BLE001, S112
                 continue

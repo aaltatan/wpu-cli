@@ -1,6 +1,5 @@
 import time
 from pathlib import Path
-from typing import Any
 
 import xlwings as xw
 from playwright.sync_api import sync_playwright
@@ -24,7 +23,7 @@ def get_messages_from_excel(
     next_row: int = first_row + 1
 
     rg_values = (next_row, first_col), (last_row, last_column)
-    rg: list[list[Any]] = ws.range(*rg_values).value
+    rg = ws.range(*rg_values).value
 
     messages_dict: dict[str, list[str]] = {}
 

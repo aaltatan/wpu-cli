@@ -8,16 +8,16 @@ from .schemas import Salary
 
 load_dotenv()
 
-API_BASE_URL = os.getenv("API_BASE_URL")
-API_VERSION = os.getenv("API_VERSION")
+API_BASE_URL = os.getenv("API_BASE_URL") or ""
+API_VERSION = os.getenv("API_VERSION") or ""
 TAXES_ENDPOINT = (
     API_BASE_URL + f"v{API_VERSION}" + "/financial/salaries-calculator/"
 )
 
 
 def calculate_net_salary(
-    gross_salary: int,
-    compensations: int | None = None,
+    gross_salary: float,
+    compensations: float | None = None,
     tax_id: int | None = None,
     ss_salary: int | None = None,
     ss_id: int | None = None,
@@ -50,8 +50,8 @@ def calculate_net_salary(
 
 
 def calculate_gross_salary(
-    amount: int,
-    compensations_rate: int | None = None,
+    amount: float,
+    compensations_rate: float | None = None,
     tax_id: int | None = None,
     ss_salary: int | None = None,
     ss_id: int | None = None,
@@ -84,7 +84,7 @@ def calculate_gross_salary(
 
 
 def generate_salaries_by_rate_range(
-    amount: int,
+    amount: float,
     tax_id: int | None = None,
     start: int = 0,
     stop: int = 100,

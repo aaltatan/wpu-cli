@@ -1,4 +1,3 @@
-from enum import StrEnum
 from typing import Annotated
 
 import typer
@@ -6,14 +5,7 @@ from playwright.sync_api import sync_playwright
 
 from cli.utils import get_authenticated_page, get_salaries_filepath
 
-from .services import add_voucher, get_salaries_voucher_data
-
-
-class Chapter(StrEnum):
-    ONE = "1"
-    TWO = "2"
-    THREE = "3"
-
+from .services import Chapter, add_voucher, get_salaries_voucher_data
 
 app = typer.Typer()
 

@@ -228,11 +228,11 @@ def generate_by_amount_range(  # noqa: PLR0913
         message = "❌ Start must be less than stop"
         raise ValueError(message)
 
-    if all([step, stop]) and step > stop:
+    if step and stop and step > stop:
         message = "❌ Step must be less than stop"
         raise ValueError(message)
 
-    if all([step, stop]) and (stop - start) < step:
+    if step and stop and (stop - start) < step:
         message = "❌ Stop - Start must be greater than step"
         raise ValueError(message)
 

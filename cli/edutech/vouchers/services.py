@@ -1,4 +1,5 @@
 import math
+from enum import StrEnum
 from pathlib import Path
 from typing import Literal, Self
 
@@ -10,6 +11,12 @@ from selectolax.parser import HTMLParser
 from cli.edutech.services import PagePipeline
 
 from .schemas import JournalRowSelector, Row
+
+
+class Chapter(StrEnum):
+    ONE = "1"
+    TWO = "2"
+    THREE = "3"
 
 
 class VoucherPagePipeline(PagePipeline):
@@ -59,7 +66,13 @@ def get_voucher_from_excel(
         (last_row, last_column),
     )
 
-    return ws.range(*rg_values).value
+    data = ws.range(*rg_values).value
+
+    if isinstance(data, list):
+        return data
+
+    message = "Invalid data"
+    raise ValueError(message)
 
 
 def get_salaries_voucher_data(  # noqa: PLR0913
@@ -68,9 +81,9 @@ def get_salaries_voucher_data(  # noqa: PLR0913
     start_cell: tuple[int, int],
     last_column: int,
     sheet_name: str,
-    chapter: Literal["1", "2", "3"],
+    chapter: Chapter,
 ) -> list[Row]:
-    rg: list[list[str]] = get_voucher_from_excel(
+    rg = get_voucher_from_excel(
         filepath=filepath,
         password=password,
         start_cell=start_cell,

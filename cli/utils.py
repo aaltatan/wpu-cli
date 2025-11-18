@@ -2,7 +2,7 @@ from pathlib import Path
 
 from playwright.sync_api import Page
 
-BASE_DIR = Path().resolve(__file__).parent.parent
+BASE_DIR = Path.cwd().parent.parent
 
 
 def get_authenticated_page(p, username: str, password: str) -> Page:
@@ -23,7 +23,7 @@ def get_authenticated_page(p, username: str, password: str) -> Page:
 
 
 def get_salaries_filepath() -> Path:
-    home = Path().resolve(__file__).home()
+    home = Path.cwd().home()
     desktop_path = home / "Desktop"
     onedrive_path = Path("D:\\OneDrive\\financial\\In_Progress")
 

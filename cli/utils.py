@@ -10,10 +10,14 @@ def get_authenticated_page(p, username: str, password: str) -> Page:
     page = browser.new_page()
     page.goto("http://edu/")
 
+    page.wait_for_timeout(2_000)
     page.click("#login")
+
     page.fill('input[name="user_id"]', username)
     page.fill("#password", password)
     page.click('button[type="submit"]')
+
+    page.wait_for_timeout(10_000)
 
     return page
 

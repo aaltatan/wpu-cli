@@ -1,15 +1,42 @@
 import math
 from pathlib import Path
-from typing import Any, Literal
+from typing import Literal, Self
 
 import xlwings as xw
-from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api import Page
 from rich.progress import track
 from selectolax.parser import HTMLParser
 
-from cli.utils import get_authenticated_page
+from cli.edutech.services import PagePipeline
 
-from .schemas import AutomataRow, Row
+from .schemas import JournalRowSelector, Row
+
+
+class VoucherPagePipeline(PagePipeline):
+    def navigate_to_add_new_voucher(self) -> Self:
+        self._page.goto("http://edu/RAS/?sc=500#/_FIN/ACT/vouchers.php?id=JOV")
+        self._page.wait_for_selector("#addVoucher")
+        self._page.click("#addVoucher")
+        self._page.wait_for_timeout(self.timeout)
+
+        return self
+
+    def add_new_rows(self, n: int) -> Self:
+        for _ in range(n - 1):
+            self._page.press("body", "Shift+N")
+
+        return self
+
+    def fill_row(self, row: Row, automata_row: JournalRowSelector) -> Self:
+        self.fill_field(row.debit, automata_row.debit)
+        self.fill_field(row.credit, automata_row.credit)
+        self.fill_field(row.account_id, automata_row.account_id, kind="select")
+        self.fill_field(
+            row.cost_center, automata_row.cost_center, kind="select"
+        )
+        self.fill_field(row.notes, automata_row.notes)
+
+        return self
 
 
 def get_voucher_from_excel(
@@ -18,7 +45,7 @@ def get_voucher_from_excel(
     start_cell: tuple[int, int] = (1, 1),
     last_column: int = 6,
     sheet_name: str = "voucher",
-) -> list[list[str]]:
+):
     wb = xw.Book(filepath, password=password)
     ws: xw.Sheet = wb.sheets[sheet_name]
 
@@ -73,54 +100,17 @@ def get_salaries_voucher_data(  # noqa: PLR0913
     return data
 
 
-def _navigate_to_add_new_voucher(page: Page) -> Page:
-    page.goto("http://edu/RAS/?sc=500#/_FIN/ACT/vouchers.php?id=JOV")
-    page.wait_for_selector("#addVoucher")
-    page.click("#addVoucher")
-
-    return page
-
-
-def _navigate_to_general_accounting(page: Page) -> Page:
-    page.goto("http://edu/RAS/?sc=500#/_FIN/ACT/menu.php")
-    return page
-
-
-def _fill_field(
-    page: Page,
-    value: Any,
-    automata_value: Any,
-    type_: Literal["select", "input"] = "input",
-) -> None:
-    if value == "":
-        return
-
-    page.fill(f"#{automata_value}", str(value))
-    if type_ == "select":
-        page.wait_for_timeout(3_000)
-        page.press("body", "ArrowDown")
-        page.press("body", "Enter")
-
-
-def _fill_row(page: Page, row: Row, automata_row: AutomataRow) -> None:
-    _fill_field(page, row.debit, automata_row.debit)
-    _fill_field(page, row.credit, automata_row.credit)
-    _fill_field(page, row.account_id, automata_row.account_id, type_="select")
-    _fill_field(page, row.cost_center, automata_row.cost_center, type_="select")
-    _fill_field(page, row.notes, automata_row.notes)
-
-
 def _parse_ids(
     parser: HTMLParser,
     id_start_with: str,
     type_: Literal["input", "textarea"] = "input",
 ) -> list[str]:
     ids = parser.css(f'{type_}[id^="{id_start_with}"]')
-    return [el.attributes.get("id") for el in ids][1:]
+    return [el.attributes.get("id") or "" for el in ids][1:]
 
 
-def _parse_additional_data(parser: HTMLParser) -> list[AutomataRow]:
-    data: list[AutomataRow] = []
+def _parse_additional_data(parser: HTMLParser) -> list[JournalRowSelector]:
+    data: list[JournalRowSelector] = []
 
     debit_inputs = _parse_ids(parser, "sumDebitId_show")
     credit_inputs = _parse_ids(parser, "sumCreditId_show")
@@ -136,47 +126,34 @@ def _parse_additional_data(parser: HTMLParser) -> list[AutomataRow]:
             "cost_center": cost_centers[idx],
             "notes": notes[idx],
         }
-        row = AutomataRow(**row)
+        row = JournalRowSelector(**row)
         data.append(row)
 
     return data
 
 
 def add_voucher(
+    authenticated_page: Page,
     timeout: int,
     data: list[Row],
-    username: str,
-    password: str,
 ):
-    with sync_playwright() as p:
-        page = get_authenticated_page(p, username, password)
+    total = len(data)
+    timeout_factor = math.ceil(len(data) / 10)
 
-        page.wait_for_timeout(timeout)
+    pipeline = (
+        VoucherPagePipeline(authenticated_page, timeout=timeout)
+        .navigate_to_general_accounting()
+        .navigate_to_add_new_voucher()
+        .add_new_rows(len(data) - 1)
+        .wait_for_timeout(timeout_factor * timeout)
+    )
 
-        page = _navigate_to_general_accounting(page)
+    parser = HTMLParser(pipeline.page.content())
+    additional_data = _parse_additional_data(parser)
 
-        input("after selecting target year, press any key to continue ... ")
+    for row, automata_row in track(
+        zip(data, additional_data, strict=True), total=total
+    ):
+        pipeline.fill_row(row, automata_row)
 
-        page = _navigate_to_add_new_voucher(page)
-
-        page.wait_for_timeout(timeout)
-
-        for _ in range(len(data) - 1):
-            page.press("body", "Shift+N")
-
-        timeout_factor = math.ceil(len(data) / 10)
-
-        page.wait_for_timeout(timeout * timeout_factor)
-
-        parser = HTMLParser(page.content())
-
-        additional_data = _parse_additional_data(parser)
-
-        total = len(data)
-
-        for row, automata_row in track(
-            zip(data, additional_data, strict=True), total=total
-        ):
-            _fill_row(page, row, automata_row)
-
-        input("Press any key to close ... ")
+    input("Press any key to close ... ")

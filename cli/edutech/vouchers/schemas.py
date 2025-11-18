@@ -4,12 +4,19 @@ from typing import Any, Literal, Self
 
 
 @dataclass
-class AutomataRow:
+class JournalRowSelector:
     debit: str = ""
     credit: str = ""
     account_id: str = ""
     cost_center: str = ""
     notes: str = ""
+
+    def __post_init__(self) -> None:
+        self.debit = "#" + self.debit
+        self.credit = "#" + self.credit
+        self.account_id = "#" + self.account_id
+        self.cost_center = "#" + self.cost_center
+        self.notes = "#" + self.notes
 
 
 @dataclass
@@ -34,7 +41,7 @@ class Row:
             self.cost_center = self.cost_centers.get(faculty, "11") + chapter
 
     @classmethod
-    def from_kwargs(cls, **kwargs: dict[str, Any]) -> Self:
+    def from_kwargs(cls, **kwargs: Any) -> Self:
         params = signature(cls).parameters
 
         class_params = {k: v for k, v in kwargs.items() if k in params}

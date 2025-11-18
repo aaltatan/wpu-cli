@@ -2,8 +2,9 @@ from enum import StrEnum
 from typing import Annotated
 
 import typer
+from playwright.sync_api import sync_playwright
 
-from cli.utils import get_salaries_filepath
+from cli.utils import get_authenticated_page, get_salaries_filepath
 
 from .services import add_voucher, get_salaries_voucher_data
 
@@ -33,7 +34,7 @@ def add_salaries(  # noqa: PLR0913
         typer.Option(
             "--edutech-username",
             "-u",
-            prompt=True,
+            prompt="Automata edutech username",
             help="Automata edutech username",
             envvar="EDUTECH_USERNAME",
         ),
@@ -43,7 +44,7 @@ def add_salaries(  # noqa: PLR0913
         typer.Option(
             "--password",
             "-p",
-            prompt=True,
+            prompt="Automata edutech password",
             help="Automata edutech password",
             hide_input=True,
             envvar="EDUTECH_PASSWORD",
@@ -54,7 +55,7 @@ def add_salaries(  # noqa: PLR0913
         typer.Option(
             "--excel-password",
             "-e",
-            prompt=True,
+            prompt="Excel file password",
             help="Excel file password",
             hide_input=True,
             envvar="EXCEL_FILE_PASSWORD",
@@ -95,4 +96,8 @@ def add_salaries(  # noqa: PLR0913
         last_column=last_column,
         sheet_name=sheet_name,
     )
-    add_voucher(timeout, data, username=edutech_username, password=password)
+    with sync_playwright() as p:
+        authenticated_page = get_authenticated_page(
+            p, edutech_username, password
+        )
+        add_voucher(authenticated_page, timeout, data)

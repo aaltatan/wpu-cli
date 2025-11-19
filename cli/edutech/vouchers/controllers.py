@@ -3,84 +3,49 @@ from typing import Annotated
 import typer
 from playwright.sync_api import sync_playwright
 
+from cli.edutech.types import (
+    EdutechPassword,
+    EdutechUsername,
+    ExcelPassword,
+    FinancialYear,
+    Timeout,
+)
+from cli.edutech.validators import validate_financial_year
 from cli.utils import get_authenticated_page, get_salaries_filepath
 
-from .services import Chapter, add_voucher, get_salaries_voucher_data
+from .services import Chapter, add_voucher, get_salaries_voucher_rows
 
 app = typer.Typer()
 
 
 @app.command()
 def add_salaries(  # noqa: PLR0913
-    timeout: Annotated[
-        int,
-        typer.Option(
-            "--timeout",
-            "-t",
-            help="Timeout for playwright",
-            envvar="PLAYWRIGHT_TIMEOUT",
-        ),
-    ],
-    edutech_username: Annotated[
-        str,
-        typer.Option(
-            "--edutech-username",
-            "-u",
-            prompt="Automata edutech username",
-            help="Automata edutech username",
-            envvar="EDUTECH_USERNAME",
-        ),
-    ],
-    password: Annotated[
-        str,
-        typer.Option(
-            "--password",
-            "-p",
-            prompt="Automata edutech password",
-            help="Automata edutech password",
-            hide_input=True,
-            envvar="EDUTECH_PASSWORD",
-        ),
-    ],
-    excel_password: Annotated[
-        str,
-        typer.Option(
-            "--excel-password",
-            "-e",
-            prompt="Excel file password",
-            help="Excel file password",
-            hide_input=True,
-            envvar="EXCEL_FILE_PASSWORD",
-        ),
-    ],
+    timeout: Timeout,
+    edutech_username: EdutechUsername,
+    password: EdutechPassword,
+    financial_year: FinancialYear,
+    excel_password: ExcelPassword,
     chapter: Annotated[
         Chapter,
-        typer.Option(
-            "--chapter",
-            "-c",
-            help="Chapter of the Salaries.xlsb file",
-        ),
-    ] = Chapter.ONE,
+        typer.Option("--chapter", help="Chapter of the Salaries.xlsb file"),
+    ],
     start_cell: Annotated[
         tuple[int, int],
-        typer.Option(
-            "--start-cell", "-f", help="Start cell in Salaries.xlsb file"
-        ),
+        typer.Option("--start-cell", help="Start cell in Salaries.xlsb file"),
     ] = (1, 2),
     last_column: Annotated[
         int,
-        typer.Option(
-            "--last-column", "-l", help="Last column in Salaries.xlsb file"
-        ),
+        typer.Option("--last-column", help="Last column in Salaries.xlsb file"),
     ] = 7,
     sheet_name: Annotated[
         str,
-        typer.Option("--sheet", "-s", help="Sheet name in Salaries.xlsb file"),
+        typer.Option("--sheet", help="Sheet name in Salaries.xlsb file"),
     ] = "Journal Entry Template",
 ):
     """Add from `Journal Entry Template` sheet in [Salaries|Partials]_[Wages|Overtime]_20****.xlsb file."""  # noqa: E501
+    validate_financial_year(financial_year)
     filepath = get_salaries_filepath()
-    data = get_salaries_voucher_data(
+    rows = get_salaries_voucher_rows(
         filepath,
         password=excel_password,
         chapter=chapter,
@@ -92,4 +57,4 @@ def add_salaries(  # noqa: PLR0913
         authenticated_page = get_authenticated_page(
             p, edutech_username, password
         )
-        add_voucher(authenticated_page, timeout, data)
+        add_voucher(authenticated_page, timeout, rows, financial_year)

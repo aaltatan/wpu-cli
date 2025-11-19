@@ -24,7 +24,7 @@ class VoucherPagePipeline(PagePipeline):
         self._page.goto("http://edu/RAS/?sc=500#/_FIN/ACT/vouchers.php?id=JOV")
         self._page.wait_for_selector("#addVoucher")
         self._page.click("#addVoucher")
-        self._page.wait_for_timeout(self.timeout)
+        self._page.wait_for_timeout(3_000)
 
         return self
 
@@ -35,13 +35,19 @@ class VoucherPagePipeline(PagePipeline):
         return self
 
     def fill_row(self, row: Row, automata_row: JournalRowSelector) -> Self:
-        self.fill_field(row.debit, automata_row.debit)
-        self.fill_field(row.credit, automata_row.credit)
-        self.fill_field(row.account_id, automata_row.account_id, kind="select")
-        self.fill_field(
-            row.cost_center, automata_row.cost_center, kind="select"
+        self.fill_input(selector=automata_row.debit, value=row.debit)
+        self.fill_input(selector=automata_row.credit, value=row.credit)
+        self.fill_input(
+            selector=automata_row.account_id,
+            value=row.account_id,
+            kind="select",
         )
-        self.fill_field(row.notes, automata_row.notes)
+        self.fill_input(
+            selector=automata_row.cost_center,
+            value=row.cost_center,
+            kind="select",
+        )
+        self.fill_input(selector=automata_row.notes, value=row.notes)
 
         return self
 
@@ -75,7 +81,7 @@ def get_voucher_from_excel(
     raise ValueError(message)
 
 
-def get_salaries_voucher_data(  # noqa: PLR0913
+def get_salaries_voucher_rows(  # noqa: PLR0913
     filepath: Path,
     password: str,
     start_cell: tuple[int, int],
@@ -146,18 +152,16 @@ def _parse_additional_data(parser: HTMLParser) -> list[JournalRowSelector]:
 
 
 def add_voucher(
-    authenticated_page: Page,
-    timeout: int,
-    data: list[Row],
+    authenticated_page: Page, timeout: int, rows: list[Row], financial_year: str
 ):
-    total = len(data)
-    timeout_factor = math.ceil(len(data) / 10)
+    total = len(rows)
+    timeout_factor = math.ceil(len(rows) / 10)
 
     pipeline = (
-        VoucherPagePipeline(authenticated_page, timeout=timeout)
-        .navigate_to_general_accounting()
+        VoucherPagePipeline(authenticated_page)
+        .navigate_to_general_accounting(financial_year=financial_year)
         .navigate_to_add_new_voucher()
-        .add_new_rows(len(data) - 1)
+        .add_new_rows(len(rows) - 1)
         .wait_for_timeout(timeout_factor * timeout)
     )
 
@@ -165,7 +169,7 @@ def add_voucher(
     additional_data = _parse_additional_data(parser)
 
     for row, automata_row in track(
-        zip(data, additional_data, strict=True), total=total
+        zip(rows, additional_data, strict=True), total=total
     ):
         pipeline.fill_row(row, automata_row)
 

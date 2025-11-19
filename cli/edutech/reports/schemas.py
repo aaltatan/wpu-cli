@@ -26,9 +26,9 @@ class JournalRow(BaseModel):
     def parse_date_string(cls, value: str) -> datetime:
         if isinstance(value, str):
             try:
-                return datetime.strptime(value, "%d/%m/%Y")
+                return datetime.strptime(value, "%d/%m/%Y")  # noqa: DTZ007
             except ValueError:
                 message = f"Invalid date string: {value}"
-                raise ValueError(message)
+                raise ValueError(message)  # noqa: B904
 
         return value

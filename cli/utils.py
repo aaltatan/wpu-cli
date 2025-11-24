@@ -25,7 +25,7 @@ def get_authenticated_page(p, username: str, password: str) -> Page:
 def get_salaries_filepath() -> Path:
     home = Path.cwd().home()
     desktop_path = home / "Desktop"
-    onedrive_path = Path("D:\\OneDrive\\financial\\In_Progress")
+    onedrive_path = Path("D:\\OneDrive\\wpu\\salaries\\in-progress")
 
     glob = list(desktop_path.glob("[Salaries|Partial]*.xlsb"))
 

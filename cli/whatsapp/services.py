@@ -1,20 +1,21 @@
 import time
 from pathlib import Path
+from typing import Any
 
 import xlwings as xw
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import Page, sync_playwright
 from rich.progress import track
 
 from .schemas import Message
 
 
-def get_messages_from_excel(
+def _get_messages_from_excel(
     fullname: Path,
     password: str,
     sheet_name: str,
     first_cell: tuple[int, int],
     last_column: int,
-) -> list[Message]:
+) -> list[Any]:
     wb: xw.Book = xw.Book(fullname, password=password)
     ws = wb.sheets(sheet_name)
 
@@ -23,9 +24,31 @@ def get_messages_from_excel(
     next_row: int = first_row + 1
 
     rg_values = (next_row, first_col), (last_row, last_column)
-    rg = ws.range(*rg_values).value
+    data = ws.range(*rg_values).value
 
+    if isinstance(data, list):
+        return data
+
+    message = "No data found in the specified range."
+    raise ValueError(message)
+
+
+def get_messages_from_excel(
+    fullname: Path,
+    password: str,
+    sheet_name: str,
+    first_cell: tuple[int, int],
+    last_column: int,
+):
     messages_dict: dict[str, list[str]] = {}
+
+    rg = _get_messages_from_excel(
+        fullname=fullname,
+        password=password,
+        sheet_name=sheet_name,
+        first_cell=first_cell,
+        last_column=last_column,
+    )
 
     for row in rg:
         phone, text = row
@@ -41,9 +64,7 @@ def get_messages_from_excel(
     return messages
 
 
-def send_messages(messages: list[Message]) -> None:
-    total = len(messages)
-
+def get_authenticated_whatsapp_page() -> Page:
     with sync_playwright() as p:
         browser = p.chromium.launch(slow_mo=50, headless=False)
         context = browser.new_context()
@@ -52,16 +73,24 @@ def send_messages(messages: list[Message]) -> None:
 
         input("After scanning QR code, Press any key to Continue ... ")
 
-        for message in track(messages, description="📩 Sending", total=total):
-            url = f"https://web.whatsapp.com/send?phone={message.phone}"
-            try:
-                page.goto(url, timeout=60_000)
+        return page
 
-                for text in message.texts:
-                    page.fill("footer .lexical-rich-text-input > div", text)
-                    page.click('[aria-label="Send"]')
 
-                time.sleep(2)
+def send_whatsapp_messages(
+    page: Page, messages: list[Message], timeout_between_messages: float
+) -> None:
+    total = len(messages)
 
-            except Exception:  # noqa: BLE001, S112
-                continue
+    for message in track(messages, description="📩 Sending", total=total):
+        url = f"https://web.whatsapp.com/send?phone={message.phone}"
+        try:
+            page.goto(url, timeout=60_000)
+
+            for text in message.texts:
+                page.fill("footer .lexical-rich-text-input > div", text)
+                page.click('[aria-label="Send"]')
+
+            time.sleep(timeout_between_messages)
+
+        except Exception:  # noqa: BLE001, S112
+            continue

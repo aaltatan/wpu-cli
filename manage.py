@@ -1,5 +1,5 @@
 import typer
-from cli import edutech, taxes, whatsapp
+from cli import edutech, taxes, templates, whatsapp
 from dotenv import load_dotenv
 
 
@@ -11,6 +11,7 @@ def main() -> None:
     app.add_typer(taxes.app, name="tax")
     app.add_typer(whatsapp.app, name="whatsapp")
     app.add_typer(edutech.app, name="edutech")
+    app.add_typer(templates.app, name="templates")
 
     app()
 

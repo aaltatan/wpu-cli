@@ -1,9 +1,10 @@
+from collections.abc import Collection
 from pathlib import Path
 from typing import Annotated, Any
 
 import typer
 
-type Data = list[dict[Any, Any]]
+type Data = Collection[dict[Any, Any]]
 
 DataFilepath = Annotated[
     Path,
@@ -58,5 +59,26 @@ IncludeIndexInFilename = Annotated[
     typer.Option(
         "--include-index",
         help="Include index in filename",
+    ),
+]
+
+PDF = Annotated[
+    bool,
+    typer.Option(
+        "--pdf",
+        help="Generate a PDF file for each template",
+    ),
+]
+
+Filename = Annotated[
+    str,
+    typer.Option("--filename", help="generated filename"),
+]
+
+DataKey = Annotated[
+    str,
+    typer.Option(
+        "--data-key",
+        help="Key to use as data from template, e.g. {%p for item in data['data'] %}",  # noqa: E501
     ),
 ]

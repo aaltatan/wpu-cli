@@ -9,7 +9,7 @@ class Loader(Protocol):
 
 
 class TemplateGenerator(Protocol):
-    def generate(self, data: Data, filename_key: str | None = None) -> None: ...
+    def generate(self, data: Data) -> None: ...
 
 
 def make_output_dir(
@@ -24,10 +24,6 @@ def make_output_dir(
     return output_dir
 
 
-def generate_templates(
-    loader: Loader,
-    generator: TemplateGenerator,
-    filename_key: str | None = None,
-) -> None:
+def generate_templates(loader: Loader, generator: TemplateGenerator) -> None:
     data = loader.load()
-    generator.generate(data=data, filename_key=filename_key)
+    generator.generate(data=data)

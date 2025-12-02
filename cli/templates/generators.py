@@ -96,20 +96,22 @@ class SingleDocxTemplateGenerator:
         template_path: Path,
         output_dir: Path,
         filename: str,
-        data_key: str,
+        template_data_key: str,
         *,
         pdf: bool = False,
     ) -> None:
         self.template = DocxTemplate(template_path)
         self.output_dir = output_dir
         self.filename = filename
-        self.data_key = data_key
+        self.template_data_key = template_data_key
         self.pdf = pdf
 
     def generate(self, data: Data) -> None:
         filepath = _generate_filepath(self.filename, self.output_dir, "docx")
 
-        self.template.render({self.data_key: data, **ADDITIONAL_CONTEXT})
+        self.template.render(
+            {self.template_data_key: data, **ADDITIONAL_CONTEXT}
+        )
         self.template.save(filepath)
 
         if self.pdf:

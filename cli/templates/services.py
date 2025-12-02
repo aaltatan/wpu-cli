@@ -12,9 +12,7 @@ class TemplateGenerator(Protocol):
     def generate(self, data: Data) -> None: ...
 
 
-def make_output_dir(
-    output_dir: Path | None = None, dir_name: str = "output"
-) -> Path:
+def make_output_dir(dir_name: str, output_dir: Path | None = None) -> Path:
     if output_dir is None:
         output_dir = Path().home() / "Desktop" / dir_name
 

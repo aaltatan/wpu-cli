@@ -75,10 +75,17 @@ Filename = Annotated[
     typer.Option("--filename", help="generated filename"),
 ]
 
-DataKey = Annotated[
+TemplateDataKey = Annotated[
     str,
     typer.Option(
         "--data-key",
         help="Key to use as data from template, e.g. {%p for item in data['data'] %}",  # noqa: E501
     ),
 ]
+
+GroupedColumns = Annotated[
+    list[str],
+    typer.Option("--column", "-c", help="Column to be grouped"),
+]
+
+GroupKey = Annotated[str, typer.Option("--group-key", help="Group key")]

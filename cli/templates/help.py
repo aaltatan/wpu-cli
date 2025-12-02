@@ -43,4 +43,4 @@ Additional context:\n
   {{ new_line }} for new line\n
   {{ tab }} for tab\n
   {{ page_break }} for page break\n
-"""  # noqa: E501
+"""  # noqa: E501, RUF001

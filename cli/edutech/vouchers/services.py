@@ -1,4 +1,3 @@
-import math
 from enum import StrEnum
 from pathlib import Path
 from typing import Literal, Self
@@ -152,24 +151,24 @@ def _parse_additional_data(parser: HTMLParser) -> list[JournalRowSelector]:
 
 
 def add_voucher(
-    authenticated_page: Page, timeout: int, rows: list[Row], financial_year: str
+    authenticated_page: Page,
+    timeout: float,
+    rows: list[Row],
+    financial_year: str,
 ):
-    total = len(rows)
-    timeout_factor = math.ceil(len(rows) / 5)
-
     pipeline = (
         VoucherPagePipeline(authenticated_page)
         .navigate_to_general_accounting(financial_year=financial_year)
         .navigate_to_add_new_voucher()
-        .add_new_rows(total)
-        .wait_for_timeout(timeout_factor * timeout)
+        .add_new_rows(len(rows))
+        .wait_for_timeout(int(timeout * len(rows) / 5))
     )
 
     parser = HTMLParser(pipeline.page.content())
     additional_data = _parse_additional_data(parser)
 
     for row, automata_row in track(
-        zip(rows, additional_data, strict=False), total=total
+        zip(rows, additional_data, strict=False), total=len(rows)
     ):
         pipeline.fill_row(row, automata_row)
 

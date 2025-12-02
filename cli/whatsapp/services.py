@@ -5,6 +5,7 @@ from typing import Any
 import xlwings as xw
 from loguru import logger
 from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api._generated import Browser, BrowserContext, Playwright
 from rich.progress import track
 
 from .schemas import Message
@@ -65,39 +66,57 @@ def get_messages_from_salaries_file(
     return messages
 
 
-def get_authenticated_whatsapp_page() -> Page:
-    with sync_playwright() as p:
-        browser = p.chromium.launch(slow_mo=50, headless=False)
-        context = browser.new_context()
-        page = context.new_page()
-        page.goto("https://web.whatsapp.com", timeout=60_000)
+def get_authenticated_whatsapp_page() -> tuple[
+    Playwright, Browser, BrowserContext, Page
+]:
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch(slow_mo=50, headless=False)
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto("https://web.whatsapp.com", timeout=60_000)
 
-        input("After scanning QR code, Press any key to Continue ... ")
+    input("After scanning QR code, Press any key to Continue ... ")
 
-        return page
+    return playwright, browser, context, page
+
+
+def close_whatsapp_page(
+    playwright: Playwright,
+    browser: Browser,
+    context: BrowserContext,
+    page: Page,
+) -> None:
+    page.close()
+    context.close()
+    browser.close()
+    playwright.stop()
 
 
 def send_whatsapp_messages(
-    page: Page, messages: list[Message], timeout_between_messages: float
+    page: Page,
+    messages: list[Message],
+    timeout_between_messages: float,
+    pageload_timeout: float,
 ) -> None:
     total = len(messages)
 
     for message in track(messages, description="📩 Sending", total=total):
-        url = f"https://web.whatsapp.com/send?phone={message.phone}"
         try:
-            page.goto(url, timeout=60_000)
+            page.goto(
+                f"https://web.whatsapp.com/send?phone={message.phone}",
+                timeout=60_000,
+            )
 
             for text in message.texts:
-                page.fill("footer .lexical-rich-text-input > div", text)
+                text_input_selector = "footer .lexical-rich-text-input > div"
+                page.wait_for_selector(
+                    text_input_selector, timeout=pageload_timeout
+                )
+                page.fill(text_input_selector, text)
                 page.click('[aria-label="Send"]')
 
             time.sleep(timeout_between_messages)
 
-            not_user_modal = page.wait_for_selector(
-                'div[data-animate-modal-backdrop="true"]', timeout=1_000
-            )
-            if not_user_modal:
-                logger.info(f"phone {message.phone} is not a whatsapp user.")
-
-        except Exception:  # noqa: BLE001, S112
+        except Exception as e:  # noqa: BLE001, PERF203
+            logger.error(f"Error sending message to {message.phone}: {e}")
             continue

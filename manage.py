@@ -1,10 +1,12 @@
 import typer
 from cli import edutech, taxes, templates, whatsapp
+from cli.logger import init_logger
 from dotenv import load_dotenv
 
 
 def main() -> None:
     load_dotenv()
+    init_logger()
 
     app = typer.Typer(name="Al-Wataniya Private University CLI")
 

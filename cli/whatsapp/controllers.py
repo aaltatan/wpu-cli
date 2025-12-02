@@ -6,7 +6,7 @@ from cli.utils import get_salaries_filepath
 
 from .services import (
     get_authenticated_whatsapp_page,
-    get_messages_from_excel,
+    get_messages_from_salaries_file,
     send_whatsapp_messages,
 )
 
@@ -14,7 +14,7 @@ app = typer.Typer()
 
 
 @app.command()
-def send_salaries(
+def send_salaries_whatsapp_messages(
     password: Annotated[
         str,
         typer.Option(
@@ -48,7 +48,7 @@ def send_salaries(
     """Send whatsapp messages from `whatsapp` sheet in [Salaries|Partials]_[Wages|Overtime]_20****.xlsb file."""  # noqa: E501
     filepath = get_salaries_filepath()
     page = get_authenticated_whatsapp_page()
-    messages = get_messages_from_excel(
+    messages = get_messages_from_salaries_file(
         filepath,
         password=password,
         sheet_name=sheet_name,

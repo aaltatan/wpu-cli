@@ -3,13 +3,14 @@ from pathlib import Path
 from typing import Any
 
 import xlwings as xw
+from loguru import logger
 from playwright.sync_api import Page, sync_playwright
 from rich.progress import track
 
 from .schemas import Message
 
 
-def _get_messages_from_excel(
+def _get_messages_from_salaries_file(
     fullname: Path,
     password: str,
     sheet_name: str,
@@ -33,7 +34,7 @@ def _get_messages_from_excel(
     raise ValueError(message)
 
 
-def get_messages_from_excel(
+def get_messages_from_salaries_file(
     fullname: Path,
     password: str,
     sheet_name: str,
@@ -42,7 +43,7 @@ def get_messages_from_excel(
 ):
     messages_dict: dict[str, list[str]] = {}
 
-    rg = _get_messages_from_excel(
+    rg = _get_messages_from_salaries_file(
         fullname=fullname,
         password=password,
         sheet_name=sheet_name,
@@ -91,6 +92,12 @@ def send_whatsapp_messages(
                 page.click('[aria-label="Send"]')
 
             time.sleep(timeout_between_messages)
+
+            not_user_modal = page.wait_for_selector(
+                'div[data-animate-modal-backdrop="true"]', timeout=1_000
+            )
+            if not_user_modal:
+                logger.info(f"phone {message.phone} is not a whatsapp user.")
 
         except Exception:  # noqa: BLE001, S112
             continue

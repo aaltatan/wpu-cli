@@ -1,5 +1,5 @@
 import typer
-from cli import edutech, taxes, templates, whatsapp
+from cli import edutech, fuzz, taxes, templates, whatsapp
 from cli.logger import init_logger
 from dotenv import load_dotenv
 
@@ -14,6 +14,7 @@ def main() -> None:
     app.add_typer(whatsapp.app, name="whatsapp")
     app.add_typer(edutech.app, name="edutech")
     app.add_typer(templates.app, name="templates")
+    app.add_typer(fuzz.app, name="fuzz")
 
     app()
 

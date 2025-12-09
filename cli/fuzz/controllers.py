@@ -20,10 +20,7 @@ from .options import (
 from .processors import get_processor_func
 from .scorers import get_scorer_func
 from .services import match_all, match_one
-from .writers import (
-    SingleQueryTerminalWriter,
-    get_writer_func,
-)
+from .writers import SingleQueryTerminalWriter, get_writer_func
 
 app = typer.Typer()
 

@@ -25,10 +25,15 @@ DefaultProcessor = StrEnum("DefaultProcessor", DEFAULT_PROCESSORS)
 AdditionalProcessor = StrEnum("AdditionalProcessor", ADDITIONAL_PROCESSORS)
 Processor = StrEnum("Processor", DEFAULT_PROCESSORS + ADDITIONAL_PROCESSORS)
 
-_processors: dict[Processor, ProcessFunc] = {}
+
+_processors: dict[
+    DefaultProcessor | AdditionalProcessor | Processor, ProcessFunc
+] = {}
 
 
-def _get_processor_func(processor: Processor) -> ProcessFunc:
+def _get_processor_func(
+    processor: DefaultProcessor | AdditionalProcessor,
+) -> ProcessFunc:
     if processor not in _processors:
         message = f"Processor '{processor}' not found"
         raise ValueError(message)
@@ -36,7 +41,9 @@ def _get_processor_func(processor: Processor) -> ProcessFunc:
     return _processors[processor]
 
 
-def get_processor_func(processors: list[Processor]) -> ProcessFunc:
+def get_processor_func(
+    processors: list[DefaultProcessor | AdditionalProcessor],
+) -> ProcessFunc:
     processors_functions = [_get_processor_func(p) for p in processors]
 
     def wrapper(query: str) -> str:
@@ -49,7 +56,7 @@ def get_processor_func(processors: list[Processor]) -> ProcessFunc:
 
 
 def register_processor(
-    processor: Processor,
+    processor: DefaultProcessor | AdditionalProcessor | Processor,
 ) -> Callable[[ProcessFunc], ProcessFunc]:
     def decorator(processor_func: ProcessFunc) -> ProcessFunc:
         @wraps(processor_func)

@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -16,6 +17,18 @@ app = typer.Typer()
 
 @app.command("send-salaries")
 def send_salaries_whatsapp_messages(  # noqa: PLR0913
+    filepath: Annotated[
+        Path,
+        typer.Option(
+            "--filepath",
+            help="Path to Salaries.xlsb file",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            resolve_path=True,
+            default_factory=get_salaries_filepath,
+        ),
+    ],
     password: Annotated[
         str,
         typer.Option(
@@ -56,8 +69,6 @@ def send_salaries_whatsapp_messages(  # noqa: PLR0913
     ] = 10_000,
 ) -> None:
     """Send whatsapp messages from `whatsapp` sheet in [Salaries|Partials]_[Wages|Overtime]_20****.xlsb file."""  # noqa: E501
-    filepath = get_salaries_filepath()
-
     playwright, browser, context, page = get_authenticated_whatsapp_page()
 
     messages = get_messages_from_salaries_file(

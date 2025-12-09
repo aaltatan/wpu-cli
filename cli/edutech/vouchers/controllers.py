@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -25,6 +26,18 @@ def add_salaries(  # noqa: PLR0913
     password: EdutechPasswordOption,
     financial_year: FinancialYearOption,
     excel_password: ExcelPasswordOption,
+    filepath: Annotated[
+        Path,
+        typer.Option(
+            "--filepath",
+            help="Path to Salaries.xlsb file",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            resolve_path=True,
+            default_factory=get_salaries_filepath,
+        ),
+    ],
     chapter: Annotated[
         Chapter,
         typer.Option("--chapter", help="Chapter of the Salaries.xlsb file"),
@@ -44,7 +57,6 @@ def add_salaries(  # noqa: PLR0913
 ):
     """Add from `Journal Entry Template` sheet in [Salaries|Partials]_[Wages|Overtime]_20****.xlsb file."""  # noqa: E501
     validate_financial_year(financial_year)
-    filepath = get_salaries_filepath()
     rows = get_salaries_voucher_rows(
         filepath,
         password=excel_password,

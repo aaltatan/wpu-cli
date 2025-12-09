@@ -1,8 +1,7 @@
 import time
 from pathlib import Path
-from typing import Any
 
-import xlwings as xw
+import pandas as pd
 from loguru import logger
 from playwright.sync_api import Page, sync_playwright
 from playwright.sync_api._generated import Browser, BrowserContext, Playwright
@@ -11,59 +10,18 @@ from rich.progress import track
 from .schemas import Message
 
 
-def _get_messages_from_salaries_file(
-    fullname: Path,
-    password: str,
-    sheet_name: str,
-    first_cell: tuple[int, int],
-    last_column: int,
-) -> list[Any]:
-    wb: xw.Book = xw.Book(fullname, password=password)
-    ws = wb.sheets(sheet_name)
-
-    last_row: int = ws.range(first_cell).end("down").row
-    first_row, first_col = first_cell
-    next_row: int = first_row + 1
-
-    rg_values = (next_row, first_col), (last_row, last_column)
-    data = ws.range(*rg_values).value
-
-    if isinstance(data, list):
-        return data
-
-    message = "No data found in the specified range."
-    raise ValueError(message)
-
-
-def get_messages_from_salaries_file(
-    fullname: Path,
-    password: str,
-    sheet_name: str,
-    first_cell: tuple[int, int],
-    last_column: int,
-):
+def get_messages_from_xlsx(filepath: Path) -> list[Message]:
     messages_dict: dict[str, list[str]] = {}
+    data = pd.read_excel(filepath).to_dict(orient="records")
 
-    rg = _get_messages_from_salaries_file(
-        fullname=fullname,
-        password=password,
-        sheet_name=sheet_name,
-        first_cell=first_cell,
-        last_column=last_column,
-    )
-
-    for row in rg:
-        phone, text = row
+    for row in data:
+        phone, text = row.values()
         if phone in messages_dict:
             messages_dict[phone].append(text)
         else:
             messages_dict[phone] = [text]
 
-    messages: list[Message] = [
-        Message(phone, texts) for phone, texts in messages_dict.items()
-    ]
-
-    return messages
+    return [Message(phone, texts) for phone, texts in messages_dict.items()]
 
 
 def get_authenticated_whatsapp_page() -> tuple[

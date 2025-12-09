@@ -22,17 +22,6 @@ EdutechPasswordOption = Annotated[
     ),
 ]
 
-ExcelPasswordOption = Annotated[
-    str,
-    typer.Option(
-        "--excel-password",
-        prompt="Excel file password",
-        help="Excel file password",
-        hide_input=True,
-        envvar="SALARIES_EXCEL_FILE_PASSWORD",
-    ),
-]
-
 EdutechUsernameOption = Annotated[
     str,
     typer.Option(
@@ -43,11 +32,11 @@ EdutechUsernameOption = Annotated[
     ),
 ]
 
-TimeoutOption = Annotated[
+TimeoutAfterInsertingRowsOption = Annotated[
     int,
     typer.Option(
         "--timeout",
-        help="Timeout for playwright",
-        envvar="PLAYWRIGHT_TIMEOUT",
+        help="Timeout after inserting rows",
+        envvar="TIMEOUT_AFTER_INSERTING_ROWS",
     ),
 ]

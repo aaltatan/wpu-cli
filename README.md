@@ -16,6 +16,7 @@ CLI application for make some automation tasks.
 
 - `EDUTECH_USERNAME`: Edutech username
 - `EDUTECH_PASSWORD`: Edutech password
+- `TIMEOUT_AFTER_INSERTING_ROWS`: Timeout for playwright e.g. 5000
 
 ### Fuzz App
 
@@ -29,8 +30,3 @@ CLI application for make some automation tasks.
 
 - `DEFAULT_TIMEOUT_BETWEEN_MESSAGES`: Default timeout between messages for whatsapp app e.g. `3`
 - `DEFAULT_PAGELOAD_TIMEOUT`: Default pageload timeout for whatsapp app e.g. `10000`
-
-### Common
-
-- `SALARIES_EXCEL_FILE_PASSWORD`: Password for Salaries.xlsb file
-- `PLAYWRIGHT_TIMEOUT`: Timeout for playwright e.g. 5000

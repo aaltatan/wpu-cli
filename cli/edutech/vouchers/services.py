@@ -2,7 +2,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Literal, Self
 
-import xlwings as xw
+import pandas as pd
 from playwright.sync_api import Page
 from rich.progress import track
 from selectolax.parser import HTMLParser
@@ -16,6 +16,9 @@ class Chapter(StrEnum):
     ONE = "1"
     TWO = "2"
     THREE = "3"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class VoucherPagePipeline(PagePipeline):
@@ -51,71 +54,22 @@ class VoucherPagePipeline(PagePipeline):
         return self
 
 
-def get_voucher_from_excel(
-    filepath: Path,
-    password: str,
-    start_cell: tuple[int, int] = (1, 1),
-    last_column: int = 6,
-    sheet_name: str = "voucher",
-):
-    wb = xw.Book(filepath, password=password)
-    ws: xw.Sheet = wb.sheets[sheet_name]
+def get_voucher_from_xlsx(filepath: Path, chapter: Chapter) -> list[Row]:
+    data = pd.read_excel(filepath).to_dict(orient="records")
 
-    last_row: int = ws.range(start_cell).end("down").row
-
-    start_row, start_col = start_cell
-    next_row: int = start_row + 1
-
-    rg_values: tuple[tuple[int, int], tuple[int, int]] = (
-        (next_row, start_col),
-        (last_row, last_column),
-    )
-
-    data = ws.range(*rg_values).value
-
-    if isinstance(data, list):
-        return data
-
-    message = "Invalid data"
-    raise ValueError(message)
-
-
-def get_salaries_voucher_rows(  # noqa: PLR0913
-    filepath: Path,
-    password: str,
-    start_cell: tuple[int, int],
-    last_column: int,
-    sheet_name: str,
-    chapter: Chapter,
-) -> list[Row]:
-    rg = get_voucher_from_excel(
-        filepath=filepath,
-        password=password,
-        start_cell=start_cell,
-        last_column=last_column,
-        sheet_name=sheet_name,
-    )
-
-    data: list[Row] = []
-
-    for r in rg:
-        faculty, string_account, notes, debit, credit, account_id = r
-
-        faculty_string: str = faculty
-
-        row = Row.from_kwargs(
-            faculty=faculty,
+    return [
+        Row.from_kwargs(
+            faculty=row["faculty"],
             chapter=chapter,
-            debit=debit,
-            credit=credit,
-            account_id=account_id,
-            notes=notes,
-            string_account=string_account,
-            faculty_string=faculty_string,
+            debit=row["debit"],
+            credit=row["credit"],
+            account_id=row["account_id"],
+            notes=row["notes"],
+            string_account=row["string_account"],
+            faculty_string=row["faculty"],
         )
-        data.append(row)
-
-    return data
+        for row in data
+    ]
 
 
 def _parse_ids(
@@ -152,16 +106,16 @@ def _parse_additional_data(parser: HTMLParser) -> list[JournalRowSelector]:
 
 def add_voucher(
     authenticated_page: Page,
-    timeout: float,
     rows: list[Row],
     financial_year: str,
+    timeout_after_inserting_rows: float,
 ):
     pipeline = (
         VoucherPagePipeline(authenticated_page)
         .navigate_to_general_accounting(financial_year=financial_year)
         .navigate_to_add_new_voucher()
         .add_new_rows(len(rows))
-        .wait_for_timeout(int(timeout * len(rows) / 5))
+        .wait_for_timeout(int(timeout_after_inserting_rows * len(rows) / 5))
     )
 
     parser = HTMLParser(pipeline.page.content())

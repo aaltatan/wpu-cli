@@ -1,7 +1,26 @@
 from datetime import datetime
 from typing import Any, Literal, Self
 
-from playwright.sync_api import Page
+from playwright.sync_api import Page, Playwright
+
+
+def get_edutech_authenticated_page(
+    playwright: Playwright, username: str, password: str
+) -> Page:
+    browser = playwright.chromium.launch(slow_mo=10, headless=False)
+    page = browser.new_page()
+    page.goto("http://edu/")
+
+    page.wait_for_timeout(2_000)
+    page.click("#login")
+
+    page.fill('input[name="user_id"]', username)
+    page.fill("#password", password)
+    page.click('button[type="submit"]')
+
+    page.wait_for_timeout(10_000)
+
+    return page
 
 
 class PagePipeline:

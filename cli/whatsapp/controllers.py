@@ -3,8 +3,6 @@ from typing import Annotated
 
 import typer
 
-from cli.utils import get_salaries_filepath
-
 from .services import (
     close_whatsapp_page,
     get_authenticated_whatsapp_page,
@@ -20,13 +18,29 @@ def send_salaries_whatsapp_messages(  # noqa: PLR0913
     filepath: Annotated[
         Path,
         typer.Option(
+            "-p",
             "--filepath",
             help="Path to Salaries.xlsb file",
             exists=True,
             file_okay=True,
             dir_okay=False,
             resolve_path=True,
-            default_factory=get_salaries_filepath,
+        ),
+    ],
+    timeout_between_messages: Annotated[
+        float,
+        typer.Option(
+            "--timeout-between-messages",
+            help="Timeout between messages",
+            envvar="DEFAULT_TIMEOUT_BETWEEN_MESSAGES",
+        ),
+    ],
+    pageload_timeout: Annotated[
+        float,
+        typer.Option(
+            "--pageload-timeout",
+            help="Timeout for pageload",
+            envvar="DEFAULT_PAGELOAD_TIMEOUT",
         ),
     ],
     password: Annotated[
@@ -36,7 +50,7 @@ def send_salaries_whatsapp_messages(  # noqa: PLR0913
             help="Password for Salaries.xlsb file",
             hide_input=True,
             prompt="Password for Salaries.xlsb file",
-            envvar="EXCEL_FILE_PASSWORD",
+            envvar="SALARIES_EXCEL_FILE_PASSWORD",
         ),
     ],
     first_cell: Annotated[
@@ -54,19 +68,6 @@ def send_salaries_whatsapp_messages(  # noqa: PLR0913
         int,
         typer.Option("--last-column", help="Last column in Salaries.xlsb file"),
     ] = 3,
-    timeout_between_messages: Annotated[
-        float,
-        typer.Option(
-            "--timeout-between-messages", help="Timeout between messages"
-        ),
-    ] = 2,
-    pageload_timeout: Annotated[
-        float,
-        typer.Option(
-            "--pageload-timeout",
-            help="Timeout for pageload",
-        ),
-    ] = 10_000,
 ) -> None:
     """Send whatsapp messages from `whatsapp` sheet in [Salaries|Partials]_[Wages|Overtime]_20****.xlsb file."""  # noqa: E501
     playwright, browser, context, page = get_authenticated_whatsapp_page()

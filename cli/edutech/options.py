@@ -29,7 +29,7 @@ ExcelPasswordOption = Annotated[
         prompt="Excel file password",
         help="Excel file password",
         hide_input=True,
-        envvar="EXCEL_FILE_PASSWORD",
+        envvar="SALARIES_EXCEL_FILE_PASSWORD",
     ),
 ]
 

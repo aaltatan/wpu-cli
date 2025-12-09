@@ -25,7 +25,12 @@ CLI application for make some automation tasks.
 - `DEFAULT_REMOVE_DUPLICATED`: Default remove duplicated for fuzzy matching e.g. `1` for `True`
 - `DEFAULT_WRITER`: Default writer for fuzzy matching e.g. `choices-xlsx`
 
+### Whatsapp App
+
+- `DEFAULT_TIMEOUT_BETWEEN_MESSAGES`: Default timeout between messages for whatsapp app e.g. `3`
+- `DEFAULT_PAGELOAD_TIMEOUT`: Default pageload timeout for whatsapp app e.g. `10000`
+
 ### Common
 
-- `EXCEL_FILE_PASSWORD`: Password for Salaries.xlsb file
+- `SALARIES_EXCEL_FILE_PASSWORD`: Password for Salaries.xlsb file
 - `PLAYWRIGHT_TIMEOUT`: Timeout for playwright e.g. 5000

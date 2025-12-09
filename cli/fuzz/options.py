@@ -3,7 +3,7 @@ from typing import Annotated
 
 import typer
 
-from .processors import Processor
+from .processors import AdditionalProcessor, DefaultProcessor
 from .scorers import Scorer
 from .writers import Writer
 
@@ -34,17 +34,17 @@ ChoicesPathOption = Annotated[
 ]
 
 ProcessorOption = Annotated[
-    list[Processor],
+    list[AdditionalProcessor],
     typer.Option("-p", "--processor", default_factory=list),
 ]
 
 DefaultProcessorOption = Annotated[
-    list[Processor],
+    list[DefaultProcessor],
     typer.Option(
         "--default-processor",
         default_factory=lambda: [
-            Processor.GENERAL,
-            Processor.ARABIC,
+            DefaultProcessor["GENERAL"],
+            DefaultProcessor["ARABIC"],
         ],
     ),
 ]

@@ -12,14 +12,18 @@ from .arabic import get_arabic_unicode as _
 type ProcessFunc = Callable[[str], str]
 
 
-class Processor(StrEnum):
-    GENERAL = "general"
-    ARABIC = "arabic"
-    WPU = "wpu"
+DEFAULT_PROCESSORS = [
+    ("GENERAL", "general"),
+    ("ARABIC", "arabic"),
+]
 
-    def __str__(self) -> str:
-        return self.value
+ADDITIONAL_PROCESSORS = [
+    ("WPU", "wpu"),
+]
 
+DefaultProcessor = StrEnum("DefaultProcessor", DEFAULT_PROCESSORS)
+AdditionalProcessor = StrEnum("AdditionalProcessor", ADDITIONAL_PROCESSORS)
+Processor = StrEnum("Processor", DEFAULT_PROCESSORS + ADDITIONAL_PROCESSORS)
 
 _processors: dict[Processor, ProcessFunc] = {}
 
@@ -58,7 +62,7 @@ def register_processor(
     return decorator
 
 
-@register_processor(Processor.GENERAL)
+@register_processor(Processor["GENERAL"])
 def do_general_processing(query: str) -> str:
     re_replacements: list[tuple[re.Pattern, str]] = [
         (re.compile(r"\s{2,}"), ""),
@@ -70,7 +74,7 @@ def do_general_processing(query: str) -> str:
     return query
 
 
-@register_processor(Processor.ARABIC)
+@register_processor(Processor["ARABIC"])
 def do_arabic_general_processing(query: str) -> str:
     re_replacements: list[tuple[re.Pattern, str]] = [
         (re.compile(rf"{_('ة')}"), "هة"),
@@ -92,7 +96,7 @@ def do_arabic_general_processing(query: str) -> str:
     return query
 
 
-@register_processor(Processor.WPU)
+@register_processor(Processor["WPU"])
 def do_process_wpu_naming_pattern(query: str) -> str:
     replacements: dict[str, str] = {
         "أ.د.": "",

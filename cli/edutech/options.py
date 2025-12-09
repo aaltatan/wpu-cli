@@ -2,7 +2,7 @@ from typing import Annotated
 
 import typer
 
-FinancialYear = Annotated[
+FinancialYearOption = Annotated[
     str,
     typer.Option(
         "--year",
@@ -11,7 +11,7 @@ FinancialYear = Annotated[
     ),
 ]
 
-EdutechPassword = Annotated[
+EdutechPasswordOption = Annotated[
     str,
     typer.Option(
         "--edutech-password",
@@ -22,7 +22,7 @@ EdutechPassword = Annotated[
     ),
 ]
 
-ExcelPassword = Annotated[
+ExcelPasswordOption = Annotated[
     str,
     typer.Option(
         "--excel-password",
@@ -33,7 +33,7 @@ ExcelPassword = Annotated[
     ),
 ]
 
-EdutechUsername = Annotated[
+EdutechUsernameOption = Annotated[
     str,
     typer.Option(
         "--username",
@@ -43,7 +43,7 @@ EdutechUsername = Annotated[
     ),
 ]
 
-Timeout = Annotated[
+TimeoutOption = Annotated[
     int,
     typer.Option(
         "--timeout",

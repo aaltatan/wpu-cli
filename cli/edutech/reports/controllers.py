@@ -5,7 +5,11 @@ import typer
 from devtools import debug
 from playwright.sync_api import sync_playwright
 
-from cli.edutech.types import EdutechPassword, EdutechUsername, FinancialYear
+from cli.edutech.options import (
+    EdutechPasswordOption,
+    EdutechUsernameOption,
+    FinancialYearOption,
+)
 from cli.edutech.validators import validate_financial_year
 from cli.utils import get_authenticated_page
 
@@ -16,9 +20,9 @@ app = typer.Typer()
 
 @app.command(name="cash")
 def generate_cash_report(  # noqa: PLR0913
-    edutech_username: EdutechUsername,
-    password: EdutechPassword,
-    financial_year: FinancialYear,
+    edutech_username: EdutechUsernameOption,
+    password: EdutechPasswordOption,
+    financial_year: FinancialYearOption,
     accounts: Annotated[
         list[str],
         typer.Option(

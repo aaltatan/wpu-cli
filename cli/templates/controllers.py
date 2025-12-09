@@ -8,19 +8,19 @@ from .generators import (
 )
 from .help import HELP_TEXT
 from .loaders import ExcelGroupedDataLoader, ExcelSingleRowDataLoader
-from .services import generate_templates, make_output_dir
-from .types import (
-    PDF,
-    DataFilepath,
-    Filename,
-    FilenameKey,
-    GroupedColumns,
+from .options import (
+    DataPathOption,
+    FilenameKeyOption,
+    FilenameOption,
+    GroupedColumnsOption,
     GroupKey,
-    IncludeIndexInFilename,
-    OutputDirectory,
-    TemplateDataKey,
-    TemplatePath,
+    IncludeIndexInFilenameOption,
+    OutputDirPathOption,
+    PDFOption,
+    TemplateDataKeyOption,
+    TemplatePathOption,
 )
+from .services import generate_templates, make_output_dir
 
 DEFAULT_FILENAME = "output"
 DEFAULT_DATA_KEY = "data"
@@ -33,12 +33,12 @@ app = typer.Typer(help=HELP_TEXT)
 
 @app.command(name="xlsx2mdocx")
 def generate_multiple_docx_files_from_xlsx_single_row(
-    data_filepath: DataFilepath,
-    template: TemplatePath,
-    output_dirpath: OutputDirectory = None,
-    filename_key: FilenameKey = None,
-    pdf: PDF = False,
-    include_index_in_filename: IncludeIndexInFilename = False,
+    data_filepath: DataPathOption,
+    template: TemplatePathOption,
+    output_dirpath: OutputDirPathOption = None,
+    filename_key: FilenameKeyOption = None,
+    pdf: PDFOption = False,
+    include_index_in_filename: IncludeIndexInFilenameOption = False,
 ):
     """Generate multiple docx files from xlsx file (single row)."""
     output_dir = make_output_dir(DEFAULT_OUTPUT_DESKTOP_DIRNAME, output_dirpath)
@@ -57,12 +57,12 @@ def generate_multiple_docx_files_from_xlsx_single_row(
 
 @app.command(name="xlsx2docx")
 def generate_single_docx_file_from_xlsx_single_row(
-    data_filepath: DataFilepath,
-    template: TemplatePath,
-    filename: Filename = DEFAULT_FILENAME,
-    template_data_key: TemplateDataKey = DEFAULT_DATA_KEY,
-    output_dirpath: OutputDirectory = None,
-    pdf: PDF = False,
+    data_filepath: DataPathOption,
+    template: TemplatePathOption,
+    filename: FilenameOption = DEFAULT_FILENAME,
+    template_data_key: TemplateDataKeyOption = DEFAULT_DATA_KEY,
+    output_dirpath: OutputDirPathOption = None,
+    pdf: PDFOption = False,
 ):
     """Generate single docx file from xlsx file (single row)."""
     output_dir = make_output_dir(DEFAULT_OUTPUT_DESKTOP_DIRNAME, output_dirpath)
@@ -77,14 +77,14 @@ def generate_single_docx_file_from_xlsx_single_row(
 
 @app.command(name="mxlsx2mdocx")
 def generate_docx_multiple_files_from_xlsx_multiple_rows(
-    grouped_columns: GroupedColumns,
-    data_filepath: DataFilepath,
-    template: TemplatePath,
+    grouped_columns: GroupedColumnsOption,
+    data_filepath: DataPathOption,
+    template: TemplatePathOption,
     group_key: GroupKey = DEFAULT_GROUP_KEY,
-    output_dirpath: OutputDirectory = None,
-    filename_key: FilenameKey = None,
-    include_index_in_filename: IncludeIndexInFilename = False,
-    pdf: PDF = False,
+    output_dirpath: OutputDirPathOption = None,
+    filename_key: FilenameKeyOption = None,
+    include_index_in_filename: IncludeIndexInFilenameOption = False,
+    pdf: PDFOption = False,
 ):
     """Generate multiple docx files from xlsx file (multiple rows)."""
     output_dir = make_output_dir(DEFAULT_OUTPUT_DESKTOP_DIRNAME, output_dirpath)
@@ -103,14 +103,14 @@ def generate_docx_multiple_files_from_xlsx_multiple_rows(
 
 @app.command(name="mxlsx2docx")
 def generate_single_docx_file_from_xlsx_multiple_rows(
-    grouped_columns: GroupedColumns,
-    data_filepath: DataFilepath,
-    template: TemplatePath,
-    filename: Filename = DEFAULT_FILENAME,
-    template_data_key: TemplateDataKey = DEFAULT_DATA_KEY,
+    grouped_columns: GroupedColumnsOption,
+    data_filepath: DataPathOption,
+    template: TemplatePathOption,
+    filename: FilenameOption = DEFAULT_FILENAME,
+    template_data_key: TemplateDataKeyOption = DEFAULT_DATA_KEY,
     group_key: GroupKey = DEFAULT_GROUP_KEY,
-    output_dirpath: OutputDirectory = None,
-    pdf: PDF = False,
+    output_dirpath: OutputDirPathOption = None,
+    pdf: PDFOption = False,
 ):
     """Generate single docx file from xlsx file (multiple rows)."""
     output_dir = make_output_dir(DEFAULT_OUTPUT_DESKTOP_DIRNAME, output_dirpath)

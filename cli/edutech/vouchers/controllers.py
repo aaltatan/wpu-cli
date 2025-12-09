@@ -3,12 +3,12 @@ from typing import Annotated
 import typer
 from playwright.sync_api import sync_playwright
 
-from cli.edutech.types import (
-    EdutechPassword,
-    EdutechUsername,
-    ExcelPassword,
-    FinancialYear,
-    Timeout,
+from cli.edutech.options import (
+    EdutechPasswordOption,
+    EdutechUsernameOption,
+    ExcelPasswordOption,
+    FinancialYearOption,
+    TimeoutOption,
 )
 from cli.edutech.validators import validate_financial_year
 from cli.utils import get_authenticated_page, get_salaries_filepath
@@ -20,11 +20,11 @@ app = typer.Typer()
 
 @app.command()
 def add_salaries(  # noqa: PLR0913
-    timeout: Timeout,
-    edutech_username: EdutechUsername,
-    password: EdutechPassword,
-    financial_year: FinancialYear,
-    excel_password: ExcelPassword,
+    timeout: TimeoutOption,
+    edutech_username: EdutechUsernameOption,
+    password: EdutechPasswordOption,
+    financial_year: FinancialYearOption,
+    excel_password: ExcelPasswordOption,
     chapter: Annotated[
         Chapter,
         typer.Option("--chapter", help="Chapter of the Salaries.xlsb file"),

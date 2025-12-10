@@ -92,10 +92,12 @@ def write_choices_excel(
     ws.range("A1").options(index=False).value = headers
 
     for idx, (query, matches) in enumerate(data, start=2):
-        formula = ",".join(matches)
+        formula = ",".join(matches) if matches else "#N/A"
         ws.range(f"A{idx}").options(index=False).value = query
         ws.range(f"B{idx}").api.Validation.Add(Type=3, Formula1=formula)
-        ws.range(f"B{idx}").options(index=False).value = matches[0]
+        ws.range(f"B{idx}").options(index=False).value = (
+            matches[0] if matches else "#N/A"
+        )
 
     wb.save(export_path)
 

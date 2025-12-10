@@ -84,10 +84,10 @@ def do_general_processing(query: str) -> str:
 @register_processor(Processor["ARABIC"])
 def do_arabic_general_processing(query: str) -> str:
     re_replacements: list[tuple[re.Pattern, str]] = [
-        (re.compile(rf"{_('ة')}"), "هة"),
+        (re.compile(rf"{_('ي')}{_('ة')}"), "يةاه"),
+        (re.compile(rf"{_('ة')}(?!\w)"), "اه"),
         (re.compile(rf"{_('ظ')}"), "زظ"),
         (re.compile(rf"{_('أ')}"), "أا"),
-        (re.compile(rf"\b{_('ا')}{_('ل')}"), ""),
     ]
 
     for pattern, replacement in re_replacements:

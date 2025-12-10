@@ -43,13 +43,13 @@ def match_one(
     if remove_duplicated:
         results = _remove_duplicated_results(results)
 
-    if accuracy is not None:
+    if accuracy is not None and len(results) > 1:
         results = _filter_by_accuracy(results, accuracy)
 
     return results
 
 
-def match_all(
+def match_list(
     queries: Collection[str],
     choices: Collection[str],
     processor_fn: Callable,

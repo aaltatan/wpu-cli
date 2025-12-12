@@ -11,7 +11,6 @@ from cli.edutech.options import (
     TimeoutAfterInsertingRowsOption,
 )
 from cli.edutech.services import get_edutech_authenticated_page
-from cli.edutech.validators import validate_financial_year
 
 from .services import Chapter, add_voucher, get_voucher_from_xlsx
 
@@ -29,7 +28,7 @@ def add_salaries(  # noqa: PLR0913
         typer.Option(
             "-p",
             "--filepath",
-            help="Path to Salaries.xlsb file",
+            help="Path to Salaries file",
             exists=True,
             file_okay=True,
             dir_okay=False,
@@ -41,7 +40,6 @@ def add_salaries(  # noqa: PLR0913
         typer.Option("--chapter", help="Chapter of the Salaries.xlsb file"),
     ],
 ):
-    validate_financial_year(financial_year)
     rows = get_voucher_from_xlsx(filepath, chapter)
     with sync_playwright() as playwright:
         authenticated_page = get_edutech_authenticated_page(

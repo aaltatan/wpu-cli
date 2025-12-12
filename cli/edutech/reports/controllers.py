@@ -11,7 +11,6 @@ from cli.edutech.options import (
     FinancialYearOption,
 )
 from cli.edutech.services import get_edutech_authenticated_page
-from cli.edutech.validators import validate_financial_year
 
 from .services import JournalsPageFilters, get_journals
 
@@ -70,7 +69,6 @@ def generate_cash_report(  # noqa: PLR0913
     ],
 ) -> None:
     """Generate cash report."""
-    validate_financial_year(financial_year)
     with sync_playwright() as playwright:
         authenticated_page = get_edutech_authenticated_page(
             playwright, edutech_username, password

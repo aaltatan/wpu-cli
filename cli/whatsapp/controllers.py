@@ -13,6 +13,11 @@ from .services import (
 app = typer.Typer()
 
 
+@app.callback()
+def main():
+    """Send whatsapp bulk messages using playwright."""
+
+
 @app.command("send")
 def send_messages(
     filepath: Annotated[

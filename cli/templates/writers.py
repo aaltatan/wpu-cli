@@ -34,7 +34,7 @@ def _generate_filepath(filename: str, output_dir: Path, extension: str) -> Path:
     return filepath
 
 
-class MultipleDocxTemplateGenerator:
+class MultipleDocxTemplateWriter:
     def __init__(
         self,
         template_path: Path,
@@ -66,7 +66,7 @@ class MultipleDocxTemplateGenerator:
 
         return filename
 
-    def generate(self, data: Data) -> None:
+    def write(self, data: Data) -> None:
         for idx, item in track(
             enumerate(data, start=1),
             description="📝 Generating",
@@ -90,7 +90,7 @@ class MultipleDocxTemplateGenerator:
                 convert(filepath, output_dir)
 
 
-class SingleDocxTemplateGenerator:
+class SingleDocxTemplateWriter:
     def __init__(
         self,
         template_path: Path,
@@ -106,7 +106,7 @@ class SingleDocxTemplateGenerator:
         self.template_data_key = template_data_key
         self.pdf = pdf
 
-    def generate(self, data: Data) -> None:
+    def write(self, data: Data) -> None:
         filepath = _generate_filepath(self.filename, self.output_dir, "docx")
 
         self.template.render(

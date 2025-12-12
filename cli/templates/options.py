@@ -29,7 +29,7 @@ TemplatePathOption = Annotated[
     ),
 ]
 
-OutputDirPathOption = Annotated[
+OutputDirOption = Annotated[
     Path | None,
     typer.Option(
         "--output-dir",
@@ -45,9 +45,10 @@ OutputDirPathOption = Annotated[
 FilenameKeyOption = Annotated[
     str | None,
     typer.Option(
-        "--filename-key",
         "-k",
+        "--filename-key",
         help="Key to use as filename from data",
+        envvar="DEFAULT_TEMPLATE_GENERATED_SINGLE_FILE_NAME",
     ),
 ]
 
@@ -77,12 +78,18 @@ TemplateDataKeyOption = Annotated[
     typer.Option(
         "--data-key",
         help="Key to use as data from template, e.g. {%p for item in data['data'] %}",  # noqa: E501
+        envvar="DEFAULT_TEMPLATE_GENERATE_SINGLE_FILE_DATA_KEY",
     ),
 ]
 
 GroupedColumnsOption = Annotated[
     list[str],
-    typer.Option("--column", "-c", help="Column to be grouped"),
+    typer.Option(
+        "--column",
+        "-c",
+        help="Column to be grouped",
+        envvar="DEFAULT_TEMPLATE_MULTIPLE_ROWS_GROUPED_KEY",
+    ),
 ]
 
 GroupKey = Annotated[str, typer.Option("--group-key", help="Group key")]

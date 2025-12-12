@@ -4,14 +4,6 @@ CLI application for make some automation tasks.
 
 ## Environment Variables
 
-### Taxes App
-
-- `API_BASE_URL`: URL for used API  
-- `API_VERSION`: API version  
-- `DEFAULT_GROSS_SALARY`: Default gross salary for calculate salary tax e.g. 837000  
-- `DEFAULT_GENERATE_AMOUNT`: Default amount for generate salary sequence e.g. 1000000  
-- `DEFAULT_GENERATE_COMPENSATIONS_RATE`: Default compensations rate for generate salary sequence e.g. 0.75  
-
 ### Edutech App
 
 - `EDUTECH_USERNAME`: Edutech username
@@ -30,3 +22,9 @@ CLI application for make some automation tasks.
 
 - `DEFAULT_TIMEOUT_BETWEEN_MESSAGES`: Default timeout between messages for whatsapp app e.g. `3`
 - `DEFAULT_PAGELOAD_TIMEOUT`: Default pageload timeout for whatsapp app e.g. `10000`
+
+### Template App
+
+- `DEFAULT_TEMPLATE_GENERATED_SINGLE_FILE_NAME`: Default filename for generated single file e.g. `output`
+- `DEFAULT_TEMPLATE_GENERATE_SINGLE_FILE_DATA_KEY`: Default data key for generated single file e.g. `data`
+- `DEFAULT_TEMPLATE_MULTIPLE_ROWS_GROUPED_KEY`: Default grouped key for generated multiple rows e.g. `data`

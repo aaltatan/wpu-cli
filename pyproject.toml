@@ -16,6 +16,7 @@ dependencies = [
     "pydantic>=2.12.3",
     "python-dotenv>=1.1.1",
     "selectolax>=0.4.0",
+    "syriantaxes>=0.1.0",
     "thefuzz>=0.22.1",
     "typer>=0.13.1",
     "xlwings>=0.33.4",

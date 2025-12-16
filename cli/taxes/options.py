@@ -8,16 +8,16 @@ BracketMinsOption = Annotated[
     typer.Option(
         "--brackets-mins",
         default_factory=list,
-        envvar="BRACKET_TAX_MINS",
+        envvar="TAXES_BRACKET_TAX_MINS",
     ),
 ]
 
-BracketMaxsOption = Annotated[
+BracketMaxesOption = Annotated[
     list[float],
     typer.Option(
         "--brackets-maxs",
         default_factory=list,
-        envvar="BRACKET_TAX_MAXS",
+        envvar="TAXES_BRACKET_TAX_MAXS",
     ),
 ]
 
@@ -26,7 +26,7 @@ BracketRatesOption = Annotated[
     typer.Option(
         "--brackets-rates",
         default_factory=list,
-        envvar="BRACKET_TAX_RATES",
+        envvar="TAXES_BRACKET_TAX_RATES",
     ),
 ]
 
@@ -41,7 +41,6 @@ MinAllowedSalaryOption = Annotated[
 TaxesRoundingMethodOption = Annotated[
     RoundingMethod,
     typer.Option(
-        "ROUND_HALF_UP",
         "--taxes-rounding-method",
         envvar="TAXES_TAXES_ROUNDING_METHOD",
     ),
@@ -58,7 +57,6 @@ TaxesRoundToNearestOption = Annotated[
 SsRoundingMethodOption = Annotated[
     RoundingMethod,
     typer.Option(
-        "ROUND_HALF_UP",
         "--ss-rounding-method",
         envvar="TAXES_SS_ROUNDING_METHOD",
     ),
@@ -69,5 +67,47 @@ SsRoundToNearestOption = Annotated[
     typer.Option(
         "--ss-round-to-nearest",
         envvar="TAXES_SS_ROUND_TO_NEAREST",
+    ),
+]
+
+MinSsAllowedSalaryOption = Annotated[
+    float,
+    typer.Option(
+        "--min-ss-allowed-salary",
+        envvar="TAXES_MIN_SS_ALLOWED_SALARY",
+    ),
+]
+
+SsDeductionRateOption = Annotated[
+    float,
+    typer.Option(
+        "--ss-deduction-rate",
+        envvar="TAXES_DEFAULT_SS_DEDUCTION_RATE",
+    ),
+]
+
+SocialSecuritySalaryOption = Annotated[
+    float | None,
+    typer.Option(
+        "--ss",
+        "--social-security-salary",
+    ),
+]
+
+FixedTaxRateOption = Annotated[
+    float,
+    typer.Option(
+        "--fixed-tax-rate",
+        envvar="TAXES_FIXED_TAX_RATE",
+    ),
+]
+
+GrossSalaryArgument = Annotated[float, typer.Argument()]
+
+GrossCompensationsOption = Annotated[
+    float,
+    typer.Option(
+        "-c",
+        "--gross-compensations",
     ),
 ]

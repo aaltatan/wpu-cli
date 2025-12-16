@@ -111,3 +111,14 @@ GrossCompensationsOption = Annotated[
         "--gross-compensations",
     ),
 ]
+
+TargetSalaryArgument = Annotated[float, typer.Argument()]
+
+CompensationsRateOption = Annotated[
+    float,
+    typer.Option(
+        "-r",
+        "--compensations-rate",
+        envvar="DEFAULT_COMPENSATIONS_RATE",
+    ),
+]

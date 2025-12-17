@@ -93,11 +93,26 @@ SsDeductionRateOption = Annotated[
     ),
 ]
 
+
+def ss_salary_callback(value: float | None) -> float | None:
+    if value:
+        min_ss_allowed_salary = int(
+            os.getenv("TAXES_MIN_SS_ALLOWED_SALARY", "0")
+        )
+        if value < min_ss_allowed_salary:
+            message = f"The social security salary must be greater than {min_ss_allowed_salary}."  # noqa: E501
+            raise typer.BadParameter(message)
+
+    return value
+
+
 SocialSecuritySalaryOption = Annotated[
     float | None,
     typer.Option(
+        "-s",
         "--ss",
         "--social-security-salary",
+        callback=ss_salary_callback,
     ),
 ]
 
@@ -111,13 +126,7 @@ FixedTaxRateOption = Annotated[
 
 GrossSalaryArgument = Annotated[float, typer.Argument()]
 
-GrossCompensationsOption = Annotated[
-    float,
-    typer.Option(
-        "-c",
-        "--gross-compensations",
-    ),
-]
+GrossCompensationsArgument = Annotated[float, typer.Argument()]
 
 TargetSalaryArgument = Annotated[float, typer.Argument()]
 

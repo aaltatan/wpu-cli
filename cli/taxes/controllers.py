@@ -7,7 +7,7 @@ from .exporters import get_export_fn, get_extension
 from .options import (
     CompensationsRateOption,
     ExportPathOption,
-    GrossCompensationsOption,
+    GrossCompensationsArgument,
     GrossSalaryArgument,
     SocialSecuritySalaryOption,
     StartAmountRangeArgument,
@@ -28,14 +28,14 @@ app = typer.Typer(callback=app_callback)
 @app.command(name="gross")
 def calculate_gross_taxes_command(
     ctx: typer.Context,
-    gross_salary: GrossSalaryArgument,
-    gross_compensations: GrossCompensationsOption = 0,
+    salary: GrossSalaryArgument,
+    compensations: GrossCompensationsArgument = 0,
     ss_salary: SocialSecuritySalaryOption = None,
 ):
     """Calculate taxes for a given gross salary and compensations."""
-    salary = calculate_gross_taxes(
-        gross_salary=gross_salary,
-        gross_compensations=gross_compensations,
+    _salary = calculate_gross_taxes(
+        gross_salary=salary,
+        gross_compensations=compensations,
         brackets=ctx.obj["brackets"],
         fixed_tax_rate=ctx.obj["fixed_tax_rate"],
         min_allowed_salary=ctx.obj["min_allowed_salary"],
@@ -45,7 +45,7 @@ def calculate_gross_taxes_command(
     )
 
     console = Console()
-    table = get_salary_table(salary, title="Gross Results")
+    table = get_salary_table(_salary, title="Gross Results")
 
     console.print(table)
 

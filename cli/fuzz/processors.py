@@ -9,7 +9,7 @@ from thefuzz.utils import full_process
 
 from .arabic import get_arabic_unicode as _
 
-type ProcessFunc = Callable[[str], str]
+type ProcessFn = Callable[[str], str]
 
 
 DEFAULT_PROCESSORS = [
@@ -27,13 +27,13 @@ Processor = StrEnum("Processor", DEFAULT_PROCESSORS + ADDITIONAL_PROCESSORS)
 
 
 _processors: dict[
-    DefaultProcessor | AdditionalProcessor | Processor, ProcessFunc
+    DefaultProcessor | AdditionalProcessor | Processor, ProcessFn
 ] = {}
 
 
-def _get_processor_func(
+def _get_processor_fn(
     processor: DefaultProcessor | AdditionalProcessor,
-) -> ProcessFunc:
+) -> ProcessFn:
     if processor not in _processors:
         message = f"Processor '{processor}' not found"
         raise ValueError(message)
@@ -41,15 +41,15 @@ def _get_processor_func(
     return _processors[processor]
 
 
-def get_processor_func(
+def get_processor_fn(
     processors: list[DefaultProcessor | AdditionalProcessor],
-) -> ProcessFunc:
-    processors_functions = [_get_processor_func(p) for p in processors]
+) -> ProcessFn:
+    processors_functions = [_get_processor_fn(p) for p in processors]
 
     def wrapper(query: str) -> str:
         result = query
-        for func in processors_functions:
-            result = func(result)
+        for fn in processors_functions:
+            result = fn(result)
         return result
 
     return wrapper
@@ -57,11 +57,11 @@ def get_processor_func(
 
 def register_processor(
     processor: DefaultProcessor | AdditionalProcessor | Processor,
-) -> Callable[[ProcessFunc], ProcessFunc]:
-    def decorator(processor_func: ProcessFunc) -> ProcessFunc:
-        @wraps(processor_func)
+) -> Callable[[ProcessFn], ProcessFn]:
+    def decorator(processor_fn: ProcessFn) -> ProcessFn:
+        @wraps(processor_fn)
         def wrapper(query: str) -> str:
-            return full_process(processor_func(query))
+            return full_process(processor_fn(query))
 
         _processors[processor] = wrapper
         return wrapper

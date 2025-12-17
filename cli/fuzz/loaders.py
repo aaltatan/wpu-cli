@@ -4,10 +4,10 @@ from pathlib import Path
 
 from cli.clipboard import get_clipboard
 
-type LoaderFunc = Callable[[Path], list[str]]
+type LoaderFn = Callable[[Path], list[str]]
 
 
-_loaders: dict[str, LoaderFunc] = {}
+_loaders: dict[str, LoaderFn] = {}
 
 
 def get_clipboard_data() -> list[str]:
@@ -25,9 +25,9 @@ def get_loader_data(path: Path) -> list[str]:
     return _loaders[loader](path)
 
 
-def register_loader(loader: str) -> Callable[[LoaderFunc], LoaderFunc]:
-    def decorator(loader_func: LoaderFunc) -> LoaderFunc:
-        @wraps(loader_func)
+def register_loader(loader: str) -> Callable[[LoaderFn], LoaderFn]:
+    def decorator(loader_fn: LoaderFn) -> LoaderFn:
+        @wraps(loader_fn)
         def wrapper(path: Path) -> list[str]:
             if not path.is_file():
                 message = f"No file found at '{path}'"
@@ -37,7 +37,7 @@ def register_loader(loader: str) -> Callable[[LoaderFunc], LoaderFunc]:
                 message = f"No loader for '{path.suffix}' was found"
                 raise ValueError(message)
 
-            return loader_func(path)
+            return loader_fn(path)
 
         _loaders[loader] = wrapper
         return wrapper

@@ -2,7 +2,7 @@
 
 import typer
 
-from .callbacks import app_callback
+from .callback import app_callback
 from .loaders import ExcelGroupedDataLoader, ExcelSingleRowDataLoader
 from .options import (
     FilenameKeyOption,

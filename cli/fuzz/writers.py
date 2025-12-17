@@ -8,7 +8,7 @@ import xlwings as xw
 from rich.console import Console
 from rich.table import Table
 
-type WriteFunc = Callable[[int, Path, MultipleQueriesResults], None]
+type WriteFn = Callable[[int, Path, MultipleQueriesResults], None]
 type MultipleQueriesResults = list[tuple[str, Results]]
 type Results = list[tuple[str, int]]
 
@@ -22,20 +22,20 @@ class Writer(StrEnum):
         return self.value
 
 
-_writers: dict[Writer, WriteFunc] = {}
+_writers: dict[Writer, WriteFn] = {}
 
 
-def get_writer_func(writer: Writer) -> WriteFunc:
+def get_writer_fn(writer: Writer) -> WriteFn:
     return _writers[writer]
 
 
-def register_writer(writer: Writer) -> Callable[[WriteFunc], WriteFunc]:
-    def decorator(writer_func: WriteFunc) -> WriteFunc:
-        @wraps(writer_func)
+def register_writer(writer: Writer) -> Callable[[WriteFn], WriteFn]:
+    def decorator(writer_fn: WriteFn) -> WriteFn:
+        @wraps(writer_fn)
         def wrapper(
             limit: int, export_path: Path, data: MultipleQueriesResults
         ) -> None:
-            writer_func(limit, export_path, data)
+            writer_fn(limit, export_path, data)
 
         _writers[writer] = wrapper
         return wrapper

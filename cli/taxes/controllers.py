@@ -2,8 +2,8 @@ import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from .callbacks import app_callback
-from .exporters import get_exporter_func, get_extension
+from .callback import app_callback
+from .exporters import get_export_fn, get_extension
 from .options import (
     CompensationsRateOption,
     ExportPathOption,
@@ -110,7 +110,7 @@ def calculate_net_salaries_from_amount_range_command(  # noqa: PLR0913
             transient=True,
         ) as progress:
             progress.add_task("Exporting ... ", total=None)
-            export_fn = get_exporter_func(get_extension(export_path))
+            export_fn = get_export_fn(get_extension(export_path))
             export_fn(salaries, export_path)
             console.print(f"✅ Results has been exported to {export_path}")
     else:

@@ -3,9 +3,9 @@ from enum import StrEnum
 
 from thefuzz.fuzz import QRatio, UQRatio, UWRatio, WRatio
 
-type AsciiScorerFunc = Callable[[str, str, bool, bool], int]
-type UnicodeScorerFunc = Callable[[str, str, bool], int]
-type ScorerFunc = AsciiScorerFunc | UnicodeScorerFunc
+type AsciiScorerFn = Callable[[str, str, bool, bool], int]
+type UnicodeScorerFn = Callable[[str, str, bool], int]
+type ScorerFn = AsciiScorerFn | UnicodeScorerFn
 
 
 class Scorer(StrEnum):
@@ -18,7 +18,7 @@ class Scorer(StrEnum):
         return self.value
 
 
-_scorers: dict[Scorer, ScorerFunc] = {
+_scorers: dict[Scorer, ScorerFn] = {
     Scorer.QUICK_RATIO: QRatio,
     Scorer.WEIGHTED_RATIO: WRatio,
     Scorer.UNICODE_QUICK_RATIO: UQRatio,
@@ -26,5 +26,5 @@ _scorers: dict[Scorer, ScorerFunc] = {
 }
 
 
-def get_scorer_func(scorer: Scorer) -> ScorerFunc:
+def get_scorer_fn(scorer: Scorer) -> ScorerFn:
     return _scorers.get(scorer, _scorers[Scorer.WEIGHTED_RATIO])

@@ -1,5 +1,6 @@
 import time
 from pathlib import Path
+from typing import Self
 
 import pandas as pd
 from loguru import logger
@@ -38,43 +39,57 @@ def get_authenticated_whatsapp_page() -> tuple[
     return playwright, browser, context, page
 
 
-def close_whatsapp_page(
-    playwright: Playwright,
-    browser: Browser,
-    context: BrowserContext,
-    page: Page,
-) -> None:
-    page.close()
-    context.close()
-    browser.close()
-    playwright.stop()
+class WhatsappSender:
+    def __init__(  # noqa: PLR0913
+        self,
+        playwright: Playwright,
+        browser: Browser,
+        context: BrowserContext,
+        page: Page,
+        timeout_between_messages: float,
+        pageload_timeout: float,
+    ) -> None:
+        self.playwright = playwright
+        self.browser = browser
+        self.context = context
+        self.page = page
+        self.timeout_between_messages = timeout_between_messages
+        self.pageload_timeout = pageload_timeout
 
+    def __enter__(self) -> Self:
+        return self
 
-def send_whatsapp_messages(
-    page: Page,
-    messages: list[Message],
-    timeout_between_messages: float,
-    pageload_timeout: float,
-) -> None:
-    total = len(messages)
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:  # noqa: ANN001
+        self.close()
 
-    for message in track(messages, description="📩 Sending", total=total):
-        try:
-            page.goto(
-                f"https://web.whatsapp.com/send?phone={message.phone}",
-                timeout=60_000,
-            )
+    def close(self) -> None:
+        self.page.close()
+        self.context.close()
+        self.browser.close()
+        self.playwright.stop()
 
-            for text in message.texts:
-                text_input_selector = "footer .lexical-rich-text-input > div"
-                page.wait_for_selector(
-                    text_input_selector, timeout=pageload_timeout
+    def send(self, messages: list[Message]) -> None:
+        total = len(messages)
+
+        for message in track(messages, description="📩 Sending", total=total):
+            try:
+                self.page.goto(
+                    f"https://web.whatsapp.com/send?phone={message.phone}",
+                    timeout=60_000,
                 )
-                page.fill(text_input_selector, text)
-                page.click('[aria-label="Send"]')
 
-            time.sleep(timeout_between_messages)
+                for text in message.texts:
+                    text_input_selector = (
+                        "footer .lexical-rich-text-input > div"
+                    )
+                    self.page.wait_for_selector(
+                        text_input_selector, timeout=self.pageload_timeout
+                    )
+                    self.page.fill(text_input_selector, text)
+                    self.page.click('[aria-label="Send"]')
 
-        except Exception as e:  # noqa: BLE001, PERF203
-            logger.error(f"Error sending message to {message.phone}: {e}")
-            continue
+                time.sleep(self.timeout_between_messages)
+
+            except Exception as e:  # noqa: BLE001, PERF203
+                logger.error(f"Error sending message to {message.phone}: {e}")
+                continue

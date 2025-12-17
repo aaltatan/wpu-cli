@@ -4,10 +4,9 @@ from typing import Annotated
 import typer
 
 from .services import (
-    close_whatsapp_page,
+    WhatsappSender,
     get_authenticated_whatsapp_page,
     get_messages_from_xlsx,
-    send_whatsapp_messages,
 )
 
 app = typer.Typer()
@@ -51,9 +50,13 @@ def send_messages(
 ) -> None:
     """Send whatsapp messages from xlsx file (You should have a file with two columns: phone number and message)."""  # noqa: E501
     playwright, browser, context, page = get_authenticated_whatsapp_page()
-    messages = get_messages_from_xlsx(filepath)
 
-    send_whatsapp_messages(
-        page, messages, timeout_between_messages, pageload_timeout
-    )
-    close_whatsapp_page(playwright, browser, context, page)
+    with WhatsappSender(
+        playwright,
+        browser,
+        context,
+        page,
+        timeout_between_messages,
+        pageload_timeout,
+    ) as sender:
+        sender.send(messages=get_messages_from_xlsx(filepath))

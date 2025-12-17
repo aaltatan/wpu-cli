@@ -10,12 +10,12 @@ import xlwings as xw
 from .constants import HEADERS
 from .schemas import Salary
 
-type ExportFunc = Callable[[list[Salary], Path], None]
+type ExportFn = Callable[[list[Salary], Path], None]
 
-_export_functions: dict[str, ExportFunc] = {}
+_export_functions: dict[str, ExportFn] = {}
 
 
-def get_exporter_functions() -> dict[str, ExportFunc]:
+def get_export_functions() -> dict[str, ExportFn]:
     return _export_functions.copy()
 
 
@@ -23,19 +23,15 @@ def get_extension(path: Path) -> str:
     return path.suffix.lower().replace(".", "")
 
 
-def get_exporter_func(extension: str) -> ExportFunc:
-    if extension not in _export_functions:
-        message = f"Exporter {extension} not found."
-        raise ValueError(message)
-
+def get_export_fn(extension: str) -> ExportFn:
     return _export_functions[extension]
 
 
-def register_extension(extension: str) -> Callable[[ExportFunc], ExportFunc]:
-    def decorator(func: ExportFunc) -> ExportFunc:
-        @wraps(func)
+def register_extension(extension: str) -> Callable[[ExportFn], ExportFn]:
+    def decorator(export_fn: ExportFn) -> ExportFn:
+        @wraps(export_fn)
         def wrapper(salaries: list[Salary], path: Path) -> None:
-            func(salaries, path)
+            export_fn(salaries, path)
 
         _export_functions[extension] = wrapper
         return wrapper

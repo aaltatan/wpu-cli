@@ -88,6 +88,15 @@ RemoveDuplicatedOption = Annotated[
     ),
 ]
 
+
+def export_path_callback(path: Path) -> Path:
+    if path.exists():
+        message = f"The file {path} already exists."
+        raise typer.BadParameter(message)
+
+    return path
+
+
 ExportPathOption = Annotated[
     Path,
     typer.Option(
@@ -99,6 +108,7 @@ ExportPathOption = Annotated[
         dir_okay=False,
         resolve_path=True,
         default_factory=lambda: Path().home() / "Desktop" / "output.xlsx",
+        callback=export_path_callback,
     ),
 ]
 

@@ -1,8 +1,11 @@
 import os
+from pathlib import Path
 from typing import Annotated
 
 import typer
 from syriantaxes import RoundingMethod
+
+from .exporters import get_exporter_functions, get_extension
 
 FACTOR = 10
 MAX_ITERATIONS = 1000
@@ -195,5 +198,35 @@ StepAmountRangeArgument = Annotated[
     float | None,
     typer.Argument(
         callback=amount_range_step_callback,
+    ),
+]
+
+
+def export_path_callback(value: Path | None) -> Path | None:
+    if value:
+        if value.exists():
+            message = f"The file {value} already exists."
+            raise typer.BadParameter(message)
+
+        extension = get_extension(value)
+
+        if extension not in get_exporter_functions():
+            message = f"extension of type (.{extension}) not supported."
+            raise typer.BadParameter(message)
+
+    return value
+
+
+ExportPathOption = Annotated[
+    Path | None,
+    typer.Option(
+        "-e",
+        "--export-path",
+        help="Path to the output file",
+        exists=False,
+        file_okay=True,
+        dir_okay=False,
+        resolve_path=True,
+        callback=export_path_callback,
     ),
 ]

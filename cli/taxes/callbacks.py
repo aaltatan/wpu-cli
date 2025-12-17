@@ -39,7 +39,7 @@ def app_callback(  # noqa: PLR0913
     ss_deduction_rate: SsDeductionRateOption,
     fixed_tax_rate: FixedTaxRateOption,
 ):
-    """Calculate taxes."""
+    """Calculate taxes based on Syrian taxes rules."""
     brackets = _get_brackets(brackets_mins, brackets_maxes, brackets_rates)
     tax_rounder = Rounder(taxes_rounding_method, taxes_round_to_nearest)
     ss_rounder = Rounder(ss_rounding_method, ss_round_to_nearest)

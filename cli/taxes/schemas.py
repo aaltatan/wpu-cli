@@ -1,14 +1,18 @@
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, ConfigDict, computed_field
 
 
 class Salary(BaseModel):
-    gross: Decimal = Field(default=Decimal(0))
-    compensations: Decimal = Field(default=Decimal(0))
-    ss_deduction: Decimal = Field(default=Decimal(0))
-    brackets_tax: Decimal = Field(default=Decimal(0))
-    fixed_tax: Decimal = Field(default=Decimal(0))
+    model_config = ConfigDict(
+        json_encoders={Decimal: lambda v: float(v)},
+    )
+
+    gross: Decimal = Decimal(0)
+    compensations: Decimal = Decimal(0)
+    ss_deduction: Decimal = Decimal(0)
+    brackets_tax: Decimal = Decimal(0)
+    fixed_tax: Decimal = Decimal(0)
 
     @computed_field
     @property

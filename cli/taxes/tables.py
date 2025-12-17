@@ -1,22 +1,14 @@
 from rich.table import Table
 
+from .constants import HEADERS
 from .schemas import Salary
 
 
 def get_salary_table(*salaries: Salary, title: str = "Results") -> Table:
     table = Table(title=title)
 
-    table.add_column("#", justify="right")
-    table.add_column("Gross", justify="right", style="cyan")
-    table.add_column("Compensations", justify="right", style="cyan")
-    table.add_column("Total", justify="right", style="green")
-    table.add_column("SS Deduction", justify="right", style="cyan")
-    table.add_column("Brackets Tax", justify="right", style="cyan")
-    table.add_column("Fixed Tax", justify="right", style="cyan")
-    table.add_column("Taxes", justify="right", style="red")
-    table.add_column("Deductions", justify="right", style="red")
-    table.add_column("Net", justify="right", style="green")
-    table.add_column("Compensations to Total Ratio", justify="right")
+    for header, options in HEADERS.items():
+        table.add_column(header, **options)  # type: ignore  # noqa: PGH003
 
     for idx, salary in enumerate(salaries, start=1):
         table.add_row(

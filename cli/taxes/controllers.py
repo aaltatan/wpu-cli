@@ -1,9 +1,12 @@
 import typer
 from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from .callbacks import app_callback
+from .exporters import get_exporter_func, get_extension
 from .options import (
     CompensationsRateOption,
+    ExportPathOption,
     GrossCompensationsOption,
     GrossSalaryArgument,
     SocialSecuritySalaryOption,
@@ -70,12 +73,13 @@ def calculate_net_salary_command(
 
 
 @app.command(name="ar")
-def calculate_net_salaries_from_amount_range_command(
+def calculate_net_salaries_from_amount_range_command(  # noqa: PLR0913
     ctx: typer.Context,
     compensations_rate: CompensationsRateOption,
     start: StartAmountRangeArgument,
     stop: StopAmountRangeArgument = None,
     step: StepAmountRangeArgument = None,
+    export_path: ExportPathOption = None,
 ):
     """Create salaries from a given amount range."""
     if stop is None:
@@ -98,6 +102,17 @@ def calculate_net_salaries_from_amount_range_command(
     )
 
     console = Console()
-    table = get_salary_table(*salaries, title="Net Results")
 
-    console.print(table)
+    if export_path is not None:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            transient=True,
+        ) as progress:
+            progress.add_task("Exporting ... ", total=None)
+            export_fn = get_exporter_func(get_extension(export_path))
+            export_fn(salaries, export_path)
+            console.print(f"✅ Results has been exported to {export_path}")
+    else:
+        table = get_salary_table(*salaries, title="Net Results")
+        console.print(table)

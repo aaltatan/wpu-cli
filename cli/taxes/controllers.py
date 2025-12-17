@@ -7,9 +7,16 @@ from .options import (
     GrossCompensationsOption,
     GrossSalaryArgument,
     SocialSecuritySalaryOption,
+    StartAmountRangeArgument,
+    StepAmountRangeArgument,
+    StopAmountRangeArgument,
     TargetSalaryArgument,
 )
-from .services import calculate_gross_taxes, calculate_net_salary
+from .services import (
+    calculate_gross_taxes,
+    calculate_net_salaries_from_amount_range,
+    calculate_net_salary,
+)
 from .tables import get_salary_table
 
 app = typer.Typer(callback=app_callback)
@@ -58,5 +65,39 @@ def calculate_net_salary_command(
 
     console = Console()
     table = get_salary_table(salary, title="Net Results")
+
+    console.print(table)
+
+
+@app.command(name="ar")
+def calculate_net_salaries_from_amount_range_command(
+    ctx: typer.Context,
+    compensations_rate: CompensationsRateOption,
+    start: StartAmountRangeArgument,
+    stop: StopAmountRangeArgument = None,
+    step: StepAmountRangeArgument = None,
+):
+    """Create salaries from a given amount range."""
+    if stop is None:
+        message = "You must provide a stop value."
+        raise typer.BadParameter(message)
+
+    if step is None:
+        message = "You must provide a step value."
+        raise typer.BadParameter(message)
+
+    salaries = calculate_net_salaries_from_amount_range(
+        start=start,
+        stop=stop,
+        step=step,
+        compensations_rate=compensations_rate,
+        brackets=ctx.obj["brackets"],
+        min_allowed_salary=ctx.obj["min_allowed_salary"],
+        fixed_tax_rate=ctx.obj["fixed_tax_rate"],
+        rounder=ctx.obj["tax_rounder"],
+    )
+
+    console = Console()
+    table = get_salary_table(*salaries, title="Net Results")
 
     console.print(table)

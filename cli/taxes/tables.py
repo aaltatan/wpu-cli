@@ -6,6 +6,7 @@ from .schemas import Salary
 def get_salary_table(*salaries: Salary, title: str = "Results") -> Table:
     table = Table(title=title)
 
+    table.add_column("#", justify="right")
     table.add_column("Gross", justify="right", style="cyan")
     table.add_column("Compensations", justify="right", style="cyan")
     table.add_column("Total", justify="right", style="green")
@@ -17,8 +18,9 @@ def get_salary_table(*salaries: Salary, title: str = "Results") -> Table:
     table.add_column("Net", justify="right", style="green")
     table.add_column("Compensations to Total Ratio", justify="right")
 
-    for salary in salaries:
+    for idx, salary in enumerate(salaries, start=1):
         table.add_row(
+            str(idx),
             f"{salary.gross:,.2f}",
             f"{salary.compensations:,.2f}",
             f"{salary.total:,.2f}",

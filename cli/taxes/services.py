@@ -85,9 +85,9 @@ def calculate_net_salary(
     )
 
 
-def create_salaries_from_amount_range(
+def calculate_net_salaries_from_amount_range(
     start: float,
-    end: float,
+    stop: float,
     step: float,
     compensations_rate: float,
     brackets: list[Bracket],
@@ -95,4 +95,14 @@ def create_salaries_from_amount_range(
     fixed_tax_rate: float,
     rounder: Rounder,
 ) -> list[Salary]:
-    pass
+    return [
+        calculate_net_salary(
+            target_salary=target,
+            compensations_rate=compensations_rate,
+            brackets=brackets,
+            min_allowed_salary=min_allowed_salary,
+            fixed_tax_rate=fixed_tax_rate,
+            rounder=rounder,
+        )
+        for target in range(int(start), int(stop) + 1, int(step))
+    ]

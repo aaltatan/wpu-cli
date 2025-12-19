@@ -89,7 +89,7 @@ SsDeductionRateOption = Annotated[
     float,
     typer.Option(
         "--ss-deduction-rate",
-        envvar="TAXES_DEFAULT_SS_DEDUCTION_RATE",
+        envvar="TAXES_SS_DEDUCTION_RATE",
     ),
 ]
 

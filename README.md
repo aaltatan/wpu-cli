@@ -4,27 +4,39 @@ CLI application for make some automation tasks.
 
 ## Environment Variables
 
-### Edutech App
+```env
+# Edutech App
+EDUTECH_USERNAME=your_username # edutech username
+EDUTECH_PASSWORD=your_password # edutech password
+EDUTECH_TIMEOUT_AFTER_INSERTING_ROWS=5000 # timeout for playwright between rows insertion
 
-- `EDUTECH_USERNAME`: Edutech username
-- `EDUTECH_PASSWORD`: Edutech password
-- `TIMEOUT_AFTER_INSERTING_ROWS`: Timeout for playwright e.g. 5000
+# Fuzz App
+FUZZ_DEFAULT_ACCURACY=60 # default accuracy for fuzzy matching
+FUZZ_DEFAULT_LIMIT=5 # default limit for fuzzy matching
+FUZZ_DEFAULT_SCORER=q # default scorer for fuzzy matching
+FUZZ_DEFAULT_REMOVE_DUPLICATED=1 # default remove duplicated for fuzzy matching
+FUZZ_DEFAULT_WRITER=choices-xlsx # default writer for fuzzy matching
 
-### Fuzz App
+# Whatsapp App
+WHATSAPP_DEFAULT_TIMEOUT_BETWEEN_MESSAGES=3 # default timeout between messages for whatsapp app
+WHATSAPP_DEFAULT_PAGELOAD_TIMEOUT=10000 # default pageload timeout for whatsapp app
 
-- `DEFAULT_ACCURACY`: Default accuracy for fuzzy matching e.g. `60`
-- `DEFAULT_LIMIT`: Default limit for fuzzy matching e.g. `5`
-- `DEFAULT_SCORER`: Default scorer for fuzzy matching e.g. `q`
-- `DEFAULT_REMOVE_DUPLICATED`: Default remove duplicated for fuzzy matching e.g. `1` for `True`
-- `DEFAULT_WRITER`: Default writer for fuzzy matching e.g. `choices-xlsx`
+# Template App
+TEMPLATES_DEFAULT_GENERATED_SINGLE_FILE_NAME=output # default filename for generated single file
+TEMPLATES_DEFAULT_GENERATE_SINGLE_FILE_DATA_KEY=data # default data key for generated single file
+TEMPLATES_DEFAULT_MULTIPLE_ROWS_GROUPED_KEY=data # default grouped key for generated multiple rows
 
-### Whatsapp App
-
-- `DEFAULT_TIMEOUT_BETWEEN_MESSAGES`: Default timeout between messages for whatsapp app e.g. `3`
-- `DEFAULT_PAGELOAD_TIMEOUT`: Default pageload timeout for whatsapp app e.g. `10000`
-
-### Template App
-
-- `DEFAULT_TEMPLATE_GENERATED_SINGLE_FILE_NAME`: Default filename for generated single file e.g. `output`
-- `DEFAULT_TEMPLATE_GENERATE_SINGLE_FILE_DATA_KEY`: Default data key for generated single file e.g. `data`
-- `DEFAULT_TEMPLATE_MULTIPLE_ROWS_GROUPED_KEY`: Default grouped key for generated multiple rows e.g. `data`
+# Taxes App
+TAXES_BRACKET_TAX_MINS=0 837000 850000 1100000 # default brackets mins for taxes app
+TAXES_BRACKET_TAX_MAXS=837000 850000 1100000 25000000 # default brackets maxes for taxes app
+TAXES_BRACKET_TAX_RATES=0 0.11 0.13 0.15 # default brackets rates for taxes app
+TAXES_MIN_ALLOWED_SALARY=837000 # default min allowed salary for taxes app
+TAXES_TAXES_ROUNDING_METHOD=ROUND_CEILING # default taxes rounding method for taxes app
+TAXES_TAXES_ROUND_TO_NEAREST=100 # default taxes round to nearest for taxes app
+TAXES_SS_ROUNDING_METHOD=ROUND_CEILING # default ss rounding method for taxes app
+TAXES_SS_ROUND_TO_NEAREST=1 # default ss round to nearest for taxes app
+TAXES_MIN_SS_ALLOWED_SALARY=750000 # default min ss allowed salary for taxes app
+TAXES_SS_DEDUCTION_RATE=0.07 # default ss deduction rate for taxes app
+TAXES_FIXED_TAX_RATE=0.05 # default fixed tax rate for taxes app
+TAXES_DEFAULT_COMPENSATIONS_RATE=0.75 # default compensations rate for taxes app
+```

@@ -48,7 +48,7 @@ FilenameKeyOption = Annotated[
         "-k",
         "--filename-key",
         help="Key to use as filename from data",
-        envvar="DEFAULT_TEMPLATE_GENERATED_SINGLE_FILE_NAME",
+        envvar="TEMPLATES_DEFAULT_GENERATED_SINGLE_FILE_NAME",
     ),
 ]
 
@@ -78,7 +78,7 @@ TemplateDataKeyOption = Annotated[
     typer.Option(
         "--data-key",
         help="Key to use as data from template, e.g. {%p for item in data['data'] %}",  # noqa: E501
-        envvar="DEFAULT_TEMPLATE_GENERATE_SINGLE_FILE_DATA_KEY",
+        envvar="TEMPLATES_DEFAULT_GENERATE_SINGLE_FILE_DATA_KEY",
     ),
 ]
 
@@ -88,7 +88,7 @@ GroupedColumnsOption = Annotated[
         "--column",
         "-c",
         help="Column to be grouped",
-        envvar="DEFAULT_TEMPLATE_MULTIPLE_ROWS_GROUPED_KEY",
+        envvar="TEMPLATES_DEFAULT_MULTIPLE_ROWS_GROUPED_KEY",
     ),
 ]
 

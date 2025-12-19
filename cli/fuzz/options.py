@@ -54,7 +54,7 @@ ScorerOption = Annotated[
     typer.Option(
         "-s",
         "--scorer",
-        envvar="DEFAULT_SCORER",
+        envvar="FUZZ_DEFAULT_SCORER",
         help="q for Quick Ratio, w for Weighted Ratio, u for unicode",
     ),
 ]
@@ -64,7 +64,7 @@ AccuracyOption = Annotated[
     typer.Option(
         "-a",
         "--accuracy",
-        envvar="DEFAULT_ACCURACY",
+        envvar="FUZZ_DEFAULT_ACCURACY",
         help="Accuracy for fuzzy matching 1 to 100",
     ),
 ]
@@ -74,7 +74,7 @@ LimitOption = Annotated[
     typer.Option(
         "-l",
         "--limit",
-        envvar="DEFAULT_LIMIT",
+        envvar="FUZZ_DEFAULT_LIMIT",
         help="Limit for matching results",
     ),
 ]
@@ -83,7 +83,7 @@ RemoveDuplicatedOption = Annotated[
     bool,
     typer.Option(
         "--remove-duplicated",
-        envvar="DEFAULT_REMOVE_DUPLICATED",
+        envvar="FUZZ_DEFAULT_REMOVE_DUPLICATED",
         help="Remove duplicated results",
     ),
 ]
@@ -117,7 +117,7 @@ WriterOption = Annotated[
     typer.Option(
         "-w",
         "--writer",
-        envvar="DEFAULT_WRITER",
+        envvar="FUZZ_DEFAULT_WRITER",
         help="writer type",
     ),
 ]

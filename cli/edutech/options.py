@@ -56,6 +56,6 @@ TimeoutAfterInsertingRowsOption = Annotated[
     typer.Option(
         "--timeout",
         help="Timeout after inserting rows",
-        envvar="TIMEOUT_AFTER_INSERTING_ROWS",
+        envvar="EDUTECH_TIMEOUT_AFTER_INSERTING_ROWS",
     ),
 ]

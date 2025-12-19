@@ -19,7 +19,7 @@ MessagesTimeoutOption = Annotated[
     typer.Option(
         "--timeout-between-messages",
         help="Timeout between messages",
-        envvar="DEFAULT_TIMEOUT_BETWEEN_MESSAGES",
+        envvar="WHATSAPP_DEFAULT_TIMEOUT_BETWEEN_MESSAGES",
     ),
 ]
 
@@ -28,6 +28,6 @@ PageloadTimeoutOption = Annotated[
     typer.Option(
         "--pageload-timeout",
         help="Timeout for pageload",
-        envvar="DEFAULT_PAGELOAD_TIMEOUT",
+        envvar="WHATSAPP_DEFAULT_PAGELOAD_TIMEOUT",
     ),
 ]

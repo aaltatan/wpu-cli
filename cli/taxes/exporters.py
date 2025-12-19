@@ -19,10 +19,6 @@ def get_export_functions() -> dict[str, ExportFn]:
     return _export_functions.copy()
 
 
-def get_extension(path: Path) -> str:
-    return path.suffix.lower().replace(".", "")
-
-
 def get_export_fn(extension: str) -> ExportFn:
     return _export_functions[extension]
 

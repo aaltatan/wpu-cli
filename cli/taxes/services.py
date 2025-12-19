@@ -31,12 +31,7 @@ def calculate_gross_taxes(
         ss_deduction = Decimal(0)
     else:
         brackets_tax = calculate_brackets_tax(
-            gross_salary,
-            brackets,
-            min_allowed_salary,
-            tax_rounder,
-            ss_obj,
-            ss_salary,
+            gross_salary, brackets, min_allowed_salary, tax_rounder, ss_obj, ss_salary
         )
         ss_deduction = ss_obj.calculate_deduction(ss_salary)
 
@@ -60,12 +55,7 @@ def calculate_net_salary(
     rounder: Rounder,
 ) -> Salary:
     gross_salary, gross_compensations = calculate_gross_components(
-        target=target_salary,
-        compensations_rate=compensations_rate,
-        brackets=brackets,
-        min_allowed_salary=min_allowed_salary,
-        compensations_tax_rate=fixed_tax_rate,
-        rounder=rounder,
+        target_salary, compensations_rate, brackets, min_allowed_salary, fixed_tax_rate, rounder
     )
 
     brackets_tax = calculate_brackets_tax(gross_salary, brackets, min_allowed_salary, rounder)

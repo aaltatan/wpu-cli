@@ -5,7 +5,9 @@ from typing import Annotated
 import typer
 from syriantaxes import RoundingMethod
 
-from .exporters import get_export_functions, get_extension
+from cli.utils import extract_extension
+
+from .exporters import get_export_functions
 
 FACTOR = 10
 MAX_ITERATIONS = 1000
@@ -213,7 +215,7 @@ def export_path_callback(value: Path | None) -> Path | None:
             message = f"The file {value} already exists."
             raise typer.BadParameter(message)
 
-        extension = get_extension(value)
+        extension = extract_extension(value)
 
         if extension not in get_export_functions():
             message = f"extension of type (.{extension}) not supported."

@@ -29,9 +29,7 @@ Processor = StrEnum("Processor", DEFAULT_PROCESSORS + ADDITIONAL_PROCESSORS)
 _processors: dict[DefaultProcessor | AdditionalProcessor | Processor, ProcessFn] = {}
 
 
-def _get_processor_fn(
-    processor: DefaultProcessor | AdditionalProcessor,
-) -> ProcessFn:
+def _get_processor_fn(processor: DefaultProcessor | AdditionalProcessor) -> ProcessFn:
     if processor not in _processors:
         message = f"Processor '{processor}' not found"
         raise ValueError(message)
@@ -39,9 +37,7 @@ def _get_processor_fn(
     return _processors[processor]
 
 
-def get_processor_fn(
-    processors: list[DefaultProcessor | AdditionalProcessor],
-) -> ProcessFn:
+def get_processor_fn(processors: list[DefaultProcessor | AdditionalProcessor]) -> ProcessFn:
     processors_functions = [_get_processor_fn(p) for p in processors]
 
     def wrapper(query: str) -> str:

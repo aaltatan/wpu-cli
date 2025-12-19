@@ -15,12 +15,7 @@ class ExcelSingleRowDataLoader:
 
 
 class ExcelGroupedDataLoader:
-    def __init__(
-        self,
-        filepath: Path,
-        group_key: str,
-        *grouped_columns: str,
-    ) -> None:
+    def __init__(self, filepath: Path, group_key: str, *grouped_columns: str) -> None:
         self.filepath = filepath
         self.grouped_columns = grouped_columns
         self.group_key = group_key

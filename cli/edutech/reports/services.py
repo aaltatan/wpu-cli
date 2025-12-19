@@ -29,11 +29,7 @@ class JournalsPageFilters:
     grid_columns: list[str]
 
 
-def get_journals(
-    authenticated_page: Page,
-    filters: JournalsPageFilters,
-    financial_year: str,
-):
+def get_journals(authenticated_page: Page, filters: JournalsPageFilters, financial_year: str):
     pipeline = (
         JournalsPagePipeline(authenticated_page)
         .navigate_to_general_accounting(financial_year=financial_year)

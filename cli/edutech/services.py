@@ -55,11 +55,7 @@ class PagePipeline:
         return self
 
     def fill_input(
-        self,
-        *,
-        selector: str,
-        value: Any,
-        kind: Literal["select", "input"] = "input",
+        self, *, selector: str, value: Any, kind: Literal["select", "input"] = "input"
     ) -> Self:
         if value:
             self._page.fill(selector, str(value))

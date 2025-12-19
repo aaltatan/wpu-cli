@@ -73,9 +73,7 @@ def get_voucher_from_xlsx(filepath: Path, chapter: Chapter) -> list[Row]:
 
 
 def _parse_ids(
-    parser: HTMLParser,
-    id_start_with: str,
-    type_: Literal["input", "textarea"] = "input",
+    parser: HTMLParser, id_start_with: str, type_: Literal["input", "textarea"] = "input"
 ) -> list[str]:
     ids = parser.css(f'{type_}[id^="{id_start_with}"]')
     return [el.attributes.get("id") or "" for el in ids][1:]

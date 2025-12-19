@@ -3,9 +3,23 @@ from typing import Annotated
 
 import typer
 
+from cli.utils import extract_extension
+
+from .loaders import get_loaders
 from .processors import AdditionalProcessor, DefaultProcessor
 from .scorers import Scorer
 from .writers import Writer
+
+
+def loader_path_callback(value: Path) -> Path:
+    extension = extract_extension(value)
+
+    if extension not in get_loaders():
+        message = f"No implementation found for '{extension}' extension"
+        raise ValueError(message)
+
+    return value
+
 
 QueriesPathOption = Annotated[
     Path,
@@ -17,6 +31,7 @@ QueriesPathOption = Annotated[
         exists=True,
         resolve_path=True,
         help="path to a file containing the queries",
+        callback=loader_path_callback,
     ),
 ]
 
@@ -30,6 +45,7 @@ ChoicesPathOption = Annotated[
         exists=True,
         resolve_path=True,
         help="path to a file containing the choices",
+        callback=loader_path_callback,
     ),
 ]
 

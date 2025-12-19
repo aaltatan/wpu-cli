@@ -50,12 +50,7 @@ class MultipleDocxTemplateWriter:
         self.pdf = pdf
         self.include_index_in_filename = include_index_in_filename
 
-    def _get_filename(
-        self,
-        item: dict[Any, Any],
-        idx: int,
-        filename_key: str | None = None,
-    ) -> str:
+    def _get_filename(self, item: dict[Any, Any], idx: int, filename_key: str | None = None) -> str:
         filename = f"template-{idx}"
 
         if filename_key and filename_key in item:

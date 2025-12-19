@@ -6,6 +6,6 @@ def init_logger() -> None:
     logger.add(
         "logs/app.log",
         level="INFO",
-        format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{function}:{line} --> {message}",  # noqa: E501
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{function}:{line} --> {message}",
         rotation="2 days",
     )

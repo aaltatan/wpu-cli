@@ -5,11 +5,7 @@ import typer
 from devtools import debug
 from playwright.sync_api import sync_playwright
 
-from cli.edutech.options import (
-    EdutechPasswordOption,
-    EdutechUsernameOption,
-    FinancialYearOption,
-)
+from cli.edutech.options import EdutechPasswordOption, EdutechUsernameOption, FinancialYearOption
 from cli.edutech.services import get_edutech_authenticated_page
 
 from .services import JournalsPageFilters, get_journals
@@ -70,9 +66,7 @@ def generate_cash_report(  # noqa: PLR0913
 ) -> None:
     """Generate cash report."""
     with sync_playwright() as playwright:
-        authenticated_page = get_edutech_authenticated_page(
-            playwright, edutech_username, password
-        )
+        authenticated_page = get_edutech_authenticated_page(playwright, edutech_username, password)
 
         filters = JournalsPageFilters(
             from_date=from_date,

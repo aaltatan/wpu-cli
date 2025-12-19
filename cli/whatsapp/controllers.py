@@ -1,11 +1,7 @@
 import typer
 
 from .loaders import get_messages_from_xlsx
-from .options import (
-    FilepathArgument,
-    MessagesTimeoutOption,
-    PageloadTimeoutOption,
-)
+from .options import FilepathArgument, MessagesTimeoutOption, PageloadTimeoutOption
 from .services import WhatsappSender
 
 app = typer.Typer()

@@ -109,9 +109,7 @@ class SingleDocxTemplateWriter:
     def write(self, data: Data) -> None:
         filepath = _generate_filepath(self.filename, self.output_dir, "docx")
 
-        self.template.render(
-            {self.template_data_key: data, **ADDITIONAL_CONTEXT}
-        )
+        self.template.render({self.template_data_key: data, **ADDITIONAL_CONTEXT})
         self.template.save(filepath)
 
         if self.pdf:

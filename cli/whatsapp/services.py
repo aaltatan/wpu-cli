@@ -10,9 +10,7 @@ from .schemas import Message
 
 
 class WhatsappSender:
-    def __init__(
-        self, timeout_between_messages: float, pageload_timeout: float
-    ) -> None:
+    def __init__(self, timeout_between_messages: float, pageload_timeout: float) -> None:
         playwright, browser, context, page = self._get_authenticated_page()
         self.playwright = playwright
         self.browser = browser
@@ -48,9 +46,7 @@ class WhatsappSender:
 
     def _send_single_message(self, message: str) -> None:
         text_input_selector = "footer .lexical-rich-text-input > div"
-        self.page.wait_for_selector(
-            text_input_selector, timeout=self.pageload_timeout
-        )
+        self.page.wait_for_selector(text_input_selector, timeout=self.pageload_timeout)
         self.page.fill(text_input_selector, message)
         self.page.click('[aria-label="Send"]')
 

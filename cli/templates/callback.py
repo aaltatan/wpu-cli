@@ -3,12 +3,7 @@ from pathlib import Path
 
 import typer
 
-from .options import (
-    DataPathOption,
-    OutputDirOption,
-    PDFOption,
-    TemplatePathOption,
-)
+from .options import DataPathOption, OutputDirOption, PDFOption, TemplatePathOption
 
 DEFAULT_OUTPUT_DESKTOP_DIRNAME = "output"
 
@@ -78,8 +73,6 @@ def app_callback(
     ctx.obj = {
         "data_filepath": data_filepath,
         "template": template,
-        "output_dir": make_output_dir(
-            DEFAULT_OUTPUT_DESKTOP_DIRNAME, output_dir
-        ),
+        "output_dir": make_output_dir(DEFAULT_OUTPUT_DESKTOP_DIRNAME, output_dir),
         "pdf": pdf,
     }

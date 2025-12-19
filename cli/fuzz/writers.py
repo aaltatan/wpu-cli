@@ -32,9 +32,7 @@ def get_writer_fn(writer: Writer) -> WriteFn:
 def register_writer(writer: Writer) -> Callable[[WriteFn], WriteFn]:
     def decorator(writer_fn: WriteFn) -> WriteFn:
         @wraps(writer_fn)
-        def wrapper(
-            limit: int, export_path: Path, data: MultipleQueriesResults
-        ) -> None:
+        def wrapper(limit: int, export_path: Path, data: MultipleQueriesResults) -> None:
             writer_fn(limit, export_path, data)
 
         _writers[writer] = wrapper
@@ -44,13 +42,9 @@ def register_writer(writer: Writer) -> Callable[[WriteFn], WriteFn]:
 
 
 @register_writer(Writer.TERMINAL)
-def write_terminal(
-    columns_count: int, _: Path, results: MultipleQueriesResults
-) -> None:
+def write_terminal(columns_count: int, _: Path, results: MultipleQueriesResults) -> None:
     console = Console()
-    table = Table(
-        show_header=True, header_style="bold magenta", title="results"
-    )
+    table = Table(show_header=True, header_style="bold magenta", title="results")
 
     table.add_column("Query", justify="right")
 
@@ -71,18 +65,14 @@ def write_flat_excel(
     data = [[query, *[match for match, _ in r]] for query, r in results]
 
     df = pd.DataFrame(
-        data,
-        columns=["Query"]
-        + [f"Match {idx + 1}" for idx in range(columns_count)],
+        data, columns=["Query"] + [f"Match {idx + 1}" for idx in range(columns_count)]
     )
 
     df.to_excel(export_path, index=False)
 
 
 @register_writer(Writer.CHOICES_XLSX)
-def write_choices_excel(
-    _: int, export_path: Path, results: MultipleQueriesResults
-) -> None:
+def write_choices_excel(_: int, export_path: Path, results: MultipleQueriesResults) -> None:
     headers = ["Query", "Matches"]
     data = [(query, [match for match, _ in r]) for query, r in results]
 
@@ -95,9 +85,7 @@ def write_choices_excel(
         formula = ",".join(matches) if matches else "#N/A"
         ws.range(f"A{idx}").options(index=False).value = query
         ws.range(f"B{idx}").api.Validation.Add(Type=3, Formula1=formula)
-        ws.range(f"B{idx}").options(index=False).value = (
-            matches[0] if matches else "#N/A"
-        )
+        ws.range(f"B{idx}").options(index=False).value = matches[0] if matches else "#N/A"
 
     wb.save(export_path)
 
@@ -108,9 +96,7 @@ class SingleQueryTerminalWriter:
         self.headers = headers
 
     def get_table(self) -> Table:
-        table = Table(
-            show_header=True, header_style="bold magenta", title=self.title
-        )
+        table = Table(show_header=True, header_style="bold magenta", title=self.title)
 
         for header in self.headers:
             table.add_column(header, justify="right")

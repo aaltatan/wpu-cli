@@ -121,9 +121,7 @@ def add_voucher(
     parser = HTMLParser(pipeline.page.content())
     additional_data = _parse_additional_data(parser)
 
-    for row, automata_row in track(
-        zip(rows, additional_data, strict=False), total=len(rows)
-    ):
+    for row, automata_row in track(zip(rows, additional_data, strict=False), total=len(rows)):
         pipeline.fill_row(row, automata_row)
 
     input("Press any key to close ... ")

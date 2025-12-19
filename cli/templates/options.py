@@ -77,7 +77,7 @@ TemplateDataKeyOption = Annotated[
     str,
     typer.Option(
         "--data-key",
-        help="Key to use as data from template, e.g. {%p for item in data['data'] %}",  # noqa: E501
+        help="Key to use as data from template, e.g. {%p for item in data['data'] %}",
         envvar="TEMPLATES_DEFAULT_GENERATE_SINGLE_FILE_DATA_KEY",
     ),
 ]

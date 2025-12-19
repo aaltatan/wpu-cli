@@ -14,15 +14,11 @@ app = typer.Typer(callback=app_callback)
 
 
 @app.command("one")
-def match_one_command(
-    ctx: typer.Context, query: Annotated[str, typer.Argument()]
-):
+def match_one_command(ctx: typer.Context, query: Annotated[str, typer.Argument()]):
     matches = match_one(
         query=query,
         choices=get_loader_data(ctx.obj["choices_path"]),
-        processor_fn=get_processor_fn(
-            ctx.obj["processors"] + ctx.obj["default_processors"]
-        ),
+        processor_fn=get_processor_fn(ctx.obj["processors"] + ctx.obj["default_processors"]),
         scorer_fn=get_scorer_fn(ctx.obj["scorer"]),
         accuracy=ctx.obj["accuracy"],
         limit=ctx.obj["limit"],
@@ -43,9 +39,7 @@ def match_list_command(
     matches = match_list(
         queries=get_loader_data(queries_path),
         choices=get_loader_data(ctx.obj["choices_path"]),
-        processor_fn=get_processor_fn(
-            ctx.obj["processors"] + ctx.obj["default_processors"]
-        ),
+        processor_fn=get_processor_fn(ctx.obj["processors"] + ctx.obj["default_processors"]),
         scorer_fn=get_scorer_fn(ctx.obj["scorer"]),
         accuracy=ctx.obj["accuracy"],
         limit=ctx.obj["limit"],
@@ -57,15 +51,11 @@ def match_list_command(
 
 
 @app.command("clip")
-def match_clip_command(
-    ctx: typer.Context, export_path: ExportPathOption, writer: WriterOption
-):
+def match_clip_command(ctx: typer.Context, export_path: ExportPathOption, writer: WriterOption):
     matches = match_list(
         queries=get_clipboard_data(),
         choices=get_loader_data(ctx.obj["choices_path"]),
-        processor_fn=get_processor_fn(
-            ctx.obj["processors"] + ctx.obj["default_processors"]
-        ),
+        processor_fn=get_processor_fn(ctx.obj["processors"] + ctx.obj["default_processors"]),
         scorer_fn=get_scorer_fn(ctx.obj["scorer"]),
         accuracy=ctx.obj["accuracy"],
         limit=ctx.obj["limit"],

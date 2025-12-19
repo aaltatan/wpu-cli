@@ -44,9 +44,7 @@ def get_journals(
     )
 
     for account in filters.accounts:
-        pipeline.fill_input(
-            selector="#voucherAccountId_label", value=account, kind="select"
-        )
+        pipeline.fill_input(selector="#voucherAccountId_label", value=account, kind="select")
 
     pipeline.click_search_voucher().wait_for_timeout(timeout=5_000)
 
@@ -56,11 +54,7 @@ def get_journals(
         pipeline.select_all_pagination_option(timeout=5_000)
         data = response.value.json()
 
-        if (
-            isinstance(data, dict)
-            and "rows" in data
-            and isinstance(data["rows"], list)
-        ):
+        if isinstance(data, dict) and "rows" in data and isinstance(data["rows"], list):
             return [JournalRow(**row) for row in data["rows"]]
 
         message = "No rows found"

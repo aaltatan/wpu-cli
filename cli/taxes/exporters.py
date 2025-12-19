@@ -103,6 +103,4 @@ def export_to_json(salaries: list[Salary], path: Path) -> None:
 @register_extension("jsonl")
 def export_to_jsonl(salaries: list[Salary], path: Path) -> None:
     with open(path, "w") as f:
-        f.writelines(
-            salary.model_dump_json(indent=4) + "\n" for salary in salaries
-        )
+        f.writelines(salary.model_dump_json(indent=4) + "\n" for salary in salaries)

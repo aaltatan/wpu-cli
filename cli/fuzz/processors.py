@@ -26,9 +26,7 @@ AdditionalProcessor = StrEnum("AdditionalProcessor", ADDITIONAL_PROCESSORS)
 Processor = StrEnum("Processor", DEFAULT_PROCESSORS + ADDITIONAL_PROCESSORS)
 
 
-_processors: dict[
-    DefaultProcessor | AdditionalProcessor | Processor, ProcessFn
-] = {}
+_processors: dict[DefaultProcessor | AdditionalProcessor | Processor, ProcessFn] = {}
 
 
 def _get_processor_fn(

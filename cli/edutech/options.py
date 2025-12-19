@@ -8,9 +8,7 @@ def validate_financial_year(year: str) -> None:
     pattern = re.compile(r"^20\d{2}/20\d{2}$")
 
     if not pattern.match(year):
-        message = (
-            f"Invalid financial year: {year} you should use format 2025/2026"
-        )
+        message = f"Invalid financial year: {year} you should use format 2025/2026"
         raise typer.BadParameter(message, param_hint="--year")
 
     last_year, current_year = year.split("/")

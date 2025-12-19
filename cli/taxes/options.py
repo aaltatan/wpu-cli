@@ -96,11 +96,9 @@ SsDeductionRateOption = Annotated[
 
 def ss_salary_callback(value: float | None) -> float | None:
     if value:
-        min_ss_allowed_salary = int(
-            os.getenv("TAXES_MIN_SS_ALLOWED_SALARY", "0")
-        )
+        min_ss_allowed_salary = int(os.getenv("TAXES_MIN_SS_ALLOWED_SALARY", "0"))
         if value < min_ss_allowed_salary:
-            message = f"The social security salary must be greater than {min_ss_allowed_salary}."  # noqa: E501
+            message = f"The social security salary must be greater than {min_ss_allowed_salary}."
             raise typer.BadParameter(message)
 
     return value
@@ -140,9 +138,7 @@ CompensationsRateOption = Annotated[
 ]
 
 
-def amount_range_start_callback(
-    _: typer.Context, __: typer.CallbackParam, value: float
-) -> float:
+def amount_range_start_callback(value: float) -> float:
     min_salary = int(os.getenv("TAXES_MIN_ALLOWED_SALARY", default="0"))
     if value < min_salary:
         message = f"The start value must be greater than {min_salary}."

@@ -65,9 +65,7 @@ def generate_docx_multiple_files_from_xlsx_multiple_rows(
     include_index_in_filename: IncludeIndexInFilenameOption = False,
 ):
     """Generate multiple docx files from xlsx file (multiple rows)."""
-    loader = ExcelGroupedDataLoader(
-        ctx.obj["data_filepath"], group_key, *grouped_columns
-    )
+    loader = ExcelGroupedDataLoader(ctx.obj["data_filepath"], group_key, *grouped_columns)
     write = MultipleDocxTemplateWriter(
         ctx.obj["template"],
         ctx.obj["output_dir"],
@@ -88,9 +86,7 @@ def generate_single_docx_file_from_xlsx_multiple_rows(
     group_key: GroupKey,
 ):
     """Generate single docx file from xlsx file (multiple rows)."""
-    loader = ExcelGroupedDataLoader(
-        ctx.obj["data_filepath"], group_key, *grouped_columns
-    )
+    loader = ExcelGroupedDataLoader(ctx.obj["data_filepath"], group_key, *grouped_columns)
     writer = SingleDocxTemplateWriter(
         ctx.obj["template"],
         ctx.obj["output_dir"],

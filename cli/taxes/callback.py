@@ -16,13 +16,8 @@ from .options import (
 )
 
 
-def _get_brackets(
-    mins: list[float], maxes: list[float], rates: list[float]
-) -> list[Bracket]:
-    return [
-        Bracket(_min, _max, rate)
-        for _min, _max, rate in zip(mins, maxes, rates, strict=True)
-    ]
+def _get_brackets(mins: list[float], maxes: list[float], rates: list[float]) -> list[Bracket]:
+    return [Bracket(_min, _max, rate) for _min, _max, rate in zip(mins, maxes, rates, strict=True)]
 
 
 def app_callback(  # noqa: PLR0913
@@ -43,9 +38,7 @@ def app_callback(  # noqa: PLR0913
     brackets = _get_brackets(brackets_mins, brackets_maxes, brackets_rates)
     tax_rounder = Rounder(taxes_rounding_method, taxes_round_to_nearest)
     ss_rounder = Rounder(ss_rounding_method, ss_round_to_nearest)
-    ss = SocialSecurity(
-        min_ss_allowed_salary, ss_deduction_rate, rounder=ss_rounder
-    )
+    ss = SocialSecurity(min_ss_allowed_salary, ss_deduction_rate, rounder=ss_rounder)
 
     ctx.obj = {
         "brackets": brackets,

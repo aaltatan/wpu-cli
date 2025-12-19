@@ -49,9 +49,7 @@ class Row:
 
         notes: str = class_params.get("notes") or ""
 
-        class_params["notes"] = (
-            notes + "\n" + "\n".join([v for v in meta.values() if v])
-        )
+        class_params["notes"] = notes + "\n" + "\n".join([v for v in meta.values() if v])
 
         return cls(**class_params)
 

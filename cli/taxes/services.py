@@ -40,9 +40,7 @@ def calculate_gross_taxes(
         )
         ss_deduction = ss_obj.calculate_deduction(ss_salary)
 
-    fixed_tax = calculate_fixed_tax(
-        gross_compensations, fixed_tax_rate, tax_rounder
-    )
+    fixed_tax = calculate_fixed_tax(gross_compensations, fixed_tax_rate, tax_rounder)
 
     return Salary(
         gross=Decimal(gross_salary),
@@ -70,12 +68,8 @@ def calculate_net_salary(
         rounder=rounder,
     )
 
-    brackets_tax = calculate_brackets_tax(
-        gross_salary, brackets, min_allowed_salary, rounder
-    )
-    fixed_tax = calculate_fixed_tax(
-        gross_compensations, fixed_tax_rate, rounder
-    )
+    brackets_tax = calculate_brackets_tax(gross_salary, brackets, min_allowed_salary, rounder)
+    fixed_tax = calculate_fixed_tax(gross_compensations, fixed_tax_rate, rounder)
 
     return Salary(
         gross=Decimal(gross_salary),

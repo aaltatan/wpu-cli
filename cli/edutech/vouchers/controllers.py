@@ -42,9 +42,7 @@ def add_salaries(  # noqa: PLR0913
 ):
     rows = get_voucher_from_xlsx(filepath, chapter)
     with sync_playwright() as playwright:
-        authenticated_page = get_edutech_authenticated_page(
-            playwright, edutech_username, password
-        )
+        authenticated_page = get_edutech_authenticated_page(playwright, edutech_username, password)
         add_voucher(
             authenticated_page,
             rows,

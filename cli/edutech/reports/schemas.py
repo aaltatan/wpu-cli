@@ -12,9 +12,7 @@ class JournalRow(BaseModel):
     debit: Annotated[Decimal, Field(alias="LOCAL_DEBIT")]
     credit: Annotated[Decimal, Field(alias="LOCAL_CREDIT")]
     account: Annotated[str, Field(alias="ACCOUNT_FULL_NAME_SL")]
-    cost_center: Annotated[str | None, Field(alias="COST_CENTER_NAME_SL")] = (
-        None
-    )
+    cost_center: Annotated[str | None, Field(alias="COST_CENTER_NAME_SL")] = None
     notes: Annotated[str | None, Field(alias="VOUCHER_DETAIL_NOTE")] = None
 
     @computed_field

@@ -4,9 +4,7 @@ from typing import Any, Literal, Self
 from playwright.sync_api import Page, Playwright
 
 
-def get_edutech_authenticated_page(
-    playwright: Playwright, username: str, password: str
-) -> Page:
+def get_edutech_authenticated_page(playwright: Playwright, username: str, password: str) -> Page:
     browser = playwright.chromium.launch(slow_mo=10, headless=False)
     page = browser.new_page()
     page.goto("http://edu/")

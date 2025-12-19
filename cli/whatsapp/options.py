@@ -14,6 +14,16 @@ FilepathArgument = Annotated[
     ),
 ]
 
+BaseUrlOption = Annotated[
+    str,
+    typer.Option(
+        "--url",
+        "--base-url",
+        help="Base url for whatsapp app",
+        envvar="WHATSAPP_DEFAULT_BASE_URL",
+    ),
+]
+
 MessagesTimeoutOption = Annotated[
     float,
     typer.Option(

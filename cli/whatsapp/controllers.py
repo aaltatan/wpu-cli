@@ -1,8 +1,8 @@
 import typer
 
 from .loaders import get_messages_from_xlsx
-from .options import FilepathArgument, MessagesTimeoutOption, PageloadTimeoutOption
-from .services import WhatsappSender
+from .options import BaseUrlOption, FilepathArgument, MessagesTimeoutOption, PageloadTimeoutOption
+from .services import WhatsappSender, WhatsappSession
 
 app = typer.Typer()
 
@@ -15,9 +15,13 @@ def main():
 @app.command("send")
 def send_messages(
     filepath: FilepathArgument,
+    base_url: BaseUrlOption,
     messages_timeout: MessagesTimeoutOption,
     pageload_timeout: PageloadTimeoutOption,
 ) -> None:
     """Send whatsapp messages from xlsx file (You should have a file with two columns: phone number and message)."""  # noqa: E501
-    with WhatsappSender(messages_timeout, pageload_timeout) as sender:
-        sender.send(messages=get_messages_from_xlsx(filepath))
+    messages = get_messages_from_xlsx(filepath)
+
+    with WhatsappSession(base_url) as session:
+        sender = WhatsappSender(session, messages_timeout, pageload_timeout)
+        sender.send(messages)

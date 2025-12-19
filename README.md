@@ -18,6 +18,7 @@ FUZZ_DEFAULT_REMOVE_DUPLICATED=1 # default remove duplicated for fuzzy matching
 FUZZ_DEFAULT_WRITER=choices-xlsx # default writer for fuzzy matching
 
 # Whatsapp App
+WHATSAPP_DEFAULT_BASE_URL=https://web.whatsapp.com # default base url for whatsapp app
 WHATSAPP_DEFAULT_TIMEOUT_BETWEEN_MESSAGES=3 # default timeout between messages for whatsapp app
 WHATSAPP_DEFAULT_PAGELOAD_TIMEOUT=10000 # default pageload timeout for whatsapp app
 

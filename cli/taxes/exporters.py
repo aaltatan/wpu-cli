@@ -60,8 +60,8 @@ def export_to_excel(salaries: list[Salary], path: Path) -> None:
 
     ws.range("A1").options(index=False).value = headers_row
 
-    for idx, salary in enumerate(salaries, start=1):
-        ws.range(f"A{idx + 1}").options(index=False).value = [
+    rows = [
+        [
             idx,
             float(salary.gross),
             float(salary.compensations),
@@ -74,6 +74,10 @@ def export_to_excel(salaries: list[Salary], path: Path) -> None:
             float(salary.net),
             float(salary.compensations_to_total_ratio),
         ]
+        for idx, salary in enumerate(salaries, start=1)
+    ]
+
+    ws.range(f"A2:A{len(rows) + 1}").options(index=False).value = rows
 
     lr = ws.range("A1").end("down").row
     lc = ws.range("A1").end("right").column

@@ -55,18 +55,18 @@ class VoucherPagePipeline(PagePipeline):
 
 
 def get_voucher_from_xlsx(filepath: Path, chapter: Chapter) -> list[Row]:
-    data = pd.read_excel(filepath).to_dict(orient="records")
+    data = pd.read_excel(filepath).fillna("").to_dict(orient="records")
 
     return [
         Row.from_kwargs(
-            faculty=row["faculty"],
+            faculty=row["Building"],
             chapter=chapter,
-            debit=row["debit"],
-            credit=row["credit"],
-            account_id=row["account_id"],
-            notes=row["notes"],
-            string_account=row["string_account"],
-            faculty_string=row["faculty"],
+            debit=row["Debit By Net"],
+            credit=row["Credit By Net"],
+            account_id=row["EDU@tech Account Number"],
+            notes=row["Notes"],
+            string_account=row["Explanation"],
+            faculty_string=row["Building"],
         )
         for row in data
     ]

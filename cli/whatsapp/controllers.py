@@ -7,13 +7,13 @@ from .options import (
     PageloadTimeoutOption,
     WhatsappUrlOption,
 )
-from .services import WhatsappSender, open_whatsapp_page
+from .services import open_whatsapp_page, send_whatsapp_messages
 
 app = typer.Typer()
 
 
 @app.callback()
-def main():
+def main() -> None:
     """Send whatsapp bulk messages using playwright."""
 
 
@@ -28,5 +28,4 @@ def send_messages(
     messages = get_messages_from_xlsx(filepath)
 
     with open_whatsapp_page(whatsapp_url) as page:
-        sender = WhatsappSender(page, messages_timeout, pageload_timeout)
-        sender.send(messages)
+        send_whatsapp_messages(page, messages, messages_timeout, pageload_timeout)

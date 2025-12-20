@@ -28,32 +28,25 @@ def open_whatsapp_page(url: str) -> Generator[Page, None, None]:
         playwright.stop()
 
 
-class WhatsappSender:
-    def __init__(
-        self, page: Page, timeout_between_messages: float, pageload_timeout: float
-    ) -> None:
-        self.page = page
-        self.timeout_between_messages = timeout_between_messages
-        self.pageload_timeout = pageload_timeout
+def _send_whatsapp_message(page: Page, message: str, timeout: float) -> None:
+    text_input_selector = "footer .lexical-rich-text-input > div"
+    page.wait_for_selector(text_input_selector, timeout=timeout)
+    page.fill(text_input_selector, message)
+    page.click('[aria-label="Send"]')
 
-    def _send_single_message(self, message: str) -> None:
-        text_input_selector = "footer .lexical-rich-text-input > div"
-        self.page.wait_for_selector(text_input_selector, timeout=self.pageload_timeout)
-        self.page.fill(text_input_selector, message)
-        self.page.click('[aria-label="Send"]')
 
-    def send(self, messages: list[Message]) -> None:
-        for message in track(messages, "📩 Sending", len(messages)):
-            try:
-                self.page.goto(
-                    f"https://web.whatsapp.com/send?phone={message.phone}", timeout=60_000
-                )
+def send_whatsapp_messages(
+    page: Page, messages: list[Message], pageload_timeout: float, timeout_between_messages: float
+) -> None:
+    for message in track(messages, "📩 Sending", len(messages)):
+        try:
+            page.goto(f"https://web.whatsapp.com/send?phone={message.phone}", timeout=60_000)
 
-                for text in message.texts:
-                    self._send_single_message(text)
+            for text in message.texts:
+                _send_whatsapp_message(page, text, pageload_timeout)
 
-                time.sleep(self.timeout_between_messages)
+            time.sleep(timeout_between_messages)
 
-            except Exception as e:  # noqa: BLE001, PERF203
-                logger.error(f"Error sending message to {message.phone}: {e}")
-                continue
+        except Exception as e:  # noqa: BLE001, PERF203
+            logger.error(f"Error sending message to {message.phone}: {e}")
+            continue

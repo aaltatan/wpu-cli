@@ -14,7 +14,7 @@ FilepathArgument = Annotated[
     ),
 ]
 
-BaseUrlOption = Annotated[
+WhatsappUrlOption = Annotated[
     str,
     typer.Option(
         "--url",

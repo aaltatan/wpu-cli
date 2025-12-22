@@ -1,21 +1,26 @@
+# ruff: noqa: B008
+
 import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
+from syriantaxes import SocialSecurity
+from typer_di import Depends, TyperDI
 
 from cli.utils import extract_extension
 
-from .callback import app_callback
 from .exporters import get_export_fn
 from .options import (
+    AmountRange,
     CompensationsRateOption,
     ExportPathOption,
     GrossCompensationsArgument,
     GrossSalaryArgument,
+    Options,
     SocialSecuritySalaryOption,
-    StartAmountRangeArgument,
-    StepAmountRangeArgument,
-    StopAmountRangeArgument,
     TargetSalaryArgument,
+    get_amount_range,
+    get_options,
+    get_ss_obj,
 )
 from .services import (
     calculate_gross_taxes,
@@ -24,25 +29,31 @@ from .services import (
 )
 from .tables import get_salary_table
 
-app = typer.Typer(callback=app_callback)
+app = TyperDI()
+
+
+@app.callback()
+def main() -> None:
+    """Calculate taxes for a given gross salary and compensations."""
 
 
 @app.command(name="gross")
 def calculate_gross_taxes_command(
-    ctx: typer.Context,
     salary: GrossSalaryArgument,
     compensations: GrossCompensationsArgument = 0,
+    options: Options = Depends(get_options),
+    ss_obj: SocialSecurity = Depends(get_ss_obj),
     ss_salary: SocialSecuritySalaryOption = None,
 ):
     """Calculate taxes for a given gross salary and compensations."""
     _salary = calculate_gross_taxes(
         gross_salary=salary,
         gross_compensations=compensations,
-        brackets=ctx.obj["brackets"],
-        fixed_tax_rate=ctx.obj["fixed_tax_rate"],
-        min_allowed_salary=ctx.obj["min_allowed_salary"],
-        tax_rounder=ctx.obj["tax_rounder"],
-        ss_obj=ctx.obj["ss"],
+        brackets=options.brackets,
+        fixed_tax_rate=options.fixed_tax_rate,
+        min_allowed_salary=options.min_allowed_salary,
+        tax_rounder=options.taxes_rounder,
+        ss_obj=ss_obj,
         ss_salary=ss_salary,
     )
 
@@ -54,18 +65,18 @@ def calculate_gross_taxes_command(
 
 @app.command(name="net")
 def calculate_net_salary_command(
-    ctx: typer.Context,
     target_salary: TargetSalaryArgument,
     compensations_rate: CompensationsRateOption,
+    options: Options = Depends(get_options),
 ):
     """Calculate gross salary and compensations for a given target salary."""
     salary = calculate_net_salary(
         target_salary=target_salary,
         compensations_rate=compensations_rate,
-        brackets=ctx.obj["brackets"],
-        fixed_tax_rate=ctx.obj["fixed_tax_rate"],
-        min_allowed_salary=ctx.obj["min_allowed_salary"],
-        rounder=ctx.obj["tax_rounder"],
+        brackets=options.brackets,
+        fixed_tax_rate=options.fixed_tax_rate,
+        min_allowed_salary=options.min_allowed_salary,
+        rounder=options.taxes_rounder,
     )
 
     console = Console()
@@ -75,32 +86,30 @@ def calculate_net_salary_command(
 
 
 @app.command(name="ar")
-def calculate_net_salaries_from_amount_range_command(  # noqa: PLR0913
-    ctx: typer.Context,
+def calculate_net_salaries_from_amount_range_command(
     compensations_rate: CompensationsRateOption,
-    start: StartAmountRangeArgument,
-    stop: StopAmountRangeArgument = None,
-    step: StepAmountRangeArgument = None,
+    ar: AmountRange = Depends(get_amount_range),
+    options: Options = Depends(get_options),
     export_path: ExportPathOption = None,
 ):
     """Create salaries from a given amount range."""
-    if stop is None:
+    if ar.stop is None:
         message = "You must provide a stop value."
         raise typer.BadParameter(message)
 
-    if step is None:
+    if ar.step is None:
         message = "You must provide a step value."
         raise typer.BadParameter(message)
 
     salaries = calculate_net_salaries_from_amount_range(
-        start=start,
-        stop=stop,
-        step=step,
+        start=ar.start,
+        stop=ar.stop,
+        step=ar.step,
         compensations_rate=compensations_rate,
-        brackets=ctx.obj["brackets"],
-        min_allowed_salary=ctx.obj["min_allowed_salary"],
-        fixed_tax_rate=ctx.obj["fixed_tax_rate"],
-        rounder=ctx.obj["tax_rounder"],
+        brackets=options.brackets,
+        min_allowed_salary=options.min_allowed_salary,
+        fixed_tax_rate=options.fixed_tax_rate,
+        rounder=options.taxes_rounder,
     )
 
     console = Console()

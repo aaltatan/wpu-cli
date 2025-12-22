@@ -1,28 +1,35 @@
+# ruff: noqa: B008
+
 from typing import Annotated
 
 import typer
+from typer_di import Depends, TyperDI
 
-from .callback import app_callback
 from .loaders import get_clipboard_data, get_loader_data
-from .options import ExportPathOption, QueriesPathOption, WriterOption
-from .processors import get_processor_fn
-from .scorers import get_scorer_fn
+from .options import ExportPathOption, Options, QueriesPathOption, WriterOption, get_options
 from .services import match_list, match_one
 from .writers import SingleQueryTerminalWriter, get_writer_fn
 
-app = typer.Typer(callback=app_callback)
+app = TyperDI()
+
+
+@app.callback()
+def main() -> None:
+    """Fuzz search in a given choices file."""
 
 
 @app.command("one")
-def match_one_command(ctx: typer.Context, query: Annotated[str, typer.Argument()]):
+def match_one_command(
+    query: Annotated[str, typer.Argument()], options: Options = Depends(get_options)
+):
     matches = match_one(
         query=query,
-        choices=get_loader_data(ctx.obj["choices_path"]),
-        processor_fn=get_processor_fn(ctx.obj["processors"] + ctx.obj["default_processors"]),
-        scorer_fn=get_scorer_fn(ctx.obj["scorer"]),
-        accuracy=ctx.obj["accuracy"],
-        limit=ctx.obj["limit"],
-        remove_duplicated=ctx.obj["remove_duplicated"],
+        choices=options.choices,
+        processor_fn=options.processor_fn,
+        scorer_fn=options.scorer_fn,
+        accuracy=options.accuracy,
+        limit=options.limit,
+        remove_duplicated=options.remove_duplicated,
     )
 
     writer = SingleQueryTerminalWriter("results", ["Score", "Match"])
@@ -31,36 +38,38 @@ def match_one_command(ctx: typer.Context, query: Annotated[str, typer.Argument()
 
 @app.command("list")
 def match_list_command(
-    ctx: typer.Context,
     queries_path: QueriesPathOption,
     export_path: ExportPathOption,
     writer: WriterOption,
+    options: Options = Depends(get_options),
 ):
     matches = match_list(
         queries=get_loader_data(queries_path),
-        choices=get_loader_data(ctx.obj["choices_path"]),
-        processor_fn=get_processor_fn(ctx.obj["processors"] + ctx.obj["default_processors"]),
-        scorer_fn=get_scorer_fn(ctx.obj["scorer"]),
-        accuracy=ctx.obj["accuracy"],
-        limit=ctx.obj["limit"],
-        remove_duplicated=ctx.obj["remove_duplicated"],
+        choices=options.choices,
+        processor_fn=options.processor_fn,
+        scorer_fn=options.scorer_fn,
+        accuracy=options.accuracy,
+        limit=options.limit,
+        remove_duplicated=options.remove_duplicated,
     )
 
     write_fn = get_writer_fn(writer)
-    write_fn(ctx.obj["limit"], export_path, matches)
+    write_fn(options.limit, export_path, matches)
 
 
 @app.command("clip")
-def match_clip_command(ctx: typer.Context, export_path: ExportPathOption, writer: WriterOption):
+def match_clip_command(
+    export_path: ExportPathOption, writer: WriterOption, options: Options = Depends(get_options)
+):
     matches = match_list(
         queries=get_clipboard_data(),
-        choices=get_loader_data(ctx.obj["choices_path"]),
-        processor_fn=get_processor_fn(ctx.obj["processors"] + ctx.obj["default_processors"]),
-        scorer_fn=get_scorer_fn(ctx.obj["scorer"]),
-        accuracy=ctx.obj["accuracy"],
-        limit=ctx.obj["limit"],
-        remove_duplicated=ctx.obj["remove_duplicated"],
+        choices=options.choices,
+        processor_fn=options.processor_fn,
+        scorer_fn=options.scorer_fn,
+        accuracy=options.accuracy,
+        limit=options.limit,
+        remove_duplicated=options.remove_duplicated,
     )
 
     write_fn = get_writer_fn(writer)
-    write_fn(ctx.obj["limit"], export_path, matches)
+    write_fn(options.limit, export_path, matches)

@@ -1,3 +1,4 @@
+from dataclasses import InitVar, dataclass, field
 from pathlib import Path
 from typing import Annotated
 
@@ -5,9 +6,9 @@ import typer
 
 from cli.utils import extract_extension
 
-from .loaders import get_loaders
-from .processors import AdditionalProcessor, DefaultProcessor
-from .scorers import Scorer
+from .loaders import get_loader_data, get_loaders
+from .processors import AdditionalProcessor, DefaultProcessor, ProcessFn, get_processor_fn
+from .scorers import Scorer, ScorerFn, get_scorer_fn
 from .writers import Writer
 
 
@@ -123,7 +124,6 @@ ExportPathOption = Annotated[
         file_okay=True,
         dir_okay=False,
         resolve_path=True,
-        default_factory=lambda: Path().home() / "Desktop" / "output.xlsx",
         callback=export_path_callback,
     ),
 ]
@@ -137,3 +137,44 @@ WriterOption = Annotated[
         help="writer type",
     ),
 ]
+
+
+@dataclass
+class Options:
+    choices_path: InitVar[ChoicesPathOption]
+    processors: InitVar[ProcessorOption]
+    default_processors: InitVar[DefaultProcessorOption]
+    scorer: InitVar[ScorerOption]
+
+    accuracy: AccuracyOption
+    limit: LimitOption
+    remove_duplicated: RemoveDuplicatedOption
+
+    choices: list[str] = field(init=False)
+    processor_fn: ProcessFn = field(init=False)
+    scorer_fn: ScorerFn = field(init=False)
+
+    def __post_init__(
+        self,
+        choices_path: ChoicesPathOption,
+        processors: ProcessorOption,
+        default_processors: DefaultProcessorOption,
+        scorer: ScorerOption,
+    ) -> None:
+        self.choices = get_loader_data(choices_path)
+        self.processor_fn = get_processor_fn(processors + default_processors)
+        self.scorer_fn = get_scorer_fn(scorer)
+
+
+def get_options(  # noqa: PLR0913
+    choices_path: ChoicesPathOption,
+    processors: ProcessorOption,
+    default_processors: DefaultProcessorOption,
+    scorer: ScorerOption,
+    accuracy: AccuracyOption,
+    limit: LimitOption,
+    remove_duplicated: RemoveDuplicatedOption,
+) -> Options:
+    return Options(
+        choices_path, processors, default_processors, scorer, accuracy, limit, remove_duplicated
+    )

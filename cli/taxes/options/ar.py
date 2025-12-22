@@ -4,6 +4,8 @@ from typing import Annotated
 
 import typer
 
+from ._options import CompensationsRateOpt, ExportPathOpt
+
 FACTOR = 10
 MAX_ITERATIONS = 1000
 
@@ -78,15 +80,9 @@ StepAmountRangeArg = Annotated[
 
 
 @dataclass
-class AmountRange:
+class AmountRangeOption:
     start: StartAmountRangeArg
-    stop: StopAmountRangeArg
-    step: StepAmountRangeArg
-
-
-def get_amount_range(
-    start: StartAmountRangeArg,
-    stop: StopAmountRangeArg = None,
-    step: StepAmountRangeArg = None,
-) -> AmountRange:
-    return AmountRange(start, stop, step)
+    compensations_rate: CompensationsRateOpt
+    stop: StopAmountRangeArg = None
+    step: StepAmountRangeArg = None
+    export_path: ExportPathOpt = None

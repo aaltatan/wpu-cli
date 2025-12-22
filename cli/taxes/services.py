@@ -69,7 +69,7 @@ def calculate_net_salary(
     )
 
 
-def calculate_net_salaries_from_amount_range(
+def calculate_net_salaries(
     start: float,
     stop: float,
     step: float,

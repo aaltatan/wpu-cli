@@ -1,65 +1,11 @@
-from pathlib import Path
-from typing import Annotated
-
-import typer
-
-from cli.taxes.exporters import get_export_functions
-from cli.utils import extract_extension
-
-from .ar import AmountRange, get_amount_range
-from .common import Options, get_options
-from .ss import SocialSecuritySalaryOpt, get_ss_obj
+from .ar import AmountRangeOption
+from .common import Options
+from .gross import GrossOptions
+from .net import NetOptions
 
 __all__ = [
-    "AmountRange",
+    "AmountRangeOption",
+    "GrossOptions",
+    "NetOptions",
     "Options",
-    "SocialSecuritySalaryOpt",
-    "get_amount_range",
-    "get_options",
-    "get_ss_obj",
-]
-
-GrossSalaryArg = Annotated[float, typer.Argument()]
-
-GrossCompensationsArg = Annotated[float, typer.Argument()]
-
-TargetSalaryArg = Annotated[float, typer.Argument()]
-
-CompensationsRateOpt = Annotated[
-    float,
-    typer.Option(
-        "-r",
-        "--compensations-rate",
-        envvar="TAXES_DEFAULT_COMPENSATIONS_RATE",
-    ),
-]
-
-
-def export_path_callback(value: Path | None) -> Path | None:
-    if value:
-        if value.exists():
-            message = f"The file {value} already exists."
-            raise typer.BadParameter(message)
-
-        extension = extract_extension(value)
-
-        if extension not in get_export_functions():
-            message = f"extension of type (.{extension}) not supported."
-            raise typer.BadParameter(message)
-
-    return value
-
-
-ExportPathOpt = Annotated[
-    Path | None,
-    typer.Option(
-        "-e",
-        "--export-path",
-        help="Path to the output file",
-        exists=False,
-        file_okay=True,
-        dir_okay=False,
-        resolve_path=True,
-        callback=export_path_callback,
-    ),
 ]

@@ -3,30 +3,13 @@
 import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
-from syriantaxes import SocialSecurity
 from typer_di import Depends, TyperDI
 
 from cli.utils import extract_extension
 
 from .exporters import get_export_fn
-from .options import (
-    AmountRange,
-    CompensationsRateOpt,
-    ExportPathOpt,
-    GrossCompensationsArg,
-    GrossSalaryArg,
-    Options,
-    SocialSecuritySalaryOpt,
-    TargetSalaryArg,
-    get_amount_range,
-    get_options,
-    get_ss_obj,
-)
-from .services import (
-    calculate_gross_taxes,
-    calculate_net_salaries_from_amount_range,
-    calculate_net_salary,
-)
+from .options import AmountRangeOption, GrossOptions, NetOptions, Options
+from .services import calculate_gross_taxes, calculate_net_salaries, calculate_net_salary
 from .tables import get_salary_table
 
 app = TyperDI()
@@ -39,22 +22,18 @@ def main() -> None:
 
 @app.command(name="gross")
 def calculate_gross_taxes_cmd(
-    salary: GrossSalaryArg,
-    compensations: GrossCompensationsArg = 0,
-    options: Options = Depends(get_options),
-    ss_obj: SocialSecurity = Depends(get_ss_obj),
-    ss_salary: SocialSecuritySalaryOpt = None,
-):
+    options: Options = Depends(Options), gross_options: GrossOptions = Depends(GrossOptions)
+) -> None:
     """Calculate taxes for a given gross salary and compensations."""
     _salary = calculate_gross_taxes(
-        gross_salary=salary,
-        gross_compensations=compensations,
+        gross_salary=gross_options.salary,
+        gross_compensations=gross_options.compensations,
         brackets=options.brackets,
         fixed_tax_rate=options.fixed_tax_rate,
         min_allowed_salary=options.min_allowed_salary,
         tax_rounder=options.taxes_rounder,
-        ss_obj=ss_obj,
-        ss_salary=ss_salary,
+        ss_obj=gross_options.ss_obj,
+        ss_salary=gross_options.ss_salary,
     )
 
     console = Console()
@@ -65,14 +44,12 @@ def calculate_gross_taxes_cmd(
 
 @app.command(name="net")
 def calculate_net_salary_cmd(
-    target_salary: TargetSalaryArg,
-    compensations_rate: CompensationsRateOpt,
-    options: Options = Depends(get_options),
-):
+    options: Options = Depends(Options), net_options: NetOptions = Depends(NetOptions)
+) -> None:
     """Calculate gross salary and compensations for a given target salary."""
     salary = calculate_net_salary(
-        target_salary=target_salary,
-        compensations_rate=compensations_rate,
+        target_salary=net_options.target_salary,
+        compensations_rate=net_options.compensations_rate,
         brackets=options.brackets,
         fixed_tax_rate=options.fixed_tax_rate,
         min_allowed_salary=options.min_allowed_salary,
@@ -86,12 +63,9 @@ def calculate_net_salary_cmd(
 
 
 @app.command(name="ar")
-def calculate_net_salaries_from_amount_range_cmd(
-    compensations_rate: CompensationsRateOpt,
-    ar: AmountRange = Depends(get_amount_range),
-    options: Options = Depends(get_options),
-    export_path: ExportPathOpt = None,
-):
+def calculate_net_salaries_cmd(
+    ar: AmountRangeOption = Depends(AmountRangeOption), options: Options = Depends(Options)
+) -> None:
     """Create salaries from a given amount range."""
     if ar.stop is None:
         message = "You must provide a stop value."
@@ -101,11 +75,11 @@ def calculate_net_salaries_from_amount_range_cmd(
         message = "You must provide a step value."
         raise typer.BadParameter(message)
 
-    salaries = calculate_net_salaries_from_amount_range(
+    salaries = calculate_net_salaries(
         start=ar.start,
         stop=ar.stop,
         step=ar.step,
-        compensations_rate=compensations_rate,
+        compensations_rate=ar.compensations_rate,
         brackets=options.brackets,
         min_allowed_salary=options.min_allowed_salary,
         fixed_tax_rate=options.fixed_tax_rate,
@@ -114,16 +88,16 @@ def calculate_net_salaries_from_amount_range_cmd(
 
     console = Console()
 
-    if export_path is not None:
+    if ar.export_path is not None:
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             transient=True,
         ) as progress:
             progress.add_task("Exporting ... ", total=None)
-            export_fn = get_export_fn(extract_extension(export_path))
-            export_fn(salaries, export_path)
-            console.print(f"✅ Results has been exported to {export_path}")
+            export_fn = get_export_fn(extract_extension(ar.export_path))
+            export_fn(salaries, ar.export_path)
+            console.print(f"✅ Results has been exported to {ar.export_path}")
     else:
         table = get_salary_table(*salaries, title="Net Results")
         console.print(table)

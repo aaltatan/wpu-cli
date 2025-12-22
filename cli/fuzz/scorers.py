@@ -1,21 +1,12 @@
 from collections.abc import Callable
-from enum import StrEnum
 
 from thefuzz.fuzz import QRatio, UQRatio, UWRatio, WRatio
+
+from .enums import Scorer
 
 type AsciiScorerFn = Callable[[str, str, bool, bool], int]
 type UnicodeScorerFn = Callable[[str, str, bool], int]
 type ScorerFn = AsciiScorerFn | UnicodeScorerFn
-
-
-class Scorer(StrEnum):
-    QUICK_RATIO = "q"
-    UNICODE_QUICK_RATIO = "uq"
-    WEIGHTED_RATIO = "w"
-    UNICODE_WEIGHTED_RATIO = "uw"
-
-    def __str__(self) -> str:
-        return self.value
 
 
 _scorers: dict[Scorer, ScorerFn] = {

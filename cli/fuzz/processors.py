@@ -2,34 +2,20 @@
 
 import re
 from collections.abc import Callable
-from enum import StrEnum
 from functools import wraps
 
 from thefuzz.utils import full_process
 
 from .arabic import get_arabic_unicode as _
+from .enums import AdditionalProcessor, DefaultProcessor, Processor
 
-type ProcessFn = Callable[[str], str]
-
-
-DEFAULT_PROCESSORS = [
-    ("GENERAL", "general"),
-    ("ARABIC", "arabic"),
-]
-
-ADDITIONAL_PROCESSORS = [
-    ("WPU", "wpu"),
-]
-
-DefaultProcessor = StrEnum("DefaultProcessor", DEFAULT_PROCESSORS)
-AdditionalProcessor = StrEnum("AdditionalProcessor", ADDITIONAL_PROCESSORS)
-Processor = StrEnum("Processor", DEFAULT_PROCESSORS + ADDITIONAL_PROCESSORS)
+type ProcessorFn = Callable[[str], str]
 
 
-_processors: dict[DefaultProcessor | AdditionalProcessor | Processor, ProcessFn] = {}
+_processors: dict[DefaultProcessor | AdditionalProcessor | Processor, ProcessorFn] = {}
 
 
-def _get_processor_fn(processor: DefaultProcessor | AdditionalProcessor) -> ProcessFn:
+def _get_processor_fn(processor: DefaultProcessor | AdditionalProcessor) -> ProcessorFn:
     if processor not in _processors:
         message = f"Processor '{processor}' not found"
         raise ValueError(message)
@@ -37,7 +23,7 @@ def _get_processor_fn(processor: DefaultProcessor | AdditionalProcessor) -> Proc
     return _processors[processor]
 
 
-def get_processor_fn(processors: list[DefaultProcessor | AdditionalProcessor]) -> ProcessFn:
+def get_processor_fn(processors: list[DefaultProcessor | AdditionalProcessor]) -> ProcessorFn:
     processors_functions = [_get_processor_fn(p) for p in processors]
 
     def wrapper(query: str) -> str:
@@ -51,8 +37,8 @@ def get_processor_fn(processors: list[DefaultProcessor | AdditionalProcessor]) -
 
 def register_processor(
     processor: DefaultProcessor | AdditionalProcessor | Processor,
-) -> Callable[[ProcessFn], ProcessFn]:
-    def decorator(processor_fn: ProcessFn) -> ProcessFn:
+) -> Callable[[ProcessorFn], ProcessorFn]:
+    def decorator(processor_fn: ProcessorFn) -> ProcessorFn:
         @wraps(processor_fn)
         def wrapper(query: str) -> str:
             return full_process(processor_fn(query))

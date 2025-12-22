@@ -2,7 +2,6 @@ from collections.abc import Callable
 from functools import wraps
 from pathlib import Path
 
-from cli.clipboard import get_clipboard
 from cli.utils import extract_extension
 
 type LoaderFn = Callable[[Path], list[str]]
@@ -13,11 +12,6 @@ _loaders: dict[str, LoaderFn] = {}
 
 def get_loaders() -> dict[str, LoaderFn]:
     return _loaders.copy()
-
-
-def get_clipboard_data() -> list[str]:
-    clipboard = get_clipboard()
-    return [line for line in clipboard.splitlines() if line]
 
 
 def get_loader_data(path: Path) -> list[str]:

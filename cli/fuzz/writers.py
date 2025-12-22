@@ -1,5 +1,4 @@
-from collections.abc import Callable, Collection
-from enum import StrEnum
+from collections.abc import Callable
 from functools import wraps
 from pathlib import Path
 
@@ -8,18 +7,11 @@ import xlwings as xw
 from rich.console import Console
 from rich.table import Table
 
+from .enums import Writer
+
 type WriteFn = Callable[[int, Path, MultipleQueriesResults], None]
 type MultipleQueriesResults = list[tuple[str, Results]]
 type Results = list[tuple[str, int]]
-
-
-class Writer(StrEnum):
-    TERMINAL = "terminal"
-    FLAT_XLSX = "flat-xlsx"
-    CHOICES_XLSX = "choices-xlsx"
-
-    def __str__(self) -> str:
-        return self.value
 
 
 _writers: dict[Writer, WriteFn] = {}
@@ -88,26 +80,3 @@ def write_choices_excel(_: int, export_path: Path, results: MultipleQueriesResul
         ws.range(f"B{idx}").options(index=False).value = matches[0] if matches else "#N/A"
 
     wb.save(export_path)
-
-
-class SingleQueryTerminalWriter:
-    def __init__(self, title: str, headers: Collection[str]) -> None:
-        self.title = title
-        self.headers = headers
-
-    def get_table(self) -> Table:
-        table = Table(show_header=True, header_style="bold magenta", title=self.title)
-
-        for header in self.headers:
-            table.add_column(header, justify="right")
-
-        return table
-
-    def write(self, results: Results) -> None:
-        console = Console()
-        table = self.get_table()
-
-        for match, score in results:
-            table.add_row(str(score), match)
-
-        console.print(table)

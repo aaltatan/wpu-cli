@@ -21,7 +21,7 @@ def _filter_by_accuracy(results: Results, accuracy: int) -> Results:
     return [(match, score) for match, score in results if score >= accuracy]
 
 
-def match_one(
+def _match_one(
     query: str,
     choices: Collection[str],
     processor_fn: Callable,
@@ -62,7 +62,7 @@ def match_list(
     return [
         (
             query,
-            match_one(
+            _match_one(
                 query,
                 choices,
                 processor_fn,

@@ -23,9 +23,8 @@ WHATSAPP_DEFAULT_TIMEOUT_BETWEEN_MESSAGES=3 # default timeout between messages f
 WHATSAPP_DEFAULT_PAGELOAD_TIMEOUT=10000 # default pageload timeout for whatsapp app
 
 # Template App
-TEMPLATES_DEFAULT_GENERATED_SINGLE_FILE_NAME=output # default filename for generated single file
-TEMPLATES_DEFAULT_GENERATE_SINGLE_FILE_DATA_KEY=data # default data key for generated single file
-TEMPLATES_DEFAULT_MULTIPLE_ROWS_GROUPED_KEY=data # default grouped key for generated multiple rows
+TEMPLATES_DEFAULT_SINGLE_DOCX_TEMPLATE_DATA_VARIABLE=data # default data key for generated single file
+TEMPLATES_DEFAULT_XLSX_MULTIPLE_ROWS_TEMPLATE_GROUP_VARIABLE=data # default grouped key for generated multiple rows
 
 # Taxes App
 TAXES_BRACKET_TAX_MINS=0 837000 850000 1100000 # default brackets mins for taxes app

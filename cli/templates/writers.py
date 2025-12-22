@@ -57,7 +57,7 @@ class MultipleDocxTemplateWriter:
             filename = item[filename_key]
 
             if self.include_index_in_filename:
-                filename = f"{idx}-{item[filename_key]}"
+                filename = f"{idx} - {item[filename_key]}"
 
         return filename
 
@@ -89,23 +89,22 @@ class SingleDocxTemplateWriter:
     def __init__(
         self,
         template_path: Path,
-        output_dir: Path,
-        filename: str,
-        template_data_key: str,
+        filepath: Path,
+        template_data_variable: str,
         *,
         pdf: bool = False,
     ) -> None:
         self.template = DocxTemplate(template_path)
-        self.output_dir = output_dir
-        self.filename = filename
-        self.template_data_key = template_data_key
+        self.filepath = filepath
+        self.template_data_variable = template_data_variable
         self.pdf = pdf
 
     def write(self, data: Data) -> None:
-        filepath = _generate_filepath(self.filename, self.output_dir, "docx")
+        filename = self.filepath.name.removesuffix(".docx")
+        output_dir = self.filepath.parent
 
-        self.template.render({self.template_data_key: data, **ADDITIONAL_CONTEXT})
-        self.template.save(filepath)
+        self.template.render({self.template_data_variable: data, **ADDITIONAL_CONTEXT})
+        self.template.save(self.filepath)
 
         if self.pdf:
-            convert(filepath, self.output_dir)
+            convert(self.filepath, output_dir / f"{filename}.pdf")

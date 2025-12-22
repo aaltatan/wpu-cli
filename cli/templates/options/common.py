@@ -35,17 +35,6 @@ TemplateFilepathOpt = Annotated[
 ]
 
 
-PDFOpt = Annotated[
-    bool,
-    typer.Option(
-        "--pdf",
-        help="Generate a PDF file(s)",
-        rich_help_panel="PDF",
-        expose_value=True,
-    ),
-]
-
-
 @dataclass
 class Options:
     data_filepath: DataFilepathOpt

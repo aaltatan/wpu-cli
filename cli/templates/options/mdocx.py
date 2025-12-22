@@ -4,7 +4,7 @@ from typing import Annotated
 
 import typer
 
-from .common import PDFOpt
+from ._options import PDFOpt
 
 RICH_HELP_PANEL = "Multiple Docx Options"
 

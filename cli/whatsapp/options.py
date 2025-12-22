@@ -1,9 +1,13 @@
+# ruff: noqa: RUF009
+
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Annotated
 
+import pandas as pd
 import typer
+from typer_di import Depends
 
-from .parsers import parse_messages
 from .schemas import Message
 
 MinMessagesTimeoutOpt = Annotated[
@@ -66,11 +70,28 @@ class Timeout:
     pageload: PageloadTimeoutOpt
 
 
-MessagesArg = Annotated[
-    list[Message],
+def _get_messages_from_xlsx(filepath: Path) -> list[Message]:
+    messages_dict: dict[str, list[str]] = {}
+    data = pd.read_excel(filepath).to_dict(orient="records")
+
+    for row in data:
+        phone, text = row.values()
+
+        phone = str(phone)
+        text = str(text).replace("_x000D_", "")
+
+        if phone in messages_dict:
+            messages_dict[phone].append(text)
+        else:
+            messages_dict[phone] = [text]
+
+    return [Message(phone, texts) for phone, texts in messages_dict.items()]
+
+
+FilepathArg = Annotated[
+    Path,
     typer.Argument(
         help="Path to xlsx file contains the messages",
-        parser=parse_messages,
     ),
 ]
 
@@ -82,3 +103,10 @@ UrlOpt = Annotated[
         envvar="WHATSAPP_DEFAULT_BASE_URL",
     ),
 ]
+
+
+@dataclass
+class Options:
+    url: UrlOpt
+    messages: list[Message] = Depends(_get_messages_from_xlsx)
+    timeout: Timeout = Depends(Timeout)

@@ -1,6 +1,8 @@
 from dataclasses import InitVar, dataclass, field
 from inspect import signature
-from typing import Any, Literal, Self
+from typing import Any, Self
+
+from .enums import Chapter
 
 
 @dataclass
@@ -22,7 +24,7 @@ class VoucherRowSelector:
 @dataclass
 class Row:
     faculty: InitVar[str]
-    chapter: InitVar[Literal["1", "2", "3"]]
+    chapter: InitVar[Chapter]
 
     debit: str = "0"
     credit: str = "0"
@@ -30,7 +32,7 @@ class Row:
     cost_center: str = field(init=False)
     notes: str = ""
 
-    def __post_init__(self, faculty: str, chapter: str) -> None:
+    def __post_init__(self, faculty: str, chapter: Chapter) -> None:
         self.debit = str(int(self.debit or 0))
         self.credit = str(int(self.credit or 0))
         self.account_id = str(int(self.account_id or 15322))

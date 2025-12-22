@@ -60,9 +60,3 @@ class VoucherPageFilters:
     to_date: ToDateOpt
     accounts: AccountsOpt
     grid_columns: GridColumnsOpt
-
-
-def get_filters(
-    from_date: FromDateOpt, to_date: ToDateOpt, accounts: AccountsOpt, grid_columns: GridColumnsOpt
-) -> VoucherPageFilters:
-    return VoucherPageFilters(from_date, to_date, accounts, grid_columns)

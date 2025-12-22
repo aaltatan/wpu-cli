@@ -4,10 +4,10 @@ from devtools import debug
 from playwright.sync_api import sync_playwright
 from typer_di import Depends, TyperDI
 
-from cli.edutech.options import EdutechOptions, get_edutech_options
+from cli.edutech.options import EdutechOptions
 from cli.edutech.services import get_edutech_authenticated_page
 
-from .options import VoucherPageFilters, get_filters
+from .options import VoucherPageFilters
 from .services import get_voucher
 
 app = TyperDI()
@@ -20,8 +20,8 @@ def main() -> None:
 
 @app.command(name="cash")
 def generate_cash_report(
-    options: EdutechOptions = Depends(get_edutech_options),
-    filters: VoucherPageFilters = Depends(get_filters),
+    options: EdutechOptions = Depends(EdutechOptions),
+    filters: VoucherPageFilters = Depends(VoucherPageFilters),
 ) -> None:
     """Generate cash report."""
     with sync_playwright() as playwright:

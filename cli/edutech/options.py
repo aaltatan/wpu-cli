@@ -56,9 +56,3 @@ class EdutechOptions:
     username: EdutechUsernameOpt
     password: EdutechPasswordOpt
     financial_year: FinancialYearOpt
-
-
-def get_edutech_options(
-    username: EdutechUsernameOpt, password: EdutechPasswordOpt, financial_year: FinancialYearOpt
-) -> EdutechOptions:
-    return EdutechOptions(username, password, financial_year)

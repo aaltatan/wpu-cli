@@ -8,11 +8,11 @@ class Message:
     texts: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        full_number: re.Pattern = re.compile(r"^\+963\d{9}$")
-        full_number_with_two_zeros: re.Pattern = re.compile(r"^00963\d{9}$")
-        number_without_plus: re.Pattern = re.compile(r"^963\d{9}$")
-        number_with_one_zero: re.Pattern = re.compile(r"^0\d{9}$")
-        number_without_country_code: re.Pattern = re.compile(r"^\d{9}$")
+        full_number = re.compile(r"^\+963\d{9}$")
+        full_number_with_two_zeros = re.compile(r"^00963\d{9}$")
+        number_without_plus = re.compile(r"^963\d{9}$")
+        number_with_one_zero = re.compile(r"^0\d{9}$")
+        number_without_country_code = re.compile(r"^\d{9}$")
 
         if full_number_with_two_zeros.match(self.phone):
             self.phone = self.phone.replace("00", "+")

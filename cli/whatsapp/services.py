@@ -12,10 +12,6 @@ from .options import Timeout
 from .schemas import Message
 
 
-def _get_random_timeout(_min: float, _max: float) -> float:
-    return random.uniform(_min, _max)  # noqa: S311
-
-
 @contextmanager
 def open_whatsapp_page(url: str, pageload_timeout: float) -> Generator[Page, None, None]:
     playwright = Stealth().use_sync(sync_playwright()).manager.start()
@@ -35,6 +31,10 @@ def open_whatsapp_page(url: str, pageload_timeout: float) -> Generator[Page, Non
         playwright.stop()
 
 
+def _get_random_timeout(_min: float, _max: float) -> float:
+    return random.uniform(_min, _max)  # noqa: S311
+
+
 def _send_whatsapp_message(page: Page, message: str, timeout: float) -> None:
     text_input_selector = "footer .lexical-rich-text-input > div"
     page.wait_for_selector(text_input_selector, timeout=timeout)
@@ -48,11 +48,11 @@ def send_whatsapp_messages(page: Page, messages: list[Message], timeout: Timeout
             page.goto(f"https://web.whatsapp.com/send?phone={message.phone}", timeout=60_000)
 
             for text in message.texts:
-                send_selector_timeout = _get_random_timeout(
+                input_selector_timeout = _get_random_timeout(
                     timeout.min_send_selector, timeout.max_send_selector
                 )
 
-                _send_whatsapp_message(page, text, send_selector_timeout)
+                _send_whatsapp_message(page, text, input_selector_timeout)
 
             timeout_between_messages = _get_random_timeout(
                 timeout.min_between_messages, timeout.max_between_messages

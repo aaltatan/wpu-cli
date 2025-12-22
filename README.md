@@ -19,8 +19,11 @@ FUZZ_DEFAULT_WRITER=choices-xlsx # default writer for fuzzy matching
 
 # Whatsapp App
 WHATSAPP_DEFAULT_BASE_URL=https://web.whatsapp.com # default base url for whatsapp app
-WHATSAPP_DEFAULT_TIMEOUT_BETWEEN_MESSAGES=3 # default timeout between messages for whatsapp app
-WHATSAPP_DEFAULT_PAGELOAD_TIMEOUT=10000 # default pageload timeout for whatsapp app
+WHATSAPP_DEFAULT_MIN_TIMEOUT_BETWEEN_MESSAGES=3 # default min timeout between messages in seconds for whatsapp app
+WHATSAPP_DEFAULT_MAX_TIMEOUT_BETWEEN_MESSAGES=6 # default max timeout between messages in seconds for whatsapp app
+WHATSAPP_DEFAULT_MIN_SEND_SELECTOR_TIMEOUT=10000 # default min send selector timeout in milliseconds for whatsapp app
+WHATSAPP_DEFAULT_MAX_SEND_SELECTOR_TIMEOUT=15000 # default max send selector timeout in milliseconds for whatsapp app
+WHATSAPP_DEFAULT_PAGELOAD_TIMEOUT=60000 # default pageload timeout in milliseconds for whatsapp app
 
 # Template App
 TEMPLATES_DEFAULT_SINGLE_DOCX_TEMPLATE_DATA_VARIABLE=data # default data key for generated single file

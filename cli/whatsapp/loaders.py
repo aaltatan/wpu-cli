@@ -11,6 +11,10 @@ def get_messages_from_xlsx(filepath: Path) -> list[Message]:
 
     for row in data:
         phone, text = row.values()
+
+        phone = str(phone)
+        text = str(text).replace("_x000D_", "")
+
         if phone in messages_dict:
             messages_dict[phone].append(text)
         else:

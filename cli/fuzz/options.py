@@ -22,7 +22,7 @@ def loader_path_callback(value: Path) -> Path:
     return value
 
 
-QueriesPathOption = Annotated[
+QueriesPathOpt = Annotated[
     Path,
     typer.Option(
         "-q",
@@ -36,7 +36,7 @@ QueriesPathOption = Annotated[
     ),
 ]
 
-ChoicesPathOption = Annotated[
+ChoicesPathOpt = Annotated[
     Path,
     typer.Option(
         "-c",
@@ -50,12 +50,16 @@ ChoicesPathOption = Annotated[
     ),
 ]
 
-ProcessorOption = Annotated[
+ProcessorOpt = Annotated[
     list[AdditionalProcessor],
-    typer.Option("-p", "--processor", default_factory=list),
+    typer.Option(
+        "-p",
+        "--processor",
+        default_factory=list,
+    ),
 ]
 
-DefaultProcessorOption = Annotated[
+DefaultProcessorOpt = Annotated[
     list[DefaultProcessor],
     typer.Option(
         "--default-processor",
@@ -66,7 +70,7 @@ DefaultProcessorOption = Annotated[
     ),
 ]
 
-ScorerOption = Annotated[
+ScorerOpt = Annotated[
     Scorer,
     typer.Option(
         "-s",
@@ -76,7 +80,7 @@ ScorerOption = Annotated[
     ),
 ]
 
-AccuracyOption = Annotated[
+AccuracyOpt = Annotated[
     int,
     typer.Option(
         "-a",
@@ -86,7 +90,7 @@ AccuracyOption = Annotated[
     ),
 ]
 
-LimitOption = Annotated[
+LimitOpt = Annotated[
     int,
     typer.Option(
         "-l",
@@ -96,7 +100,7 @@ LimitOption = Annotated[
     ),
 ]
 
-RemoveDuplicatedOption = Annotated[
+RemoveDuplicatedOpt = Annotated[
     bool,
     typer.Option(
         "--remove-duplicated",
@@ -114,7 +118,7 @@ def export_path_callback(path: Path) -> Path:
     return path
 
 
-ExportPathOption = Annotated[
+ExportPathOpt = Annotated[
     Path,
     typer.Option(
         "-e",
@@ -128,7 +132,7 @@ ExportPathOption = Annotated[
     ),
 ]
 
-WriterOption = Annotated[
+WriterOpt = Annotated[
     Writer,
     typer.Option(
         "-w",
@@ -141,14 +145,14 @@ WriterOption = Annotated[
 
 @dataclass
 class Options:
-    choices_path: InitVar[ChoicesPathOption]
-    processors: InitVar[ProcessorOption]
-    default_processors: InitVar[DefaultProcessorOption]
-    scorer: InitVar[ScorerOption]
+    choices_path: InitVar[ChoicesPathOpt]
+    processors: InitVar[ProcessorOpt]
+    default_processors: InitVar[DefaultProcessorOpt]
+    scorer: InitVar[ScorerOpt]
 
-    accuracy: AccuracyOption
-    limit: LimitOption
-    remove_duplicated: RemoveDuplicatedOption
+    accuracy: AccuracyOpt
+    limit: LimitOpt
+    remove_duplicated: RemoveDuplicatedOpt
 
     choices: list[str] = field(init=False)
     processor_fn: ProcessFn = field(init=False)
@@ -156,10 +160,10 @@ class Options:
 
     def __post_init__(
         self,
-        choices_path: ChoicesPathOption,
-        processors: ProcessorOption,
-        default_processors: DefaultProcessorOption,
-        scorer: ScorerOption,
+        choices_path: ChoicesPathOpt,
+        processors: ProcessorOpt,
+        default_processors: DefaultProcessorOpt,
+        scorer: ScorerOpt,
     ) -> None:
         self.choices = get_loader_data(choices_path)
         self.processor_fn = get_processor_fn(processors + default_processors)
@@ -167,13 +171,13 @@ class Options:
 
 
 def get_options(  # noqa: PLR0913
-    choices_path: ChoicesPathOption,
-    processors: ProcessorOption,
-    default_processors: DefaultProcessorOption,
-    scorer: ScorerOption,
-    accuracy: AccuracyOption,
-    limit: LimitOption,
-    remove_duplicated: RemoveDuplicatedOption,
+    choices_path: ChoicesPathOpt,
+    processors: ProcessorOpt,
+    default_processors: DefaultProcessorOpt,
+    scorer: ScorerOpt,
+    accuracy: AccuracyOpt,
+    limit: LimitOpt,
+    remove_duplicated: RemoveDuplicatedOpt,
 ) -> Options:
     return Options(
         choices_path, processors, default_processors, scorer, accuracy, limit, remove_duplicated

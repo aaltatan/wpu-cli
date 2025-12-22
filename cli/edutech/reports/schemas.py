@@ -5,7 +5,7 @@ from typing import Annotated
 from pydantic import BaseModel, Field, computed_field, field_validator
 
 
-class JournalRow(BaseModel):
+class VoucherRow(BaseModel):
     serial: Annotated[str, Field(alias="VOUCHER_NUMBER")]
     date: Annotated[datetime, Field(alias="VOUCHER_DATE")]
     kind: Annotated[str, Field(alias="VOUCHER_TYPE_NAME_SL")]

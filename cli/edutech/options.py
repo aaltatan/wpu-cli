@@ -1,4 +1,5 @@
 import re
+from dataclasses import dataclass
 from typing import Annotated
 
 import typer
@@ -18,7 +19,7 @@ def validate_financial_year(year: str) -> None:
         raise typer.BadParameter(message, param_hint="--year")
 
 
-FinancialYearOption = Annotated[
+FinancialYearOpt = Annotated[
     str,
     typer.Option(
         "--year",
@@ -28,7 +29,7 @@ FinancialYearOption = Annotated[
     ),
 ]
 
-EdutechPasswordOption = Annotated[
+EdutechPasswordOpt = Annotated[
     str,
     typer.Option(
         "--edutech-password",
@@ -39,7 +40,7 @@ EdutechPasswordOption = Annotated[
     ),
 ]
 
-EdutechUsernameOption = Annotated[
+EdutechUsernameOpt = Annotated[
     str,
     typer.Option(
         "--username",
@@ -49,11 +50,15 @@ EdutechUsernameOption = Annotated[
     ),
 ]
 
-TimeoutAfterInsertingRowsOption = Annotated[
-    int,
-    typer.Option(
-        "--timeout",
-        help="Timeout after inserting rows",
-        envvar="EDUTECH_TIMEOUT_AFTER_INSERTING_ROWS",
-    ),
-]
+
+@dataclass
+class EdutechOptions:
+    username: EdutechUsernameOpt
+    password: EdutechPasswordOpt
+    financial_year: FinancialYearOpt
+
+
+def get_edutech_options(
+    username: EdutechUsernameOpt, password: EdutechPasswordOpt, financial_year: FinancialYearOpt
+) -> EdutechOptions:
+    return EdutechOptions(username, password, financial_year)

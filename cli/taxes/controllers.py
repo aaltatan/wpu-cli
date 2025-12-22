@@ -11,13 +11,13 @@ from cli.utils import extract_extension
 from .exporters import get_export_fn
 from .options import (
     AmountRange,
-    CompensationsRateOption,
-    ExportPathOption,
-    GrossCompensationsArgument,
-    GrossSalaryArgument,
+    CompensationsRateOpt,
+    ExportPathOpt,
+    GrossCompensationsArg,
+    GrossSalaryArg,
     Options,
-    SocialSecuritySalaryOption,
-    TargetSalaryArgument,
+    SocialSecuritySalaryOpt,
+    TargetSalaryArg,
     get_amount_range,
     get_options,
     get_ss_obj,
@@ -38,12 +38,12 @@ def main() -> None:
 
 
 @app.command(name="gross")
-def calculate_gross_taxes_command(
-    salary: GrossSalaryArgument,
-    compensations: GrossCompensationsArgument = 0,
+def calculate_gross_taxes_cmd(
+    salary: GrossSalaryArg,
+    compensations: GrossCompensationsArg = 0,
     options: Options = Depends(get_options),
     ss_obj: SocialSecurity = Depends(get_ss_obj),
-    ss_salary: SocialSecuritySalaryOption = None,
+    ss_salary: SocialSecuritySalaryOpt = None,
 ):
     """Calculate taxes for a given gross salary and compensations."""
     _salary = calculate_gross_taxes(
@@ -64,9 +64,9 @@ def calculate_gross_taxes_command(
 
 
 @app.command(name="net")
-def calculate_net_salary_command(
-    target_salary: TargetSalaryArgument,
-    compensations_rate: CompensationsRateOption,
+def calculate_net_salary_cmd(
+    target_salary: TargetSalaryArg,
+    compensations_rate: CompensationsRateOpt,
     options: Options = Depends(get_options),
 ):
     """Calculate gross salary and compensations for a given target salary."""
@@ -86,11 +86,11 @@ def calculate_net_salary_command(
 
 
 @app.command(name="ar")
-def calculate_net_salaries_from_amount_range_command(
-    compensations_rate: CompensationsRateOption,
+def calculate_net_salaries_from_amount_range_cmd(
+    compensations_rate: CompensationsRateOpt,
     ar: AmountRange = Depends(get_amount_range),
     options: Options = Depends(get_options),
-    export_path: ExportPathOption = None,
+    export_path: ExportPathOpt = None,
 ):
     """Create salaries from a given amount range."""
     if ar.stop is None:

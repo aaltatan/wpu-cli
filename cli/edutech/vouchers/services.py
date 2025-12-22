@@ -1,4 +1,3 @@
-from enum import StrEnum
 from pathlib import Path
 from typing import Literal, Self
 
@@ -9,16 +8,8 @@ from selectolax.parser import HTMLParser
 
 from cli.edutech.services import PagePipeline
 
-from .schemas import JournalRowSelector, Row
-
-
-class Chapter(StrEnum):
-    ONE = "1"
-    TWO = "2"
-    THREE = "3"
-
-    def __str__(self) -> str:
-        return self.value
+from .options import Chapter
+from .schemas import Row, VoucherRowSelector
 
 
 class VoucherPagePipeline(PagePipeline):
@@ -36,7 +27,7 @@ class VoucherPagePipeline(PagePipeline):
 
         return self
 
-    def fill_row(self, row: Row, automata_row: JournalRowSelector) -> Self:
+    def fill_row(self, row: Row, automata_row: VoucherRowSelector) -> Self:
         self.fill_input(selector=automata_row.debit, value=row.debit)
         self.fill_input(selector=automata_row.credit, value=row.credit)
         self.fill_input(
@@ -79,8 +70,8 @@ def _parse_ids(
     return [el.attributes.get("id") or "" for el in ids][1:]
 
 
-def _parse_additional_data(parser: HTMLParser) -> list[JournalRowSelector]:
-    data: list[JournalRowSelector] = []
+def _parse_additional_data(parser: HTMLParser) -> list[VoucherRowSelector]:
+    data: list[VoucherRowSelector] = []
 
     debit_inputs = _parse_ids(parser, "sumDebitId_show")
     credit_inputs = _parse_ids(parser, "sumCreditId_show")
@@ -96,7 +87,7 @@ def _parse_additional_data(parser: HTMLParser) -> list[JournalRowSelector]:
             "cost_center": cost_centers[idx],
             "notes": notes[idx],
         }
-        row = JournalRowSelector(**row)
+        row = VoucherRowSelector(**row)
         data.append(row)
 
     return data

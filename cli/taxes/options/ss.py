@@ -4,7 +4,7 @@ from typing import Annotated
 import typer
 from syriantaxes import Rounder, RoundingMethod, SocialSecurity
 
-SsRoundingMethodOption = Annotated[
+SsRoundingMethodOpt = Annotated[
     RoundingMethod,
     typer.Option(
         "--ss-rounding-method",
@@ -13,7 +13,7 @@ SsRoundingMethodOption = Annotated[
     ),
 ]
 
-SsRoundToNearestOption = Annotated[
+SsRoundToNearestOpt = Annotated[
     float,
     typer.Option(
         "--ss-round-to-nearest",
@@ -22,7 +22,7 @@ SsRoundToNearestOption = Annotated[
     ),
 ]
 
-MinSsAllowedSalaryOption = Annotated[
+MinSsAllowedSalaryOpt = Annotated[
     float,
     typer.Option(
         "--min-ss-allowed-salary",
@@ -31,7 +31,7 @@ MinSsAllowedSalaryOption = Annotated[
     ),
 ]
 
-SsDeductionRateOption = Annotated[
+SsDeductionRateOpt = Annotated[
     float,
     typer.Option(
         "--ss-deduction-rate",
@@ -46,10 +46,10 @@ def get_ss_rounder(ss_rounding_method: RoundingMethod, ss_rounding_to_nearest: f
 
 
 def get_ss_obj(
-    ss_rounding_method: SsRoundingMethodOption,
-    ss_rounding_to_nearest: SsRoundToNearestOption,
-    min_ss_allowed_salary: MinSsAllowedSalaryOption,
-    ss_deduction_rate: SsDeductionRateOption,
+    ss_rounding_method: SsRoundingMethodOpt,
+    ss_rounding_to_nearest: SsRoundToNearestOpt,
+    min_ss_allowed_salary: MinSsAllowedSalaryOpt,
+    ss_deduction_rate: SsDeductionRateOpt,
 ) -> SocialSecurity:
     rounder = get_ss_rounder(ss_rounding_method, ss_rounding_to_nearest)
     return SocialSecurity(min_ss_allowed_salary, ss_deduction_rate, rounder)
@@ -65,7 +65,7 @@ def ss_salary_callback(value: float | None) -> float | None:
     return value
 
 
-SocialSecuritySalaryOption = Annotated[
+SocialSecuritySalaryOpt = Annotated[
     float | None,
     typer.Argument(
         callback=ss_salary_callback,

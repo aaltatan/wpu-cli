@@ -8,24 +8,24 @@ from cli.utils import extract_extension
 
 from .ar import AmountRange, get_amount_range
 from .common import Options, get_options
-from .ss import SocialSecuritySalaryOption, get_ss_obj
+from .ss import SocialSecuritySalaryOpt, get_ss_obj
 
 __all__ = [
     "AmountRange",
     "Options",
-    "SocialSecuritySalaryOption",
+    "SocialSecuritySalaryOpt",
     "get_amount_range",
     "get_options",
     "get_ss_obj",
 ]
 
-GrossSalaryArgument = Annotated[float, typer.Argument()]
+GrossSalaryArg = Annotated[float, typer.Argument()]
 
-GrossCompensationsArgument = Annotated[float, typer.Argument()]
+GrossCompensationsArg = Annotated[float, typer.Argument()]
 
-TargetSalaryArgument = Annotated[float, typer.Argument()]
+TargetSalaryArg = Annotated[float, typer.Argument()]
 
-CompensationsRateOption = Annotated[
+CompensationsRateOpt = Annotated[
     float,
     typer.Option(
         "-r",
@@ -50,7 +50,7 @@ def export_path_callback(value: Path | None) -> Path | None:
     return value
 
 
-ExportPathOption = Annotated[
+ExportPathOpt = Annotated[
     Path | None,
     typer.Option(
         "-e",

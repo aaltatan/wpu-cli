@@ -1,84 +1,32 @@
-from datetime import datetime, timezone
-from typing import Annotated
+# ruff: noqa: B008
 
-import typer
 from devtools import debug
 from playwright.sync_api import sync_playwright
+from typer_di import Depends, TyperDI
 
-from cli.edutech.options import EdutechPasswordOption, EdutechUsernameOption, FinancialYearOption
+from cli.edutech.options import EdutechOptions, get_edutech_options
 from cli.edutech.services import get_edutech_authenticated_page
 
-from .services import JournalsPageFilters, get_journals
+from .options import VoucherPageFilters, get_filters
+from .services import get_voucher
 
-app = typer.Typer()
+app = TyperDI()
+
+
+@app.callback()
+def main() -> None:
+    """Generate reports from edutech."""
 
 
 @app.command(name="cash")
-def generate_cash_report(  # noqa: PLR0913
-    edutech_username: EdutechUsernameOption,
-    password: EdutechPasswordOption,
-    financial_year: FinancialYearOption,
-    accounts: Annotated[
-        list[str],
-        typer.Option(
-            "--accounts",
-            "-a",
-            help="Accounts to filter journals data by",
-            default_factory=lambda: [
-                "186208",
-                "186209",
-                "186210",
-            ],
-        ),
-    ],
-    grid_columns: Annotated[
-        list[str],
-        typer.Option(
-            "--columns",
-            "-c",
-            help="Grid columns to select",
-            default_factory=lambda: [
-                "tAccountName",
-                "tAccountNameCode",
-                "tVoucherType",
-                "tVoucherNumber",
-                "costCenterCol",
-                "noteCol",
-            ],
-        ),
-    ],
-    from_date: Annotated[
-        datetime,
-        typer.Option(
-            "--from-date",
-            help="From date in edutech general accounting",
-            prompt="From date in edutech general accounting e.g. 2025-11-17",
-        ),
-    ],
-    to_date: Annotated[
-        datetime,
-        typer.Option(
-            "--to-date",
-            help="To date in edutech general accounting",
-            default_factory=lambda: datetime.now(timezone.utc),
-        ),
-    ],
+def generate_cash_report(
+    options: EdutechOptions = Depends(get_edutech_options),
+    filters: VoucherPageFilters = Depends(get_filters),
 ) -> None:
     """Generate cash report."""
     with sync_playwright() as playwright:
-        authenticated_page = get_edutech_authenticated_page(playwright, edutech_username, password)
-
-        filters = JournalsPageFilters(
-            from_date=from_date,
-            to_date=to_date,
-            accounts=accounts,
-            grid_columns=grid_columns,
+        authenticated_page = get_edutech_authenticated_page(
+            playwright, options.username, options.password
         )
-
-        journals = get_journals(
-            authenticated_page=authenticated_page,
-            filters=filters,
-            financial_year=financial_year,
-        )
-
-        debug(journals)
+        voucher = get_voucher(authenticated_page, filters, options.financial_year)
+        debug(voucher)

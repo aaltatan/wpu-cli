@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-from datetime import datetime
 from typing import Self
 
 from playwright.sync_api import Page
@@ -7,11 +5,12 @@ from playwright.sync_api import Page
 from cli.edutech.services import PagePipeline
 
 from .exceptions import NoRowsFoundError
-from .schemas import JournalRow
+from .options import VoucherPageFilters
+from .schemas import VoucherRow
 
 
 class JournalsPagePipeline(PagePipeline):
-    def navigate_to_journals_page(self) -> Self:
+    def navigate_to_vouchers_page(self) -> Self:
         self._page.goto("http://edu/RAS/?sc=500#/_FIN/ACT/journal.php")
         self._page.wait_for_timeout(3_000)
         return self
@@ -21,19 +20,11 @@ class JournalsPagePipeline(PagePipeline):
         return self
 
 
-@dataclass
-class JournalsPageFilters:
-    from_date: datetime
-    to_date: datetime
-    accounts: list[str]
-    grid_columns: list[str]
-
-
-def get_journals(authenticated_page: Page, filters: JournalsPageFilters, financial_year: str):
+def get_voucher(authenticated_page: Page, filters: VoucherPageFilters, financial_year: str):
     pipeline = (
         JournalsPagePipeline(authenticated_page)
         .navigate_to_general_accounting(financial_year=financial_year)
-        .navigate_to_journals_page()
+        .navigate_to_vouchers_page()
         .select_grid_columns(*filters.grid_columns)
         .fill_date_input("#fromDate", filters.from_date)
         .fill_date_input("#toDate", filters.to_date)
@@ -51,7 +42,7 @@ def get_journals(authenticated_page: Page, filters: JournalsPageFilters, financi
         data = response.value.json()
 
         if isinstance(data, dict) and "rows" in data and isinstance(data["rows"], list):
-            return [JournalRow(**row) for row in data["rows"]]
+            return [VoucherRow(**row) for row in data["rows"]]
 
         message = "No rows found"
         raise NoRowsFoundError(message)

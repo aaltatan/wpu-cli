@@ -5,7 +5,7 @@ import typer
 
 RICH_HELP_PANEL = "Multiple Rows xlsx Options"
 
-GroupedColumnsOption = Annotated[
+GroupedColumnsOpt = Annotated[
     list[str],
     typer.Option(
         "-c",
@@ -15,7 +15,7 @@ GroupedColumnsOption = Annotated[
     ),
 ]
 
-GroupKeyVariable = Annotated[
+GroupKeyVariableOpt = Annotated[
     str,
     typer.Option(
         "-g",
@@ -29,12 +29,11 @@ GroupKeyVariable = Annotated[
 
 @dataclass
 class MultipleRowsXlsxOptions:
-    grouped_columns: GroupedColumnsOption
-    group_variable: GroupKeyVariable
+    grouped_columns: GroupedColumnsOpt
+    group_variable: GroupKeyVariableOpt
 
 
 def get_multiple_rows_xlsx_options(
-    grouped_columns: GroupedColumnsOption,
-    group_variable: GroupKeyVariable,
+    grouped_columns: GroupedColumnsOpt, group_variable: GroupKeyVariableOpt
 ) -> MultipleRowsXlsxOptions:
     return MultipleRowsXlsxOptions(grouped_columns, group_variable)

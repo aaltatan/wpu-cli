@@ -4,7 +4,7 @@ from typing import Annotated
 import typer
 from syriantaxes import Bracket, Rounder, RoundingMethod
 
-BracketMinsOption = Annotated[
+BracketMinsOpt = Annotated[
     list[float],
     typer.Option(
         "--brackets-mins",
@@ -14,7 +14,7 @@ BracketMinsOption = Annotated[
     ),
 ]
 
-BracketMaxesOption = Annotated[
+BracketMaxesOpt = Annotated[
     list[float],
     typer.Option(
         "--brackets-maxs",
@@ -24,7 +24,7 @@ BracketMaxesOption = Annotated[
     ),
 ]
 
-BracketRatesOption = Annotated[
+BracketRatesOpt = Annotated[
     list[float],
     typer.Option(
         "--brackets-rates",
@@ -34,7 +34,7 @@ BracketRatesOption = Annotated[
     ),
 ]
 
-MinAllowedSalaryOption = Annotated[
+MinAllowedSalaryOpt = Annotated[
     float,
     typer.Option(
         "--min-allowed-salary",
@@ -42,7 +42,7 @@ MinAllowedSalaryOption = Annotated[
     ),
 ]
 
-FixedTaxRateOption = Annotated[
+FixedTaxRateOpt = Annotated[
     float,
     typer.Option(
         "--fixed-tax-rate",
@@ -50,7 +50,7 @@ FixedTaxRateOption = Annotated[
     ),
 ]
 
-TaxesRoundingMethodOption = Annotated[
+TaxesRoundingMethodOpt = Annotated[
     RoundingMethod,
     typer.Option(
         "--taxes-rounding-method",
@@ -59,7 +59,7 @@ TaxesRoundingMethodOption = Annotated[
     ),
 ]
 
-TaxesRoundToNearestOption = Annotated[
+TaxesRoundToNearestOpt = Annotated[
     float,
     typer.Option(
         "--taxes-round-to-nearest",
@@ -70,7 +70,7 @@ TaxesRoundToNearestOption = Annotated[
 
 
 def _get_brackets(
-    mins: BracketMinsOption, maxes: BracketMaxesOption, rates: BracketRatesOption
+    mins: BracketMinsOpt, maxes: BracketMaxesOpt, rates: BracketRatesOpt
 ) -> list[Bracket]:
     return [Bracket(mins, maxs, rate) for mins, maxs, rate in zip(mins, maxes, rates, strict=True)]
 
@@ -83,39 +83,39 @@ def _get_rounder(
 
 @dataclass
 class Options:
-    brackets_mins: InitVar[BracketMinsOption]
-    brackets_maxs: InitVar[BracketMaxesOption]
-    brackets_rates: InitVar[BracketRatesOption]
+    brackets_mins: InitVar[BracketMinsOpt]
+    brackets_maxs: InitVar[BracketMaxesOpt]
+    brackets_rates: InitVar[BracketRatesOpt]
 
-    taxes_rounding_method: InitVar[TaxesRoundingMethodOption]
-    taxes_rounding_to_nearest: InitVar[TaxesRoundToNearestOption]
+    taxes_rounding_method: InitVar[TaxesRoundingMethodOpt]
+    taxes_rounding_to_nearest: InitVar[TaxesRoundToNearestOpt]
 
-    min_allowed_salary: MinAllowedSalaryOption
-    fixed_tax_rate: FixedTaxRateOption
+    min_allowed_salary: MinAllowedSalaryOpt
+    fixed_tax_rate: FixedTaxRateOpt
 
     brackets: list[Bracket] = field(init=False)
     taxes_rounder: Rounder = field(init=False)
 
     def __post_init__(
         self,
-        brackets_mins: BracketMinsOption,
-        brackets_maxs: BracketMaxesOption,
-        brackets_rates: BracketRatesOption,
-        taxes_rounding_method: TaxesRoundingMethodOption,
-        taxes_rounding_to_nearest: TaxesRoundToNearestOption,
+        brackets_mins: BracketMinsOpt,
+        brackets_maxs: BracketMaxesOpt,
+        brackets_rates: BracketRatesOpt,
+        taxes_rounding_method: TaxesRoundingMethodOpt,
+        taxes_rounding_to_nearest: TaxesRoundToNearestOpt,
     ) -> None:
         self.brackets = _get_brackets(brackets_mins, brackets_maxs, brackets_rates)
         self.taxes_rounder = _get_rounder(taxes_rounding_method, taxes_rounding_to_nearest)
 
 
 def get_options(  # noqa: PLR0913
-    brackets_mins: BracketMinsOption,
-    brackets_maxs: BracketMaxesOption,
-    brackets_rates: BracketRatesOption,
-    taxes_rounding_method: TaxesRoundingMethodOption,
-    taxes_rounding_to_nearest: TaxesRoundToNearestOption,
-    min_allowed_salary: MinAllowedSalaryOption,
-    fixed_tax_rate: FixedTaxRateOption,
+    brackets_mins: BracketMinsOpt,
+    brackets_maxs: BracketMaxesOpt,
+    brackets_rates: BracketRatesOpt,
+    taxes_rounding_method: TaxesRoundingMethodOpt,
+    taxes_rounding_to_nearest: TaxesRoundToNearestOpt,
+    min_allowed_salary: MinAllowedSalaryOpt,
+    fixed_tax_rate: FixedTaxRateOpt,
 ) -> Options:
     return Options(
         brackets_mins,

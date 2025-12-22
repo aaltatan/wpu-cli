@@ -4,7 +4,7 @@ from typing import Any, Literal, Self
 
 
 @dataclass
-class JournalRowSelector:
+class VoucherRowSelector:
     debit: str = ""
     credit: str = ""
     account_id: str = ""

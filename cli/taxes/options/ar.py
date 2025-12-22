@@ -17,7 +17,7 @@ def amount_range_start_callback(value: float) -> float:
     return value
 
 
-StartAmountRangeArgument = Annotated[
+StartAmountRangeArg = Annotated[
     float,
     typer.Argument(
         callback=amount_range_start_callback,
@@ -38,7 +38,7 @@ def amount_range_stop_callback(
     return value
 
 
-StopAmountRangeArgument = Annotated[
+StopAmountRangeArg = Annotated[
     float | None,
     typer.Argument(
         callback=amount_range_stop_callback,
@@ -69,7 +69,7 @@ def amount_range_step_callback(
     return value
 
 
-StepAmountRangeArgument = Annotated[
+StepAmountRangeArg = Annotated[
     float | None,
     typer.Argument(
         callback=amount_range_step_callback,
@@ -79,14 +79,14 @@ StepAmountRangeArgument = Annotated[
 
 @dataclass
 class AmountRange:
-    start: StartAmountRangeArgument
-    stop: StopAmountRangeArgument
-    step: StepAmountRangeArgument
+    start: StartAmountRangeArg
+    stop: StopAmountRangeArg
+    step: StepAmountRangeArg
 
 
 def get_amount_range(
-    start: StartAmountRangeArgument,
-    stop: StopAmountRangeArgument = None,
-    step: StepAmountRangeArgument = None,
+    start: StartAmountRangeArg,
+    stop: StopAmountRangeArg = None,
+    step: StepAmountRangeArg = None,
 ) -> AmountRange:
     return AmountRange(start, stop, step)

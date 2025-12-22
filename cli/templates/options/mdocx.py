@@ -4,11 +4,11 @@ from typing import Annotated
 
 import typer
 
-from .common import PDFOption
+from .common import PDFOpt
 
 RICH_HELP_PANEL = "Multiple Docx Options"
 
-FilenameKeyOption = Annotated[
+FilenameKeyOpt = Annotated[
     str,
     typer.Option(
         "-k",
@@ -18,7 +18,7 @@ FilenameKeyOption = Annotated[
     ),
 ]
 
-IncludeIndexInFilenameOption = Annotated[
+IncludeIndexInFilenameOpt = Annotated[
     bool,
     typer.Option(
         "-i",
@@ -36,7 +36,7 @@ def create_output_dir(output_dir: Path) -> Path:
     return output_dir
 
 
-OutputDirOption = Annotated[
+OutputDirOpt = Annotated[
     Path,
     typer.Option(
         "-o",
@@ -54,17 +54,17 @@ OutputDirOption = Annotated[
 
 @dataclass
 class MultipleDocxOptions:
-    output_dir: OutputDirOption
-    filename_key: FilenameKeyOption
-    include_idx_in_filename: IncludeIndexInFilenameOption
-    pdf: PDFOption
+    output_dir: OutputDirOpt
+    filename_key: FilenameKeyOpt
+    include_idx_in_filename: IncludeIndexInFilenameOpt
+    pdf: PDFOpt
 
 
 def get_multiple_docx_options(
-    output_dir: OutputDirOption,
-    filename_key: FilenameKeyOption,
+    output_dir: OutputDirOpt,
+    filename_key: FilenameKeyOpt,
     *,
-    include_idx_in_filename: IncludeIndexInFilenameOption = True,
-    pdf: PDFOption = False,
+    include_idx_in_filename: IncludeIndexInFilenameOpt = True,
+    pdf: PDFOpt = False,
 ) -> MultipleDocxOptions:
     return MultipleDocxOptions(output_dir, filename_key, include_idx_in_filename, pdf)

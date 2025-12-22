@@ -6,7 +6,7 @@ import typer
 
 RICH_HELP_PANEL = "Common Options"
 
-DataFilepathOption = Annotated[
+DataFilepathOpt = Annotated[
     Path,
     typer.Option(
         "-d",
@@ -20,7 +20,7 @@ DataFilepathOption = Annotated[
     ),
 ]
 
-TemplateFilepathOption = Annotated[
+TemplateFilepathOpt = Annotated[
     Path,
     typer.Option(
         "-t",
@@ -35,7 +35,7 @@ TemplateFilepathOption = Annotated[
 ]
 
 
-PDFOption = Annotated[
+PDFOpt = Annotated[
     bool,
     typer.Option(
         "--pdf",
@@ -48,11 +48,9 @@ PDFOption = Annotated[
 
 @dataclass
 class Options:
-    data_filepath: DataFilepathOption
-    template_filepath: TemplateFilepathOption
+    data_filepath: DataFilepathOpt
+    template_filepath: TemplateFilepathOpt
 
 
-def get_options(
-    data_filepath: DataFilepathOption, template_filepath: TemplateFilepathOption
-) -> Options:
+def get_options(data_filepath: DataFilepathOpt, template_filepath: TemplateFilepathOpt) -> Options:
     return Options(data_filepath, template_filepath)

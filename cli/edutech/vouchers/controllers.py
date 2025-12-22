@@ -1,51 +1,35 @@
-from pathlib import Path
-from typing import Annotated
+# ruff: noqa: B008
 
-import typer
 from playwright.sync_api import sync_playwright
+from typer_di import Depends, TyperDI
 
-from cli.edutech.options import (
-    EdutechPasswordOption,
-    EdutechUsernameOption,
-    FinancialYearOption,
-    TimeoutAfterInsertingRowsOption,
-)
+from cli.edutech.options import EdutechOptions, get_edutech_options
 from cli.edutech.services import get_edutech_authenticated_page
 
-from .services import Chapter, add_voucher, get_voucher_from_xlsx
+from .options import AddVouchersOptions, get_add_vouchers_options
+from .services import add_voucher, get_voucher_from_xlsx
 
-app = typer.Typer()
+app = TyperDI()
+
+
+@app.callback()
+def main() -> None:
+    """Add vouchers to edutech."""
 
 
 @app.command()
-def add_salaries(  # noqa: PLR0913
-    timeout_after_inserting_rows: TimeoutAfterInsertingRowsOption,
-    edutech_username: EdutechUsernameOption,
-    password: EdutechPasswordOption,
-    financial_year: FinancialYearOption,
-    filepath: Annotated[
-        Path,
-        typer.Option(
-            "-p",
-            "--filepath",
-            help="Path to Salaries file",
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            resolve_path=True,
-        ),
-    ],
-    chapter: Annotated[
-        Chapter,
-        typer.Option("--chapter", help="Chapter of the Salaries.xlsb file"),
-    ],
+def add_salaries(
+    options: AddVouchersOptions = Depends(get_add_vouchers_options),
+    edutech_options: EdutechOptions = Depends(get_edutech_options),
 ):
-    rows = get_voucher_from_xlsx(filepath, chapter)
+    rows = get_voucher_from_xlsx(options.filepath, options.chapter)
     with sync_playwright() as playwright:
-        authenticated_page = get_edutech_authenticated_page(playwright, edutech_username, password)
+        authenticated_page = get_edutech_authenticated_page(
+            playwright, edutech_options.username, edutech_options.password
+        )
         add_voucher(
-            authenticated_page,
-            rows,
-            financial_year,
-            timeout_after_inserting_rows,
+            rows=rows,
+            authenticated_page=authenticated_page,
+            financial_year=edutech_options.financial_year,
+            timeout_after_inserting_rows=options.timeout_after_inserting_rows,
         )

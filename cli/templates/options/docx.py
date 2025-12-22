@@ -4,7 +4,7 @@ from typing import Annotated
 
 import typer
 
-from .common import PDFOption
+from .common import PDFOpt
 
 RICH_HELP_PANEL = "Single Docx Options"
 
@@ -17,7 +17,7 @@ def filepath_callback(value: Path) -> Path:
     return value
 
 
-FilepathOption = Annotated[
+FilepathOpt = Annotated[
     Path,
     typer.Option(
         "-o",
@@ -33,7 +33,7 @@ FilepathOption = Annotated[
 ]
 
 
-TemplateDataVariableOption = Annotated[
+TemplateDataVariableOpt = Annotated[
     str,
     typer.Option(
         "-v",
@@ -55,15 +55,12 @@ TemplateDataVariableOption = Annotated[
 
 @dataclass
 class SingleDocxOptions:
-    filepath: FilepathOption
-    template_data_variable: TemplateDataVariableOption
-    pdf: PDFOption
+    filepath: FilepathOpt
+    template_data_variable: TemplateDataVariableOpt
+    pdf: PDFOpt
 
 
 def get_single_docx_options(
-    filepath: FilepathOption,
-    template_data_variable: TemplateDataVariableOption,
-    *,
-    pdf: PDFOption = False,
+    filepath: FilepathOpt, template_data_variable: TemplateDataVariableOpt, *, pdf: PDFOpt = False
 ) -> SingleDocxOptions:
     return SingleDocxOptions(filepath, template_data_variable, pdf)

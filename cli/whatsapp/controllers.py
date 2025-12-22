@@ -1,7 +1,8 @@
+# ruff: noqa: B008
+
 from typer_di import Depends, TyperDI
 
-from .loaders import get_messages_from_xlsx
-from .options import FilepathArgument, Timeout, WhatsappUrlOption, get_timeout
+from .options import Timeout, WhatsappOptions, get_timeout, get_whatsapp_options
 from .services import open_whatsapp_page, send_whatsapp_messages
 
 app = TyperDI()
@@ -13,13 +14,10 @@ def main() -> None:
 
 
 @app.command("send")
-def send_messages(
-    filepath: FilepathArgument,
-    whatsapp_url: WhatsappUrlOption,
-    timeout: Timeout = Depends(get_timeout),  # noqa: B008
+def send_messages_cmd(
+    options: WhatsappOptions = Depends(get_whatsapp_options),
+    timeout: Timeout = Depends(get_timeout),
 ) -> None:
     """Send whatsapp messages from xlsx file (You should have a file with two columns: phone number and message)."""  # noqa: E501
-    messages = get_messages_from_xlsx(filepath)
-
-    with open_whatsapp_page(whatsapp_url, timeout.pageload) as page:
-        send_whatsapp_messages(page, messages, timeout)
+    with open_whatsapp_page(options.url, timeout.pageload) as page:
+        send_whatsapp_messages(page, options.messages, timeout)

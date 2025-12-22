@@ -6,7 +6,7 @@ from docx2pdf import convert
 from docxtpl import DocxTemplate
 from rich.progress import track
 
-from .types import Data
+from .schemas import Data
 
 ADDITIONAL_CONTEXT = {
     "new_line": "\n",

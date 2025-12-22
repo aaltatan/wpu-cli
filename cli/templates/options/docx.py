@@ -58,9 +58,3 @@ class SingleDocxOptions:
     filepath: FilepathOpt
     template_data_variable: TemplateDataVariableOpt
     pdf: PDFOpt
-
-
-def get_single_docx_options(
-    filepath: FilepathOpt, template_data_variable: TemplateDataVariableOpt, *, pdf: PDFOpt = False
-) -> SingleDocxOptions:
-    return SingleDocxOptions(filepath, template_data_variable, pdf)

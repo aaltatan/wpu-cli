@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .types import Data
+from .schemas import Data
 
 
 class ExcelSingleRowDataLoader:

@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from .types import Data
+from .schemas import Data
 
 
 class Loader(Protocol):

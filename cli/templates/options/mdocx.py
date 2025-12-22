@@ -58,13 +58,3 @@ class MultipleDocxOptions:
     filename_key: FilenameKeyOpt
     include_idx_in_filename: IncludeIndexInFilenameOpt
     pdf: PDFOpt
-
-
-def get_multiple_docx_options(
-    output_dir: OutputDirOpt,
-    filename_key: FilenameKeyOpt,
-    *,
-    include_idx_in_filename: IncludeIndexInFilenameOpt = True,
-    pdf: PDFOpt = False,
-) -> MultipleDocxOptions:
-    return MultipleDocxOptions(output_dir, filename_key, include_idx_in_filename, pdf)

@@ -50,7 +50,3 @@ PDFOpt = Annotated[
 class Options:
     data_filepath: DataFilepathOpt
     template_filepath: TemplateFilepathOpt
-
-
-def get_options(data_filepath: DataFilepathOpt, template_filepath: TemplateFilepathOpt) -> Options:
-    return Options(data_filepath, template_filepath)

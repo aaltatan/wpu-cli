@@ -31,9 +31,3 @@ GroupKeyVariableOpt = Annotated[
 class MultipleRowsXlsxOptions:
     grouped_columns: GroupedColumnsOpt
     group_variable: GroupKeyVariableOpt
-
-
-def get_multiple_rows_xlsx_options(
-    grouped_columns: GroupedColumnsOpt, group_variable: GroupKeyVariableOpt
-) -> MultipleRowsXlsxOptions:
-    return MultipleRowsXlsxOptions(grouped_columns, group_variable)

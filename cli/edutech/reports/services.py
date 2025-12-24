@@ -1,12 +1,19 @@
-from typing import Self
+from datetime import datetime
+from typing import Protocol, Self
 
 from playwright.sync_api import Page
 
 from cli.edutech.services import PagePipeline
 
 from .exceptions import NoRowsFoundError
-from .options import VoucherPageFilters
 from .schemas import VoucherRow
+
+
+class Filters(Protocol):
+    from_date: datetime
+    to_date: datetime
+    accounts: list[str]
+    grid_columns: list[str]
 
 
 class JournalsPagePipeline(PagePipeline):
@@ -20,7 +27,7 @@ class JournalsPagePipeline(PagePipeline):
         return self
 
 
-def get_voucher(authenticated_page: Page, filters: VoucherPageFilters, financial_year: str):
+def get_voucher(authenticated_page: Page, filters: Filters, financial_year: str):
     pipeline = (
         JournalsPagePipeline(authenticated_page)
         .navigate_to_general_accounting(financial_year=financial_year)

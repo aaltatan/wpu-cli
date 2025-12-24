@@ -1,17 +1,14 @@
+from collections.abc import Generator
+from contextlib import contextmanager
 from datetime import datetime
 from typing import Any, Literal, Self
 
-from playwright.sync_api import Page, Playwright
+from playwright.sync_api import Page, sync_playwright
 
 
-def get_edutech_authenticated_page(playwright: Playwright, username: str, password: str) -> Page:
-    browser = playwright.chromium.launch(slow_mo=10, headless=False)
-    page = browser.new_page()
-    page.goto("http://edu/")
-
-    page.wait_for_timeout(2_000)
+def _login_to_edutech(page: Page, username: str, password: str) -> Page:
+    page.wait_for_selector("#login", timeout=60_000)
     page.click("#login")
-
     page.fill('input[name="user_id"]', username)
     page.fill("#password", password)
     page.click('button[type="submit"]')
@@ -19,6 +16,25 @@ def get_edutech_authenticated_page(playwright: Playwright, username: str, passwo
     page.wait_for_timeout(10_000)
 
     return page
+
+
+@contextmanager
+def open_authenticated_edutech_page(username: str, password: str) -> Generator[Page, None, None]:
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch(slow_mo=50, headless=False)
+    context = browser.new_context()
+    page = context.new_page()
+
+    page.goto("http://edu/", timeout=60_000)
+    _login_to_edutech(page, username, password)
+
+    try:
+        yield page
+    finally:
+        page.close()
+        context.close()
+        browser.close()
+        playwright.stop()
 
 
 class PagePipeline:

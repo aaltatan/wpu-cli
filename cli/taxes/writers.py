@@ -10,26 +10,26 @@ import xlwings as xw
 from .constants import HEADERS
 from .schemas import Salary
 
-type ExportFn = Callable[[list[Salary], Path], None]
+type WriteFn = Callable[[list[Salary], Path], None]
 
-_export_functions: dict[str, ExportFn] = {}
-
-
-def get_export_functions() -> dict[str, ExportFn]:
-    return _export_functions.copy()
+_write_functions: dict[str, WriteFn] = {}
 
 
-def get_export_fn(extension: str) -> ExportFn:
-    return _export_functions[extension]
+def get_write_functions() -> dict[str, WriteFn]:
+    return _write_functions.copy()
 
 
-def register_extension(extension: str) -> Callable[[ExportFn], ExportFn]:
-    def decorator(export_fn: ExportFn) -> ExportFn:
-        @wraps(export_fn)
+def get_write_fn(extension: str) -> WriteFn:
+    return _write_functions[extension]
+
+
+def register_extension(extension: str) -> Callable[[WriteFn], WriteFn]:
+    def decorator(write_fn: WriteFn) -> WriteFn:
+        @wraps(write_fn)
         def wrapper(salaries: list[Salary], path: Path) -> None:
-            export_fn(salaries, path)
+            write_fn(salaries, path)
 
-        _export_functions[extension] = wrapper
+        _write_functions[extension] = wrapper
         return wrapper
 
     return decorator
@@ -48,7 +48,7 @@ def _format_bold(rg: xw.Range) -> None:
 
 
 @register_extension("xlsx")
-def export_to_excel(salaries: list[Salary], path: Path) -> None:
+def write_to_excel(salaries: list[Salary], path: Path) -> None:
     wb = xw.Book()
     ws = wb.sheets.active
 
@@ -89,7 +89,7 @@ def export_to_excel(salaries: list[Salary], path: Path) -> None:
 
 
 @register_extension("json")
-def export_to_json(salaries: list[Salary], path: Path) -> None:
+def write_to_json(salaries: list[Salary], path: Path) -> None:
     data = [json.loads(salary.model_dump_json()) for salary in salaries]
 
     with open(path, "w") as f:
@@ -97,6 +97,6 @@ def export_to_json(salaries: list[Salary], path: Path) -> None:
 
 
 @register_extension("jsonl")
-def export_to_jsonl(salaries: list[Salary], path: Path) -> None:
+def write_to_jsonl(salaries: list[Salary], path: Path) -> None:
     with open(path, "w") as f:
         f.writelines(salary.model_dump_json(indent=4) + "\n" for salary in salaries)

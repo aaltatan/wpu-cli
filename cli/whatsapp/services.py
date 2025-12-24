@@ -21,7 +21,7 @@ class Timeout(Protocol):
 
 
 @contextmanager
-def open_whatsapp_page(url: str, pageload_timeout: float) -> Generator[Page, None, None]:
+def open_whatsapp_web_page(url: str, pageload_timeout: float) -> Generator[Page, None, None]:
     playwright = Stealth().use_sync(sync_playwright()).manager.start()
     browser = playwright.chromium.launch(slow_mo=50, headless=False)
     context = browser.new_context()
@@ -50,7 +50,7 @@ def _send_whatsapp_message(page: Page, message: str, timeout: float) -> None:
     page.click('[aria-label="Send"]')
 
 
-def send_whatsapp_messages(page: Page, messages: list[Message], timeout: Timeout) -> None:
+def send_whatsapp_messages_web(page: Page, messages: list[Message], timeout: Timeout) -> None:
     for message in track(messages, "📩 Sending", len(messages)):
         try:
             page.goto(

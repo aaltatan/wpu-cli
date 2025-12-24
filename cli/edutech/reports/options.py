@@ -41,6 +41,7 @@ FromDateOpt = Annotated[
         "--from-date",
         help="From date in edutech general accounting",
         prompt="From date in edutech general accounting e.g. 2025-11-17",
+        default_factory=lambda: datetime.now(timezone.utc),
     ),
 ]
 
@@ -49,6 +50,7 @@ ToDateOpt = Annotated[
     typer.Option(
         "--to-date",
         help="To date in edutech general accounting",
+        prompt="To date in edutech general accounting e.g. 2025-11-17",
         default_factory=lambda: datetime.now(timezone.utc),
     ),
 ]

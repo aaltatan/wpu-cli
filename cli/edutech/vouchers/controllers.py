@@ -1,13 +1,12 @@
 # ruff: noqa: B008
 
-from playwright.sync_api import sync_playwright
 from typer_di import Depends, TyperDI
 
 from cli.edutech.options import EdutechOptions
-from cli.edutech.services import get_edutech_authenticated_page
+from cli.edutech.services import open_authenticated_edutech_page
 
 from .options import AddVouchersOptions
-from .services import add_voucher, get_voucher_from_xlsx
+from .services import add_voucher
 
 app = TyperDI()
 
@@ -19,17 +18,13 @@ def main() -> None:
 
 @app.command()
 def add_salaries(
-    options: AddVouchersOptions = Depends(AddVouchersOptions),
-    edutech_options: EdutechOptions = Depends(EdutechOptions),
+    options: EdutechOptions = Depends(EdutechOptions),
+    vouchers_options: AddVouchersOptions = Depends(AddVouchersOptions),
 ):
-    rows = get_voucher_from_xlsx(options.filepath, options.chapter)
-    with sync_playwright() as playwright:
-        authenticated_page = get_edutech_authenticated_page(
-            playwright, edutech_options.username, edutech_options.password
-        )
+    with open_authenticated_edutech_page(options.username, options.password) as page:
         add_voucher(
-            rows=rows,
-            authenticated_page=authenticated_page,
-            financial_year=edutech_options.financial_year,
-            timeout_after_inserting_rows=options.timeout_after_inserting_rows,
+            rows=vouchers_options.rows,
+            authenticated_page=page,
+            financial_year=options.financial_year,
+            timeout_after_inserting_rows=vouchers_options.timeout_after_inserting_rows,
         )

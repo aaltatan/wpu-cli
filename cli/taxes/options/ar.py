@@ -4,7 +4,7 @@ from typing import Annotated
 
 import typer
 
-from ._options import CompensationsRateOpt, ExportPathOpt
+from ._options import CompensationsRateOpt, WritePathOpt
 
 FACTOR = 10
 MAX_ITERATIONS = 1000
@@ -85,4 +85,4 @@ class AmountRangeOption:
     compensations_rate: CompensationsRateOpt
     stop: StopAmountRangeArg = None
     step: StepAmountRangeArg = None
-    export_path: ExportPathOpt = None
+    write_path: WritePathOpt = None

@@ -8,11 +8,11 @@ import typer
 from typer_di import Depends
 
 from cli.fuzz.enums import AdditionalProcessor, DefaultProcessor, Scorer
-from cli.fuzz.loaders import get_loader_data
 from cli.fuzz.processors import ProcessorFn, get_processor_fn
+from cli.fuzz.readers import get_reader_data
 from cli.fuzz.scorers import ScorerFn, get_scorer_fn
 
-from ._callbacks import loader_path_callback
+from ._callbacks import reader_path_callback
 
 ChoicesPathOpt = Annotated[
     Path,
@@ -24,7 +24,7 @@ ChoicesPathOpt = Annotated[
         exists=True,
         resolve_path=True,
         help="path to a file containing the choices",
-        callback=loader_path_callback,
+        callback=reader_path_callback,
     ),
 ]
 
@@ -89,7 +89,7 @@ RemoveDuplicatedOpt = Annotated[
 
 
 def _get_choices(choices_path: ChoicesPathOpt) -> list[str]:
-    return get_loader_data(choices_path)
+    return get_reader_data(choices_path)
 
 
 def _get_processor_fn(

@@ -1,11 +1,10 @@
 # ruff: noqa: B008
 
 from devtools import debug
-from playwright.sync_api import sync_playwright
 from typer_di import Depends, TyperDI
 
 from cli.edutech.options import EdutechOptions
-from cli.edutech.services import get_edutech_authenticated_page
+from cli.edutech.services import open_authenticated_edutech_page
 
 from .options import VoucherPageFilters
 from .services import get_voucher
@@ -24,9 +23,6 @@ def generate_cash_report(
     filters: VoucherPageFilters = Depends(VoucherPageFilters),
 ) -> None:
     """Generate cash report."""
-    with sync_playwright() as playwright:
-        authenticated_page = get_edutech_authenticated_page(
-            playwright, options.username, options.password
-        )
-        voucher = get_voucher(authenticated_page, filters, options.financial_year)
+    with open_authenticated_edutech_page(options.username, options.password) as page:
+        voucher = get_voucher(page, filters, options.financial_year)
         debug(voucher)

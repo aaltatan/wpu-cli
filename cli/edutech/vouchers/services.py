@@ -1,14 +1,11 @@
-from pathlib import Path
 from typing import Literal, Self
 
-import pandas as pd
 from playwright.sync_api import Page
 from rich.progress import track
 from selectolax.parser import HTMLParser
 
 from cli.edutech.services import PagePipeline
 
-from .options import Chapter
 from .schemas import Row, VoucherRowSelector
 
 
@@ -43,24 +40,6 @@ class VoucherPagePipeline(PagePipeline):
         self.fill_input(selector=automata_row.notes, value=row.notes)
 
         return self
-
-
-def get_voucher_from_xlsx(filepath: Path, chapter: Chapter) -> list[Row]:
-    data = pd.read_excel(filepath).fillna("").to_dict(orient="records")
-
-    return [
-        Row.from_kwargs(
-            faculty=row["Building"],
-            chapter=chapter,
-            debit=row["Debit By Net"],
-            credit=row["Credit By Net"],
-            account_id=row["EDU@tech Account Number"],
-            notes=row["Notes"],
-            string_account=row["Explanation"],
-            faculty_string=row["Building"],
-        )
-        for row in data
-    ]
 
 
 def _parse_ids(

@@ -7,10 +7,10 @@ from typer_di import Depends, TyperDI
 
 from cli.utils import extract_extension
 
-from .exporters import get_export_fn
 from .options import AmountRangeOption, GrossOptions, NetOptions, Options
 from .services import calculate_gross_taxes, calculate_net_salaries, calculate_net_salary
 from .tables import get_salary_table
+from .writers import get_write_fn
 
 app = TyperDI()
 
@@ -88,16 +88,16 @@ def calculate_net_salaries_cmd(
 
     console = Console()
 
-    if ar.export_path is not None:
+    if ar.write_path is not None:
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             transient=True,
         ) as progress:
-            progress.add_task("Exporting ... ", total=None)
-            export_fn = get_export_fn(extract_extension(ar.export_path))
-            export_fn(salaries, ar.export_path)
-            console.print(f"✅ Results has been exported to {ar.export_path}")
+            progress.add_task("Writing ... ", total=None)
+            write_fn = get_write_fn(extract_extension(ar.write_path))
+            write_fn(salaries, ar.write_path)
+            console.print(f"✅ Results has been written to {ar.write_path}")
     else:
         table = get_salary_table(*salaries, title="Net Results")
         console.print(table)

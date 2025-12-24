@@ -1,14 +1,15 @@
 # ruff: noqa: RUF009
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Annotated
 
-import pandas as pd
 import typer
 from typer_di import Depends
 
-from .schemas import Message
+from cli.whatsapp.readers import read_messages_from_xlsx
+from cli.whatsapp.schemas import Message
+
+from ._options import FilepathArg
 
 MinMessagesTimeoutOpt = Annotated[
     float,
@@ -70,31 +71,6 @@ class Timeout:
     pageload: PageloadTimeoutOpt
 
 
-def _get_messages_from_xlsx(filepath: Path) -> list[Message]:
-    messages_dict: dict[str, list[str]] = {}
-    data = pd.read_excel(filepath).to_dict(orient="records")
-
-    for row in data:
-        phone, text = row.values()
-
-        phone = str(phone)
-        text = str(text).replace("_x000D_", "")
-
-        if phone in messages_dict:
-            messages_dict[phone].append(text)
-        else:
-            messages_dict[phone] = [text]
-
-    return [Message(phone, texts) for phone, texts in messages_dict.items()]
-
-
-FilepathArg = Annotated[
-    Path,
-    typer.Argument(
-        help="Path to xlsx file contains the messages",
-    ),
-]
-
 UrlOpt = Annotated[
     str,
     typer.Option(
@@ -105,8 +81,12 @@ UrlOpt = Annotated[
 ]
 
 
+def _read_messages_from_xlsx_wrapper(filepath: FilepathArg) -> list[Message]:
+    return read_messages_from_xlsx(filepath)
+
+
 @dataclass
-class Options:
+class WebOptions:
     url: UrlOpt
-    messages: list[Message] = Depends(_get_messages_from_xlsx)
+    messages: list[Message] = Depends(_read_messages_from_xlsx_wrapper)
     timeout: Timeout = Depends(Timeout)

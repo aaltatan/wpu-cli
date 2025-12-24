@@ -5,9 +5,9 @@ from typing import Annotated
 import typer
 from typer_di import Depends
 
-from cli.fuzz.loaders import get_loader_data
+from cli.fuzz.readers import get_reader_data
 
-from ._callbacks import loader_path_callback
+from ._callbacks import reader_path_callback
 
 QueriesPathOpt = Annotated[
     Path,
@@ -19,15 +19,15 @@ QueriesPathOpt = Annotated[
         exists=True,
         resolve_path=True,
         help="path to a file containing the queries",
-        callback=loader_path_callback,
+        callback=reader_path_callback,
     ),
 ]
 
 
-def _get_loader_data(queries_path: QueriesPathOpt) -> list[str]:
-    return get_loader_data(queries_path)
+def _get_reader_data_wrapper(queries_path: QueriesPathOpt) -> list[str]:
+    return get_reader_data(queries_path)
 
 
 @dataclass
 class QueryOptions:
-    queries: list[str] = Depends(_get_loader_data)  # noqa: RUF009
+    queries: list[str] = Depends(_get_reader_data_wrapper)  # noqa: RUF009

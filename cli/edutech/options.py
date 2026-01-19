@@ -55,7 +55,7 @@ EdutechUsernameOpt = Annotated[
 
 
 @dataclass
-class EdutechOptions:
+class Edutech:
     username: EdutechUsernameOpt
     password: EdutechPasswordOpt
     financial_year: FinancialYearOpt

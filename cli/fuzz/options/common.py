@@ -1,11 +1,8 @@
-# ruff: noqa: RUF009
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated
 
 import typer
-from typer_di import Depends
 
 from cli.fuzz.enums import AdditionalProcessor, DefaultProcessor, Scorer
 from cli.fuzz.processors import ProcessorFn, get_processor_fn
@@ -88,26 +85,22 @@ RemoveDuplicatedOpt = Annotated[
 ]
 
 
-def _get_choices(choices_path: ChoicesPathOpt) -> list[str]:
+def get_choices_wrapper(choices_path: ChoicesPathOpt) -> list[str]:
     return get_reader_data(choices_path)
 
 
-def _get_processor_fn(
+def get_processor_fn_wrapper(
     processors: ProcessorOpt, default_processors: DefaultProcessorOpt
 ) -> ProcessorFn:
     return get_processor_fn(processors + default_processors)
 
 
-def _get_scorer_fn(scorer: ScorerOpt) -> ScorerFn:
+def get_scorer_fn_wrapper(scorer: ScorerOpt) -> ScorerFn:
     return get_scorer_fn(scorer)
 
 
 @dataclass
-class Options:
+class Config:
     accuracy: AccuracyOpt
     limit: LimitOpt
     remove_duplicated: RemoveDuplicatedOpt
-
-    choices: list[str] = Depends(_get_choices)
-    processor_fn: ProcessorFn = Depends(_get_processor_fn)
-    scorer_fn: ScorerFn = Depends(_get_scorer_fn)

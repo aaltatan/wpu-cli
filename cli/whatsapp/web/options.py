@@ -1,22 +1,20 @@
-# ruff: noqa: RUF009
-
 from dataclasses import dataclass
 from typing import Annotated
 
 import typer
-from typer_di import Depends
 
+from cli.whatsapp.options import FilepathArg
 from cli.whatsapp.readers import read_messages_from_xlsx
-from cli.whatsapp.schemas import Message
 
-from ._options import FilepathArg
+from .readers import get_messages
+from .schemas import Message
 
 MinMessagesTimeoutOpt = Annotated[
     float,
     typer.Option(
         "--min-timeout-between-messages",
         help="Min Timeout between messages in seconds",
-        envvar="WHATSAPP_DEFAULT_MIN_TIMEOUT_BETWEEN_MESSAGES",
+        envvar="WHATSAPP_WEB_DEFAULT_MIN_TIMEOUT_BETWEEN_MESSAGES",
         rich_help_panel="Timeout",
     ),
 ]
@@ -26,7 +24,7 @@ MaxMessagesTimeoutOpt = Annotated[
     typer.Option(
         "--max-timeout-between-messages",
         help="Max Timeout between messages in seconds",
-        envvar="WHATSAPP_DEFAULT_MAX_TIMEOUT_BETWEEN_MESSAGES",
+        envvar="WHATSAPP_WEB_DEFAULT_MAX_TIMEOUT_BETWEEN_MESSAGES",
         rich_help_panel="Timeout",
     ),
 ]
@@ -36,7 +34,7 @@ MinSendSelectorTimeoutOpt = Annotated[
     typer.Option(
         "--min-send-selector-timeout",
         help="Min Timeout for send selector in milliseconds",
-        envvar="WHATSAPP_DEFAULT_MIN_SEND_SELECTOR_TIMEOUT",
+        envvar="WHATSAPP_WEB_DEFAULT_MIN_SEND_SELECTOR_TIMEOUT",
         rich_help_panel="Timeout",
     ),
 ]
@@ -46,7 +44,7 @@ MaxSendSelectorTimeoutOpt = Annotated[
     typer.Option(
         "--max-send-selector-timeout",
         help="Max Timeout for send selector in milliseconds",
-        envvar="WHATSAPP_DEFAULT_MAX_SEND_SELECTOR_TIMEOUT",
+        envvar="WHATSAPP_WEB_DEFAULT_MAX_SEND_SELECTOR_TIMEOUT",
         rich_help_panel="Timeout",
     ),
 ]
@@ -56,7 +54,7 @@ PageloadTimeoutOpt = Annotated[
     typer.Option(
         "--pageload-timeout",
         help="Timeout for pageload in milliseconds",
-        envvar="WHATSAPP_DEFAULT_PAGELOAD_TIMEOUT",
+        envvar="WHATSAPP_WEB_DEFAULT_PAGELOAD_TIMEOUT",
         rich_help_panel="Timeout",
     ),
 ]
@@ -76,17 +74,11 @@ UrlOpt = Annotated[
     typer.Option(
         "--url",
         help="Base url for whatsapp app",
-        envvar="WHATSAPP_DEFAULT_BASE_URL",
+        envvar="WHATSAPP_WEB_DEFAULT_BASE_URL",
     ),
 ]
 
 
-def _read_messages_from_xlsx_wrapper(filepath: FilepathArg) -> list[Message]:
-    return read_messages_from_xlsx(filepath)
-
-
-@dataclass
-class WebOptions:
-    url: UrlOpt
-    messages: list[Message] = Depends(_read_messages_from_xlsx_wrapper)
-    timeout: Timeout = Depends(Timeout)
+def read_messages_from_xlsx_wrapper(filepath: FilepathArg) -> list[Message]:
+    messages = read_messages_from_xlsx(filepath)
+    return get_messages(messages)

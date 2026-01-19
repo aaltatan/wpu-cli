@@ -3,10 +3,6 @@ from dataclasses import dataclass
 from typing import Annotated
 
 import typer
-from syriantaxes import SocialSecurity
-from typer_di import Depends
-
-from ._ss import get_ss_obj
 
 GrossSalaryArg = Annotated[float, typer.Argument()]
 
@@ -32,8 +28,7 @@ SocialSecuritySalaryOpt = Annotated[
 
 
 @dataclass
-class GrossOptions:
+class Gross:
     salary: GrossSalaryArg
     compensations: GrossCompensationsArg = 0
-    ss_obj: SocialSecurity = Depends(get_ss_obj)  # noqa: RUF009
     ss_salary: SocialSecuritySalaryOpt = None

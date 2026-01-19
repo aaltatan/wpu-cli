@@ -4,7 +4,7 @@ from typing import Annotated
 
 import typer
 
-from ._options import CompensationsRateOpt, WritePathOpt
+from ._options import CompensationsRateOpt
 
 FACTOR = 10
 MAX_ITERATIONS = 1000
@@ -80,9 +80,8 @@ StepAmountRangeArg = Annotated[
 
 
 @dataclass
-class AmountRangeOption:
-    start: StartAmountRangeArg
+class AmountRange:
     compensations_rate: CompensationsRateOpt
+    start: StartAmountRangeArg
     stop: StopAmountRangeArg = None
     step: StepAmountRangeArg = None
-    write_path: WritePathOpt = None

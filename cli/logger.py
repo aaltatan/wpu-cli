@@ -2,7 +2,6 @@ from loguru import logger
 
 
 def init_logger() -> None:
-    logger.remove()
     logger.add(
         "logs/app.log",
         level="INFO",

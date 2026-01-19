@@ -1,9 +1,7 @@
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated
 
 import typer
-from typer_di import Depends
 
 from .enums import Chapter
 from .readers import read_voucher_from_xlsx
@@ -40,11 +38,5 @@ ChapterOpt = Annotated[
 ]
 
 
-def _read_voucher_from_xlsx_wrapper(filepath: VoucherFilepathOpt, chapter: ChapterOpt) -> list[Row]:
+def read_voucher_from_xlsx_wrapper(filepath: VoucherFilepathOpt, chapter: ChapterOpt) -> list[Row]:
     return read_voucher_from_xlsx(filepath, chapter)
-
-
-@dataclass
-class AddVouchersOptions:
-    timeout_after_inserting_rows: TimeoutAfterInsertingRowsOpt
-    rows: list[Row] = Depends(_read_voucher_from_xlsx_wrapper)  # noqa: RUF009

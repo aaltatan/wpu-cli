@@ -1,9 +1,7 @@
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated
 
 import typer
-from typer_di import Depends
 
 from cli.fuzz.readers import get_reader_data
 
@@ -24,10 +22,7 @@ QueriesPathOpt = Annotated[
 ]
 
 
-def _get_reader_data_wrapper(queries_path: QueriesPathOpt) -> list[str]:
+def get_reader_data_wrapper(queries_path: QueriesPathOpt) -> list[str]:
     return get_reader_data(queries_path)
 
 
-@dataclass
-class QueryOptions:
-    queries: list[str] = Depends(_get_reader_data_wrapper)  # noqa: RUF009

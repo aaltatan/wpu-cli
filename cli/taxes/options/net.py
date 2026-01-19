@@ -9,6 +9,6 @@ TargetSalaryArg = Annotated[float, typer.Argument()]
 
 
 @dataclass
-class NetOptions:
+class Net:
     target_salary: TargetSalaryArg
     compensations_rate: CompensationsRateOpt

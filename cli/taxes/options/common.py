@@ -1,9 +1,12 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Annotated
 
 import typer
 from syriantaxes import Bracket, Rounder, RoundingMethod
-from typer_di import Depends
+
+from cli.taxes.writers import get_write_functions
+from cli.utils import extract_extension
 
 BracketMinsOpt = Annotated[
     list[float],
@@ -61,10 +64,10 @@ TaxesRoundToNearestOpt = Annotated[
 ]
 
 
-def get_rounder(
-    taxes_rounding_method: TaxesRoundingMethodOpt, taxes_rounding_to_nearest: TaxesRoundToNearestOpt
+def get_taxes_rounder(
+    method: TaxesRoundingMethodOpt, to_nearest: TaxesRoundToNearestOpt
 ) -> Rounder:
-    return Rounder(taxes_rounding_method, taxes_rounding_to_nearest)
+    return Rounder(method, to_nearest)
 
 
 MinAllowedSalaryOpt = Annotated[
@@ -85,8 +88,36 @@ FixedTaxRateOpt = Annotated[
 
 
 @dataclass
-class Options:
+class Config:
     min_allowed_salary: MinAllowedSalaryOpt
     fixed_tax_rate: FixedTaxRateOpt
-    brackets: list[Bracket] = Depends(get_brackets)  # noqa: RUF009
-    taxes_rounder: Rounder = Depends(get_rounder)  # noqa: RUF009
+
+
+def write_path_callback(value: Path | None) -> Path | None:
+    if value:
+        if value.exists():
+            message = f"The file {value} already exists."
+            raise typer.BadParameter(message)
+
+        extension = extract_extension(value)
+
+        if extension not in get_write_functions():
+            message = f"extension of type (.{extension}) not supported."
+            raise typer.BadParameter(message)
+
+    return value
+
+
+WritePathOpt = Annotated[
+    Path | None,
+    typer.Option(
+        "-e",
+        "--write-path",
+        help="Path to the output file",
+        exists=False,
+        file_okay=True,
+        dir_okay=False,
+        resolve_path=True,
+        callback=write_path_callback,
+    ),
+]

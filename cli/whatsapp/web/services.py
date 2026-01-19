@@ -9,7 +9,7 @@ from playwright.sync_api import Page, sync_playwright
 from playwright_stealth import Stealth
 from rich.progress import track
 
-from .schemas import Message
+from cli.whatsapp.web.schemas import Message
 
 
 class Timeout(Protocol):

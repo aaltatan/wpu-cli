@@ -1,3 +1,14 @@
-from .controllers import app
+import typer
 
-__all__ = ["app"]
+from . import desktop, web
+
+app = typer.Typer()
+
+
+@app.callback()
+def main() -> None:
+    """Send whatsapp bulk messages."""
+
+
+app.add_typer(web.app, name="web")
+app.add_typer(desktop.app, name="desktop")

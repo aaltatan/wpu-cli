@@ -36,6 +36,6 @@ TemplateFilepathOpt = Annotated[
 
 
 @dataclass
-class Options:
-    data_filepath: DataFilepathOpt
-    template_filepath: TemplateFilepathOpt
+class PathOptions:
+    data: DataFilepathOpt
+    template: TemplateFilepathOpt

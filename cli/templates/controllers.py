@@ -2,7 +2,7 @@
 
 from typer_di import Depends, TyperDI
 
-from .options import MultipleDocxOptions, MultipleRowsXlsxOptions, Options, SingleDocxOptions
+from .options import MultipleDocxOptions, MultipleRowsXlsxOptions, PathOptions, SingleDocxOptions
 from .readers import ExcelGroupedDataReader, ExcelSingleRowDataReader
 from .services import write_templates
 from .writers import MultipleDocxTemplateWriter, SingleDocxTemplateWriter
@@ -91,12 +91,12 @@ def main() -> None:
     ),
 )
 def generate_multiple_docx_files_from_xlsx_single_row(
-    options: Options = Depends(Options),
+    paths: PathOptions = Depends(PathOptions),
     mdocx_options: MultipleDocxOptions = Depends(MultipleDocxOptions),
 ):
-    reader = ExcelSingleRowDataReader(options.data_filepath)
+    reader = ExcelSingleRowDataReader(paths.data)
     writer = MultipleDocxTemplateWriter(
-        options.template_filepath,
+        paths.template,
         mdocx_options.output_dir,
         mdocx_options.filename_key,
         pdf=mdocx_options.pdf,
@@ -136,12 +136,12 @@ def generate_multiple_docx_files_from_xlsx_single_row(
     ),
 )
 def generate_single_docx_file_from_xlsx_single_row(
-    options: Options = Depends(Options),
+    paths: PathOptions = Depends(PathOptions),
     docx_options: SingleDocxOptions = Depends(SingleDocxOptions),
 ):
-    reader = ExcelSingleRowDataReader(options.data_filepath)
+    reader = ExcelSingleRowDataReader(paths.data)
     writer = SingleDocxTemplateWriter(
-        options.template_filepath,
+        paths.template,
         docx_options.filepath,
         docx_options.template_data_variable,
         pdf=docx_options.pdf,
@@ -191,17 +191,17 @@ def generate_single_docx_file_from_xlsx_single_row(
     ),
 )
 def generate_docx_multiple_files_from_xlsx_multiple_rows(
-    options: Options = Depends(Options),
+    paths: PathOptions = Depends(PathOptions),
     mdocx_options: MultipleDocxOptions = Depends(MultipleDocxOptions),
     mxlsx_options: MultipleRowsXlsxOptions = Depends(MultipleRowsXlsxOptions),
 ):
     reader = ExcelGroupedDataReader(
-        options.data_filepath,
+        paths.data,
         mxlsx_options.group_variable,
         *mxlsx_options.grouped_columns,
     )
     write = MultipleDocxTemplateWriter(
-        options.template_filepath,
+        paths.template,
         mdocx_options.output_dir,
         mdocx_options.filename_key,
         pdf=mdocx_options.pdf,
@@ -248,15 +248,15 @@ def generate_docx_multiple_files_from_xlsx_multiple_rows(
     ),
 )
 def generate_single_docx_file_from_xlsx_multiple_rows(
-    options: Options = Depends(Options),
+    paths: PathOptions = Depends(PathOptions),
     docx_options: SingleDocxOptions = Depends(SingleDocxOptions),
     mxlsx_options: MultipleRowsXlsxOptions = Depends(MultipleRowsXlsxOptions),
 ):
     reader = ExcelGroupedDataReader(
-        options.data_filepath, mxlsx_options.group_variable, *mxlsx_options.grouped_columns
+        paths.data, mxlsx_options.group_variable, *mxlsx_options.grouped_columns
     )
     writer = SingleDocxTemplateWriter(
-        options.template_filepath,
+        paths.template,
         docx_options.filepath,
         docx_options.template_data_variable,
         pdf=docx_options.pdf,

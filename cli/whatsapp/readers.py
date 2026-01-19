@@ -1,23 +1,19 @@
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
-from cli.whatsapp.schemas import Message
 
+def read_messages_from_xlsx(filepath: Path) -> list[dict[Any, Any]]:
+    messages: list[dict[str, str]] = []
+    _messages = pd.read_excel(filepath).to_dict(orient="records")
 
-def read_messages_from_xlsx(filepath: Path) -> list[Message]:
-    messages_dict: dict[str, list[str]] = {}
-    data = pd.read_excel(filepath).to_dict(orient="records")
-
-    for row in data:
+    for row in _messages:
         phone, text = row.values()
 
         phone = str(phone)
         text = str(text).replace("_x000D_", "")
 
-        if phone in messages_dict:
-            messages_dict[phone].append(text)
-        else:
-            messages_dict[phone] = [text]
+        messages.append({"phone": phone, "text": text})
 
-    return [Message(phone, texts) for phone, texts in messages_dict.items()]
+    return messages

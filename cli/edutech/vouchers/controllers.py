@@ -2,10 +2,11 @@
 
 from typer_di import Depends, TyperDI
 
-from cli.edutech.options import EdutechOptions
+from cli.edutech.options import Edutech
 from cli.edutech.services import open_authenticated_edutech_page
 
-from .options import AddVouchersOptions
+from .options import TimeoutAfterInsertingRowsOpt, read_voucher_from_xlsx_wrapper
+from .schemas import Row
 from .services import add_voucher
 
 app = TyperDI()
@@ -18,13 +19,14 @@ def main() -> None:
 
 @app.command()
 def add_salaries(
-    options: EdutechOptions = Depends(EdutechOptions),
-    vouchers_options: AddVouchersOptions = Depends(AddVouchersOptions),
+    timeout_after_inserting_rows: TimeoutAfterInsertingRowsOpt,
+    edutech: Edutech = Depends(Edutech),
+    rows: list[Row] = Depends(read_voucher_from_xlsx_wrapper),
 ):
-    with open_authenticated_edutech_page(options.username, options.password) as page:
+    with open_authenticated_edutech_page(edutech.username, edutech.password) as page:
         add_voucher(
-            rows=vouchers_options.rows,
+            rows=rows,
             authenticated_page=page,
-            financial_year=options.financial_year,
-            timeout_after_inserting_rows=vouchers_options.timeout_after_inserting_rows,
+            financial_year=edutech.financial_year,
+            timeout_after_inserting_rows=timeout_after_inserting_rows,
         )

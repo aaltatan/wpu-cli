@@ -2,7 +2,12 @@
 
 from typer_di import Depends, TyperDI
 
-from .options import MultipleDocxOptions, MultipleRowsXlsxOptions, PathOptions, SingleDocxOptions
+from .dependencies import (
+    MultipleDocxOptions,
+    MultipleRowsXlsxOptions,
+    PathOptions,
+    SingleDocxOptions,
+)
 from .readers import ExcelGroupedDataReader, ExcelSingleRowDataReader
 from .services import write_templates
 from .writers import MultipleDocxTemplateWriter, SingleDocxTemplateWriter

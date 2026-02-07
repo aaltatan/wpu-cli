@@ -1,10 +1,9 @@
 import os
-from dataclasses import dataclass
-from typing import Annotated
+from pathlib import Path
 
 import typer
 
-from ._options import CompensationsRateOpt
+from cli.utils import extract_extension
 
 FACTOR = 10
 MAX_ITERATIONS = 1000
@@ -19,14 +18,6 @@ def amount_range_start_callback(value: float) -> float:
     return value
 
 
-StartAmountRangeArg = Annotated[
-    float,
-    typer.Argument(
-        callback=amount_range_start_callback,
-    ),
-]
-
-
 def amount_range_stop_callback(
     ctx: typer.Context, _: typer.CallbackParam, value: float | None
 ) -> float | None:
@@ -38,14 +29,6 @@ def amount_range_stop_callback(
         raise typer.BadParameter(message)
 
     return value
-
-
-StopAmountRangeArg = Annotated[
-    float | None,
-    typer.Argument(
-        callback=amount_range_stop_callback,
-    ),
-]
 
 
 def amount_range_step_callback(
@@ -71,17 +54,28 @@ def amount_range_step_callback(
     return value
 
 
-StepAmountRangeArg = Annotated[
-    float | None,
-    typer.Argument(
-        callback=amount_range_step_callback,
-    ),
-]
+def write_path_callback(
+    ctx: typer.Context, _: typer.CallbackParam, value: Path | None
+) -> Path | None:
+    if value:
+        if value.exists():
+            message = f"The file {value} already exists."
+            raise typer.BadParameter(message)
+
+        extension = extract_extension(value)
+
+        if extension not in ctx.obj["registry"]:
+            message = f"extension of type ({extension}) not supported."
+            raise typer.BadParameter(message)
+
+    return value
 
 
-@dataclass
-class AmountRange:
-    compensations_rate: CompensationsRateOpt
-    start: StartAmountRangeArg
-    stop: StopAmountRangeArg = None
-    step: StepAmountRangeArg = None
+def ss_salary_callback(value: float | None) -> float | None:
+    if value:
+        min_ss_allowed_salary = int(os.getenv("TAXES_MIN_SS_ALLOWED_SALARY", "0"))
+        if value < min_ss_allowed_salary:
+            message = f"The social security salary must be greater than {min_ss_allowed_salary}."
+            raise typer.BadParameter(message)
+
+    return value

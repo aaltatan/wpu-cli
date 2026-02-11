@@ -9,7 +9,7 @@ type UnicodeScorerFn = Callable[[str, str, bool], int]
 type ScorerFn = AsciiScorerFn | UnicodeScorerFn
 
 
-_scorers: dict[Scorer, ScorerFn] = {
+SCORERS: dict[Scorer, ScorerFn] = {
     Scorer.QUICK_RATIO: QRatio,
     Scorer.WEIGHTED_RATIO: WRatio,
     Scorer.UNICODE_QUICK_RATIO: UQRatio,
@@ -18,4 +18,4 @@ _scorers: dict[Scorer, ScorerFn] = {
 
 
 def get_scorer_fn(scorer: Scorer) -> ScorerFn:
-    return _scorers.get(scorer, _scorers[Scorer.WEIGHTED_RATIO])
+    return SCORERS.get(scorer, SCORERS[Scorer.WEIGHTED_RATIO])

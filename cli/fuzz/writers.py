@@ -14,26 +14,33 @@ type MultipleQueriesResults = list[tuple[str, Results]]
 type Results = list[tuple[str, int]]
 
 
-_writers: dict[Writer, WriteFn] = {}
+class WriterRegistry:
+    def __init__(self) -> None:
+        self._writers: dict[Writer, WriteFn] = {}
+
+    def __getitem__(self, writer: Writer) -> WriteFn:
+        if writer not in self._writers:
+            message = f"Writer '{writer}' not found"
+            raise ValueError(message)
+
+        return self._writers[writer]
+
+    def register(self, writer: Writer) -> Callable[[WriteFn], WriteFn]:
+        def decorator(writer_fn: WriteFn) -> WriteFn:
+            @wraps(writer_fn)
+            def wrapper(limit: int, export_path: Path, data: MultipleQueriesResults) -> None:
+                writer_fn(limit, export_path, data)
+
+            self._writers[writer] = wrapper
+            return wrapper
+
+        return decorator
 
 
-def get_writer_fn(writer: Writer) -> WriteFn:
-    return _writers[writer]
+writers = WriterRegistry()
 
 
-def register_writer(writer: Writer) -> Callable[[WriteFn], WriteFn]:
-    def decorator(writer_fn: WriteFn) -> WriteFn:
-        @wraps(writer_fn)
-        def wrapper(limit: int, export_path: Path, data: MultipleQueriesResults) -> None:
-            writer_fn(limit, export_path, data)
-
-        _writers[writer] = wrapper
-        return wrapper
-
-    return decorator
-
-
-@register_writer(Writer.TERMINAL)
+@writers.register(Writer.TERMINAL)
 def write_terminal(columns_count: int, _: Path, results: MultipleQueriesResults) -> None:
     console = Console()
     table = Table(show_header=True, header_style="bold magenta", title="results")
@@ -50,7 +57,7 @@ def write_terminal(columns_count: int, _: Path, results: MultipleQueriesResults)
     console.print(table)
 
 
-@register_writer(Writer.FLAT_XLSX)
+@writers.register(Writer.FLAT_XLSX)
 def write_flat_excel(
     columns_count: int, export_path: Path, results: MultipleQueriesResults
 ) -> None:
@@ -63,7 +70,7 @@ def write_flat_excel(
     df.to_excel(export_path, index=False)
 
 
-@register_writer(Writer.CHOICES_XLSX)
+@writers.register(Writer.CHOICES_XLSX)
 def write_choices_excel(_: int, export_path: Path, results: MultipleQueriesResults) -> None:
     headers = ["Query", "Matches"]
     data = [(query, [match for match, _ in r]) for query, r in results]

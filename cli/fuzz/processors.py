@@ -12,44 +12,50 @@ from .enums import AdditionalProcessor, DefaultProcessor, Processor
 type ProcessorFn = Callable[[str], str]
 
 
-_processors: dict[DefaultProcessor | AdditionalProcessor | Processor, ProcessorFn] = {}
+class ProcessorRegistry:
+    def __init__(self) -> None:
+        self._processors: dict[DefaultProcessor | AdditionalProcessor | Processor, ProcessorFn] = {}
 
+    def __getitem__(
+        self, processor: DefaultProcessor | AdditionalProcessor | Processor
+    ) -> ProcessorFn:
+        if processor not in self._processors:
+            message = f"Processor '{processor}' not found"
+            raise ValueError(message)
 
-def _get_processor_fn(processor: DefaultProcessor | AdditionalProcessor) -> ProcessorFn:
-    if processor not in _processors:
-        message = f"Processor '{processor}' not found"
-        raise ValueError(message)
+        return self._processors[processor]
 
-    return _processors[processor]
+    def get_processor_fn(
+        self, processors: list[DefaultProcessor | AdditionalProcessor]
+    ) -> ProcessorFn:
+        processors_functions = [self[p] for p in processors]
 
-
-def get_processor_fn(processors: list[DefaultProcessor | AdditionalProcessor]) -> ProcessorFn:
-    processors_functions = [_get_processor_fn(p) for p in processors]
-
-    def wrapper(query: str) -> str:
-        result = query
-        for fn in processors_functions:
-            result = fn(result)
-        return result
-
-    return wrapper
-
-
-def register_processor(
-    processor: DefaultProcessor | AdditionalProcessor | Processor,
-) -> Callable[[ProcessorFn], ProcessorFn]:
-    def decorator(processor_fn: ProcessorFn) -> ProcessorFn:
-        @wraps(processor_fn)
         def wrapper(query: str) -> str:
-            return full_process(processor_fn(query))
+            result = query
+            for fn in processors_functions:
+                result = fn(result)
+            return result
 
-        _processors[processor] = wrapper
         return wrapper
 
-    return decorator
+    def register(
+        self, processor: DefaultProcessor | AdditionalProcessor | Processor
+    ) -> Callable[[ProcessorFn], ProcessorFn]:
+        def decorator(processor_fn: ProcessorFn) -> ProcessorFn:
+            @wraps(processor_fn)
+            def wrapper(query: str) -> str:
+                return full_process(processor_fn(query))
+
+            self._processors[processor] = wrapper
+            return wrapper
+
+        return decorator
 
 
-@register_processor(Processor["GENERAL"])
+processors = ProcessorRegistry()
+
+
+@processors.register(Processor["GENERAL"])
 def do_general_processing(query: str) -> str:
     re_replacements: list[tuple[re.Pattern, str]] = [
         (re.compile(r"\s{2,}"), ""),
@@ -61,7 +67,7 @@ def do_general_processing(query: str) -> str:
     return query
 
 
-@register_processor(Processor["ARABIC"])
+@processors.register(Processor["ARABIC"])
 def do_arabic_general_processing(query: str) -> str:
     re_replacements: list[tuple[re.Pattern, str]] = [
         (re.compile(rf"{_('ي')}{_('ة')}"), "يةاه"),
@@ -83,7 +89,7 @@ def do_arabic_general_processing(query: str) -> str:
     return query
 
 
-@register_processor(Processor["WPU"])
+@processors.register(Processor["WPU"])
 def do_process_wpu_naming_pattern(query: str) -> str:
     replacements: dict[str, str] = {
         "أ.د.": "",

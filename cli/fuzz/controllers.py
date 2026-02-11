@@ -7,15 +7,15 @@ from cli.clipboard import get_clipboard
 from .dependencies import (
     Config,
     WriteOptions,
-    get_choices_wrapper,
+    get_choices,
     get_processor_fn_wrapper,
-    get_reader_data_wrapper,
+    get_reader_data,
     get_scorer_fn_wrapper,
 )
 from .processors import ProcessorFn
 from .scorers import ScorerFn
 from .services import match_list
-from .writers import get_writer_fn
+from .writers import writers
 
 app = TyperDI()
 
@@ -27,8 +27,8 @@ def main() -> None:
 
 @app.command("list")
 def match_list_cmd(
-    queries: list[str] = Depends(get_reader_data_wrapper),
-    choices: list[str] = Depends(get_choices_wrapper),
+    queries: list[str] = Depends(get_reader_data),
+    choices: list[str] = Depends(get_choices),
     processor_fn: ProcessorFn = Depends(get_processor_fn_wrapper),
     scorer_fn: ScorerFn = Depends(get_scorer_fn_wrapper),
     config: Config = Depends(Config),
@@ -44,13 +44,13 @@ def match_list_cmd(
         remove_duplicated=config.remove_duplicated,
     )
 
-    write_fn = get_writer_fn(write_options.writer)
+    write_fn = writers[write_options.writer]
     write_fn(config.limit, write_options.export_path, matches)
 
 
 @app.command("clip")
 def match_clip_cmd(
-    choices: list[str] = Depends(get_choices_wrapper),
+    choices: list[str] = Depends(get_choices),
     processor_fn: ProcessorFn = Depends(get_processor_fn_wrapper),
     scorer_fn: ScorerFn = Depends(get_scorer_fn_wrapper),
     config: Config = Depends(Config),
@@ -68,5 +68,5 @@ def match_clip_cmd(
         remove_duplicated=config.remove_duplicated,
     )
 
-    write_fn = get_writer_fn(write_options.writer)
+    write_fn = writers[write_options.writer]
     write_fn(config.limit, write_options.export_path, matches)

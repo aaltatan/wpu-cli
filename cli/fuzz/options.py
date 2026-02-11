@@ -4,7 +4,7 @@ from typing import Annotated
 import typer
 
 from cli.fuzz.enums import AdditionalProcessor, DefaultProcessor, Scorer
-from cli.fuzz.readers import get_readers
+from cli.fuzz.readers import readers
 from cli.fuzz.writers import Writer
 from cli.utils import extract_extension
 
@@ -12,7 +12,7 @@ from cli.utils import extract_extension
 def reader_path_callback(value: Path) -> Path:
     extension = extract_extension(value)
 
-    if extension not in get_readers():
+    if extension not in readers:
         message = f"No implementation found for '{extension}' extension"
         raise typer.BadParameter(message)
 

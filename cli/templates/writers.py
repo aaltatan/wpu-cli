@@ -63,15 +63,11 @@ class MultipleDocxTemplateWriter:
 
     def write(self, data: Data) -> None:
         for idx, item in track(
-            enumerate(data, start=1),
-            description="📝 Generating",
-            total=len(data),
+            enumerate(data, start=1), description="📝 Generating", total=len(data)
         ):
             filename = self._get_filename(item, idx, self.filename_key)
             filepath = _generate_filepath(
-                filename,
-                self.output_dir if not self.pdf else self.output_dir / "docx",
-                "docx",
+                filename, self.output_dir if not self.pdf else self.output_dir / "docx", "docx"
             )
 
             self.template.render({**item, **ADDITIONAL_CONTEXT})

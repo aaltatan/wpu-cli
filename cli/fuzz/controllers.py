@@ -4,7 +4,7 @@ from typer_di import Depends, TyperDI
 
 from cli.clipboard import get_clipboard
 
-from .options import (
+from .dependencies import (
     Config,
     WriteOptions,
     get_choices_wrapper,

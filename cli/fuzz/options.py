@@ -1,15 +1,23 @@
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated
 
 import typer
 
 from cli.fuzz.enums import AdditionalProcessor, DefaultProcessor, Scorer
-from cli.fuzz.processors import ProcessorFn, get_processor_fn
-from cli.fuzz.readers import get_reader_data
-from cli.fuzz.scorers import ScorerFn, get_scorer_fn
+from cli.fuzz.readers import get_readers
+from cli.fuzz.writers import Writer
+from cli.utils import extract_extension
 
-from ._callbacks import reader_path_callback
+
+def reader_path_callback(value: Path) -> Path:
+    extension = extract_extension(value)
+
+    if extension not in get_readers():
+        message = f"No implementation found for '{extension}' extension"
+        raise typer.BadParameter(message)
+
+    return value
+
 
 ChoicesPathOpt = Annotated[
     Path,
@@ -85,22 +93,49 @@ RemoveDuplicatedOpt = Annotated[
 ]
 
 
-def get_choices_wrapper(choices_path: ChoicesPathOpt) -> list[str]:
-    return get_reader_data(choices_path)
+QueriesPathOpt = Annotated[
+    Path,
+    typer.Option(
+        "-q",
+        "--queries-input",
+        file_okay=True,
+        dir_okay=False,
+        exists=True,
+        resolve_path=True,
+        help="path to a file containing the queries",
+        callback=reader_path_callback,
+    ),
+]
 
 
-def get_processor_fn_wrapper(
-    processors: ProcessorOpt, default_processors: DefaultProcessorOpt
-) -> ProcessorFn:
-    return get_processor_fn(processors + default_processors)
+def export_path_callback(path: Path) -> Path:
+    if path.exists():
+        message = f"The file {path} already exists."
+        raise typer.BadParameter(message)
+
+    return path
 
 
-def get_scorer_fn_wrapper(scorer: ScorerOpt) -> ScorerFn:
-    return get_scorer_fn(scorer)
+ExportPathOpt = Annotated[
+    Path,
+    typer.Option(
+        "-e",
+        "--export-path",
+        help="Path to the output file",
+        exists=False,
+        file_okay=True,
+        dir_okay=False,
+        resolve_path=True,
+        callback=export_path_callback,
+    ),
+]
 
-
-@dataclass
-class Config:
-    accuracy: AccuracyOpt
-    limit: LimitOpt
-    remove_duplicated: RemoveDuplicatedOpt
+WriterOpt = Annotated[
+    Writer,
+    typer.Option(
+        "-w",
+        "--writer",
+        envvar="FUZZ_DEFAULT_WRITER",
+        help="writer type",
+    ),
+]

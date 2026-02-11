@@ -1,13 +1,22 @@
-# ruff: noqa: B008
+# ruff: noqa: B008, T201
+from dataclasses import dataclass
 
-from devtools import debug
 from typer_di import Depends, TyperDI
 
-from cli.edutech.options import Edutech
+from cli.edutech.dependencies import Edutech
 from cli.edutech.services import open_authenticated_edutech_page
 
-from .options import VoucherPageFilters
+from .options import AccountsOpt, FromDateOpt, GridColumnsOpt, ToDateOpt
 from .services import get_voucher
+
+
+@dataclass
+class VoucherPageFilters:
+    from_date: FromDateOpt
+    to_date: ToDateOpt
+    accounts: AccountsOpt
+    grid_columns: GridColumnsOpt
+
 
 app = TyperDI()
 
@@ -24,4 +33,4 @@ def generate_cash_report(
     """Generate cash report."""
     with open_authenticated_edutech_page(edutech.username, edutech.password) as page:
         voucher = get_voucher(page, filters, edutech.financial_year)
-        debug(voucher)
+        print(voucher)

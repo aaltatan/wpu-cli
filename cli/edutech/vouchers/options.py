@@ -4,8 +4,6 @@ from typing import Annotated
 import typer
 
 from .enums import Chapter
-from .readers import read_voucher_from_xlsx
-from .schemas import Row
 
 TimeoutAfterInsertingRowsOpt = Annotated[
     int,
@@ -36,7 +34,3 @@ ChapterOpt = Annotated[
         help="Chapter of the Salaries.xlsb file",
     ),
 ]
-
-
-def read_voucher_from_xlsx_wrapper(filepath: VoucherFilepathOpt, chapter: ChapterOpt) -> list[Row]:
-    return read_voucher_from_xlsx(filepath, chapter)

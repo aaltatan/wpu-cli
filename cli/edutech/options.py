@@ -1,5 +1,4 @@
 import re
-from dataclasses import dataclass
 from typing import Annotated
 
 import typer
@@ -52,10 +51,3 @@ EdutechUsernameOpt = Annotated[
         envvar="EDUTECH_USERNAME",
     ),
 ]
-
-
-@dataclass
-class Edutech:
-    username: EdutechUsernameOpt
-    password: EdutechPasswordOpt
-    financial_year: FinancialYearOpt

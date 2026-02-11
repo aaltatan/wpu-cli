@@ -25,19 +25,11 @@ class VoucherPagePipeline(PagePipeline):
         return self
 
     def fill_row(self, row: Row, automata_row: VoucherRowSelector) -> Self:
-        self.fill_input(selector=automata_row.debit, value=row.debit)
-        self.fill_input(selector=automata_row.credit, value=row.credit)
-        self.fill_input(
-            selector=automata_row.account_id,
-            value=row.account_id,
-            kind="select",
-        )
-        self.fill_input(
-            selector=automata_row.cost_center,
-            value=row.cost_center,
-            kind="select",
-        )
-        self.fill_input(selector=automata_row.notes, value=row.notes)
+        self.fill_input(automata_row.debit, row.debit)
+        self.fill_input(automata_row.credit, row.credit)
+        self.fill_searchbox(automata_row.account_id, row.account_id)
+        self.fill_searchbox(automata_row.cost_center, row.cost_center)
+        self.fill_input(automata_row.notes, row.notes)
 
         return self
 
@@ -91,5 +83,3 @@ def add_voucher(
 
     for row, automata_row in track(zip(rows, additional_data, strict=False), total=len(rows)):
         pipeline.fill_row(row, automata_row)
-
-    input("Press any key to close ... ")

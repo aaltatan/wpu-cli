@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Annotated
 
@@ -54,11 +53,3 @@ ToDateOpt = Annotated[
         default_factory=lambda: datetime.now(timezone.utc),
     ),
 ]
-
-
-@dataclass
-class VoucherPageFilters:
-    from_date: FromDateOpt
-    to_date: ToDateOpt
-    accounts: AccountsOpt
-    grid_columns: GridColumnsOpt

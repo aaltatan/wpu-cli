@@ -40,7 +40,7 @@ def calculate_gross_taxes_cmd(
     gross: Gross = Depends(Gross),
 ) -> None:
     """Calculate taxes for a given gross salary and compensations."""
-    _salary = calculate_gross_taxes(
+    salary = calculate_gross_taxes(
         gross_salary=gross.salary,
         gross_compensations=gross.compensations,
         brackets=brackets,
@@ -52,7 +52,7 @@ def calculate_gross_taxes_cmd(
     )
 
     console = Console()
-    table = get_salary_table(_salary, title="Gross Results")
+    table = get_salary_table(salary, title="Gross Results")
 
     console.print(table)
 

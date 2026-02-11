@@ -1,12 +1,6 @@
-from dataclasses import dataclass
 from typing import Annotated
 
 import typer
-
-from cli.whatsapp.options import FilepathArg
-from cli.whatsapp.readers import read_messages_from_xlsx
-
-from .readers import get_desktop_whatsapp_hyperlinks
 
 CheckingLoopOpt = Annotated[
     int,
@@ -40,18 +34,6 @@ BetweenMessagesOpt = Annotated[
 ]
 
 
-@dataclass
-class Timeout:
-    checking_loop: int = 15
-    after_opening: float = 2
-    between_messages: float = 1
-
-
-def get_desktop_whatsapp_hyperlinks_wrapper(filepath: FilepathArg) -> list[str]:
-    messages = read_messages_from_xlsx(filepath)
-    return get_desktop_whatsapp_hyperlinks(messages)
-
-
 BlockAfterErrorOpt = Annotated[
     bool,
     typer.Option(
@@ -60,8 +42,3 @@ BlockAfterErrorOpt = Annotated[
         rich_help_panel="Block After Error",
     ),
 ]
-
-
-@dataclass
-class Config:
-    block_after_error: BlockAfterErrorOpt

@@ -1,12 +1,38 @@
 # ruff: noqa: B008
+from dataclasses import dataclass
 
 from typer_di import Depends, TyperDI
 
-from .options import Timeout, UrlOpt, read_messages_from_xlsx_wrapper
+from cli.whatsapp.options import FilepathArg
+from cli.whatsapp.readers import read_messages_from_xlsx
+
+from .options import (
+    MaxMessagesTimeoutOpt,
+    MaxSendSelectorTimeoutOpt,
+    MinMessagesTimeoutOpt,
+    MinSendSelectorTimeoutOpt,
+    PageloadTimeoutOpt,
+    UrlOpt,
+)
+from .readers import get_messages
 from .schemas import Message
 from .services import open_whatsapp_web_page, send_whatsapp_messages_web
 
 app = TyperDI()
+
+
+@dataclass
+class Timeout:
+    min_between_messages: MinMessagesTimeoutOpt
+    max_between_messages: MaxMessagesTimeoutOpt
+    min_send_selector: MinSendSelectorTimeoutOpt
+    max_send_selector: MaxSendSelectorTimeoutOpt
+    pageload: PageloadTimeoutOpt
+
+
+def read_messages_from_xlsx_wrapper(filepath: FilepathArg) -> list[Message]:
+    messages = read_messages_from_xlsx(filepath)
+    return get_messages(messages)
 
 
 @app.callback()

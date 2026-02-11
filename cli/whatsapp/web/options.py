@@ -1,13 +1,6 @@
-from dataclasses import dataclass
 from typing import Annotated
 
 import typer
-
-from cli.whatsapp.options import FilepathArg
-from cli.whatsapp.readers import read_messages_from_xlsx
-
-from .readers import get_messages
-from .schemas import Message
 
 MinMessagesTimeoutOpt = Annotated[
     float,
@@ -60,15 +53,6 @@ PageloadTimeoutOpt = Annotated[
 ]
 
 
-@dataclass
-class Timeout:
-    min_between_messages: MinMessagesTimeoutOpt
-    max_between_messages: MaxMessagesTimeoutOpt
-    min_send_selector: MinSendSelectorTimeoutOpt
-    max_send_selector: MaxSendSelectorTimeoutOpt
-    pageload: PageloadTimeoutOpt
-
-
 UrlOpt = Annotated[
     str,
     typer.Option(
@@ -77,8 +61,3 @@ UrlOpt = Annotated[
         envvar="WHATSAPP_WEB_DEFAULT_BASE_URL",
     ),
 ]
-
-
-def read_messages_from_xlsx_wrapper(filepath: FilepathArg) -> list[Message]:
-    messages = read_messages_from_xlsx(filepath)
-    return get_messages(messages)

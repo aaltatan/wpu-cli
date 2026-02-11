@@ -1,9 +1,32 @@
 # ruff: noqa: B008
+from dataclasses import dataclass
 
 from typer_di import Depends, TyperDI
 
-from .options import Config, Timeout, get_desktop_whatsapp_hyperlinks_wrapper
+from cli.whatsapp.options import FilepathArg
+from cli.whatsapp.readers import read_messages_from_xlsx
+
+from .options import BlockAfterErrorOpt
+from .readers import get_desktop_whatsapp_hyperlinks
 from .services import WhatsappDesktopSender, check_numbers, send_numbers
+
+
+@dataclass
+class Timeout:
+    checking_loop: int = 15
+    after_opening: float = 2
+    between_messages: float = 1
+
+
+@dataclass
+class Config:
+    block_after_error: BlockAfterErrorOpt
+
+
+def get_desktop_whatsapp_hyperlinks_wrapper(filepath: FilepathArg) -> list[str]:
+    messages = read_messages_from_xlsx(filepath)
+    return get_desktop_whatsapp_hyperlinks(messages)
+
 
 app = TyperDI()
 

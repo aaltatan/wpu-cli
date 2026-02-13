@@ -9,7 +9,7 @@ def read_messages_from_xlsx(filepath: Path) -> list[dict[Any, Any]]:
     _messages = pd.read_excel(filepath).to_dict(orient="records")
 
     for row in _messages:
-        phone, text = row.values()
+        phone, text, *_ = row.values()
 
         phone = str(phone)
         text = str(text).replace("_x000D_", "")

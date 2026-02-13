@@ -68,12 +68,11 @@ class WhatsappDesktopSender:
         ui.click(x, y)
 
 
-def _send_messages(
+def send_messages(
     sender: WhatsappDesktopSender,
     hyperlinks: list[str],
     timeout: Timeout,
     *,
-    send: bool,
     block_after_error: bool,
 ) -> None:
     for link in hyperlinks:
@@ -82,7 +81,7 @@ def _send_messages(
 
         send_status = sender.check_send_status(timeout.checking_loop)
 
-        if send_status and send:
+        if send_status:
             sender.click_send_btn()
 
         if not send_status:
@@ -90,27 +89,23 @@ def _send_messages(
             if block_after_error:
                 input("Press any key to continue...")
 
-        if send:
-            time.sleep(timeout.between_messages)
+        time.sleep(timeout.between_messages)
 
 
 def check_numbers(
     sender: WhatsappDesktopSender,
-    messages: list[str],
+    hyperlinks: list[str],
     timeout: Timeout,
     *,
     block_after_error: bool,
 ) -> None:
-    return _send_messages(
-        sender, messages, timeout, send=False, block_after_error=block_after_error
-    )
+    for link in hyperlinks:
+        webbrowser.open(link)
+        time.sleep(timeout.after_opening)
 
-
-def send_numbers(
-    sender: WhatsappDesktopSender,
-    messages: list[str],
-    timeout: Timeout,
-    *,
-    block_after_error: bool,
-) -> None:
-    return _send_messages(sender, messages, timeout, send=True, block_after_error=block_after_error)
+        has_error = sender.has_error_popup()
+        if has_error:
+            logger.error(f"This number is not available: {link}")
+            if block_after_error:
+                input("Press any key to continue...")
+                continue

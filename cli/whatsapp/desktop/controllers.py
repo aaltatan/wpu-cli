@@ -6,16 +6,21 @@ from typer_di import Depends, TyperDI
 from cli.whatsapp.options import FilepathArg
 from cli.whatsapp.readers import read_messages_from_xlsx
 
-from .options import BlockAfterErrorOpt
+from .options import (
+    AfterOpeningTimeoutOpt,
+    BetweenMessagesTimeoutOpt,
+    BlockAfterErrorOpt,
+    CheckingLoopTimeoutOpt,
+)
 from .readers import get_desktop_whatsapp_hyperlinks
 from .services import WhatsappDesktopSender, check_numbers, send_messages
 
 
 @dataclass
 class Timeout:
-    checking_loop: int = 15
-    after_opening: float = 2
-    between_messages: float = 1
+    checking_loop: CheckingLoopTimeoutOpt
+    after_opening: AfterOpeningTimeoutOpt
+    between_messages: BetweenMessagesTimeoutOpt
 
 
 @dataclass

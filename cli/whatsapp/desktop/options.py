@@ -2,7 +2,7 @@ from typing import Annotated
 
 import typer
 
-CheckingLoopOpt = Annotated[
+CheckingLoopTimeoutOpt = Annotated[
     int,
     typer.Option(
         "-t",
@@ -13,7 +13,7 @@ CheckingLoopOpt = Annotated[
     ),
 ]
 
-AfterOpeningOpt = Annotated[
+AfterOpeningTimeoutOpt = Annotated[
     float,
     typer.Option(
         "--after-opening-timeout",
@@ -23,7 +23,7 @@ AfterOpeningOpt = Annotated[
     ),
 ]
 
-BetweenMessagesOpt = Annotated[
+BetweenMessagesTimeoutOpt = Annotated[
     float,
     typer.Option(
         "--between-messages-timeout",

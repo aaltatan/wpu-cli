@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, computed_field
 
 class Salary(BaseModel):
     model_config = ConfigDict(
-        json_encoders={Decimal: lambda v: float(v)},
+        json_encoders={Decimal: float},
     )
 
     gross: Decimal = Decimal(0)

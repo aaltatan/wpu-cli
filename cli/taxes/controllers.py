@@ -1,4 +1,4 @@
-# ruff: noqa: B008
+# ruff: noqa: B008, PLR0913
 
 import typer
 from rich.console import Console
@@ -14,6 +14,7 @@ from .dependencies import (
     Gross,
     Net,
     get_brackets,
+    get_console,
     get_ss_obj,
     get_taxes_rounder,
 )
@@ -38,6 +39,7 @@ def calculate_gross_taxes_cmd(
     taxes_rounder: Rounder = Depends(get_taxes_rounder),
     ss_obj: SocialSecurity = Depends(get_ss_obj),
     gross: Gross = Depends(Gross),
+    console: Console = Depends(get_console),
 ) -> None:
     """Calculate taxes for a given gross salary and compensations."""
     salary = calculate_gross_taxes(
@@ -51,9 +53,7 @@ def calculate_gross_taxes_cmd(
         ss_salary=gross.ss_salary,
     )
 
-    console = Console()
     table = get_salary_table(salary, title="Gross Results")
-
     console.print(table)
 
 
@@ -63,6 +63,7 @@ def calculate_net_salary_cmd(
     brackets: list[Bracket] = Depends(get_brackets),
     taxes_rounder: Rounder = Depends(get_taxes_rounder),
     net: Net = Depends(Net),
+    console: Console = Depends(get_console),
 ) -> None:
     """Calculate gross salary and compensations for a given target salary."""
     salary = calculate_net_salary(
@@ -74,9 +75,7 @@ def calculate_net_salary_cmd(
         rounder=taxes_rounder,
     )
 
-    console = Console()
     table = get_salary_table(salary, title="Net Results")
-
     console.print(table)
 
 
@@ -87,6 +86,7 @@ def calculate_net_salaries_cmd(
     taxes_rounder: Rounder = Depends(get_taxes_rounder),
     ar: AmountRange = Depends(AmountRange),
     write_path: WritePathOpt = None,
+    console: Console = Depends(get_console),
 ) -> None:
     """Create salaries from a given amount range."""
     if ar.stop is None:
@@ -107,8 +107,6 @@ def calculate_net_salaries_cmd(
         fixed_tax_rate=config.fixed_tax_rate,
         rounder=taxes_rounder,
     )
-
-    console = Console()
 
     if write_path is not None:
         with Progress(

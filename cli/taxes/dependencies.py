@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from rich.console import Console
 from syriantaxes import Bracket, Rounder, SocialSecurity
 from typer_di import Depends
 
@@ -77,3 +78,7 @@ def get_ss_obj(
     rounder: Rounder = Depends(get_ss_rounder),  # noqa: B008
 ) -> SocialSecurity:
     return SocialSecurity(min_salary, deduction_rate, rounder)
+
+
+def get_console() -> Console:
+    return Console()

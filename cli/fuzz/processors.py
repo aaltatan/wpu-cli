@@ -56,9 +56,9 @@ processors = ProcessorRegistry()
 
 
 @processors.register(Processor["GENERAL"])
-def do_general_processing(query: str) -> str:
+def process_general(query: str) -> str:
     re_replacements: list[tuple[re.Pattern, str]] = [
-        (re.compile(r"\s{2,}"), ""),
+        (re.compile(r"\s{2,}"), " "),
     ]
 
     for pattern, replacement in re_replacements:
@@ -68,7 +68,7 @@ def do_general_processing(query: str) -> str:
 
 
 @processors.register(Processor["ARABIC"])
-def do_arabic_general_processing(query: str) -> str:
+def process_arabic(query: str) -> str:
     re_replacements: list[tuple[re.Pattern, str]] = [
         (re.compile(rf"{_('ي')}{_('ة')}"), "يةاه"),
         (re.compile(rf"{_('ة')}(?!\w)"), "اه"),
@@ -90,7 +90,7 @@ def do_arabic_general_processing(query: str) -> str:
 
 
 @processors.register(Processor["WPU"])
-def do_process_wpu_naming_pattern(query: str) -> str:
+def process_wpu_naming_pattern(query: str) -> str:
     replacements: dict[str, str] = {
         "أ.د.": "",
         "ا.د.": "",

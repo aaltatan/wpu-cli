@@ -8,9 +8,9 @@ from .dependencies import (
     Config,
     WriteOptions,
     get_choices,
-    get_processor_fn_wrapper,
+    get_processor_fn,
     get_reader_data,
-    get_scorer_fn_wrapper,
+    get_scorer_fn,
 )
 from .processors import ProcessorFn
 from .scorers import ScorerFn
@@ -29,8 +29,8 @@ def main() -> None:
 def match_list_cmd(
     queries: list[str] = Depends(get_reader_data),
     choices: list[str] = Depends(get_choices),
-    processor_fn: ProcessorFn = Depends(get_processor_fn_wrapper),
-    scorer_fn: ScorerFn = Depends(get_scorer_fn_wrapper),
+    processor_fn: ProcessorFn = Depends(get_processor_fn),
+    scorer_fn: ScorerFn = Depends(get_scorer_fn),
     config: Config = Depends(Config),
     write_options: WriteOptions = Depends(WriteOptions),
 ):
@@ -51,8 +51,8 @@ def match_list_cmd(
 @app.command("clip")
 def match_clip_cmd(
     choices: list[str] = Depends(get_choices),
-    processor_fn: ProcessorFn = Depends(get_processor_fn_wrapper),
-    scorer_fn: ScorerFn = Depends(get_scorer_fn_wrapper),
+    processor_fn: ProcessorFn = Depends(get_processor_fn),
+    scorer_fn: ScorerFn = Depends(get_scorer_fn),
     config: Config = Depends(Config),
     write_options: WriteOptions = Depends(WriteOptions),
 ):

@@ -1,6 +1,7 @@
 from enum import StrEnum
 
-from .schemas import RGB, Position
+type RGB = tuple[int, int, int]
+type Position = tuple[int, int]
 
 
 class RGBName(StrEnum):
@@ -8,13 +9,19 @@ class RGBName(StrEnum):
     AVAILABLE_GREEN_BUTTON = "available_green_button"
 
 
+class Button(StrEnum):
+    ERROR_OK = "error_ok"
+    SEND = "send"
+
+
 COLORS: dict[RGB, RGBName] = {
-    (37, 191, 102): RGBName.AVAILABLE_GREEN_BUTTON,
+    (58, 197, 118): RGBName.AVAILABLE_GREEN_BUTTON,
 }
 
-DEVICES: dict[Position, dict[str, Position]] = {
+
+DEVICES: dict[Position, dict[Button, Position]] = {
     (1920, 1200): {
-        "error_ok": (700, 400),
-        "send_btn": (934, 710),
+        Button.ERROR_OK: (700, 400),
+        Button.SEND: (934, 710),
     },
 }

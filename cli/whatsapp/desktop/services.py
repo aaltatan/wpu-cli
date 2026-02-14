@@ -5,8 +5,14 @@ from typing import Protocol
 import pyautogui as ui
 from loguru import logger
 
-from .constants import COLORS, DEVICES, RGBName
-from .schemas import RGB, Position
+from .constants import COLORS, DEVICES, RGB, Button, Position, RGBName
+
+
+class DeviceNotSupportedError(Exception):
+    def __init__(self, device_size: Position) -> None:
+        width, height = device_size
+        message = f"Device size {width}x{height} not supported"
+        super().__init__(message)
 
 
 class Timeout(Protocol):
@@ -17,55 +23,47 @@ class Timeout(Protocol):
 
 class WhatsappDesktopSender:
     def __init__(self) -> None:
-        self.device_size = self.get_device_size()
-
-    @staticmethod
-    def get_device_size() -> Position:
-        height, width = ui.size()
-        return height, width
-
-    @staticmethod
-    def get_color(position: Position) -> RGB:
-        x, y = position
-        return ui.pixel(x, y)
-
-    def get_send_btn_position(self) -> Position:
-        if self.device_size not in DEVICES:
-            message = f"Device size {self.device_size} not supported"
-            raise ValueError(message)
-
-        return DEVICES[self.device_size]["send_btn"]
-
-    def _check_send_status(self) -> bool:
-        if self.has_error_popup():
-            return False
-
-        x, y = self.get_send_btn_position()
-        rgb = self.get_color((x, y))
-        color = COLORS.get(rgb, RGBName.UNKNOWN)
-        return color == RGBName.AVAILABLE_GREEN_BUTTON
+        self.device_size = self._get_device_size()
 
     def check_send_status(self, timeout: int) -> bool:
         for _ in range(1, timeout + 1):
-            if self._check_send_status():
+            if (
+                not self.has_error_popup()
+                and self._get_rgb(Button.SEND) == RGBName.AVAILABLE_GREEN_BUTTON
+            ):
                 return True
             time.sleep(1)
 
         return False
 
     def has_error_popup(self) -> bool:
-        x, y = DEVICES[self.device_size]["error_ok"]
-        rgb = self.get_color((x, y))
-        color = COLORS.get(rgb, RGBName.UNKNOWN)
-        return color == RGBName.AVAILABLE_GREEN_BUTTON
+        return self._get_rgb(Button.ERROR_OK) == RGBName.AVAILABLE_GREEN_BUTTON
 
     def click_send_btn(self) -> None:
-        x, y = self.get_send_btn_position()
+        self._click_btn(Button.SEND)
+
+    def _click_btn(self, button: Button) -> None:
+        x, y = self._get_btn_position(button)
         ui.click(x, y)
 
-    def click_error_ok_btn(self) -> None:
-        x, y = DEVICES[self.device_size]["error_ok"]
-        ui.click(x, y)
+    def _get_device_size(self) -> Position:
+        height, width = ui.size()
+        return height, width
+
+    def _get_color(self, position: Position) -> RGB:
+        x, y = position
+        return ui.pixel(x, y)
+
+    def _get_btn_position(self, button: Button) -> Position:
+        if self.device_size not in DEVICES:
+            raise DeviceNotSupportedError(self.device_size)
+
+        return DEVICES[self.device_size][button]
+
+    def _get_rgb(self, button: Button) -> RGBName:
+        position = self._get_btn_position(button)
+        color = self._get_color(position)
+        return COLORS.get(color, RGBName.UNKNOWN)
 
 
 def send_messages(

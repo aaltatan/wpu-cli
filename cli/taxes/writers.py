@@ -51,6 +51,9 @@ def write_to_excel(salaries: list[Salary], path: Path) -> None:
     wb = xw.Book()
     ws = wb.sheets.active
 
+    filename = path.name.split(".")[0].title()
+    ws.name = filename
+
     headers_row = [header for header, _ in HEADERS.items()]
 
     ws.range("A1").options(index=False).value = headers_row
@@ -58,16 +61,16 @@ def write_to_excel(salaries: list[Salary], path: Path) -> None:
     rows = [
         [
             idx,
-            float(salary.gross),
-            float(salary.compensations),
-            float(salary.total),
-            float(salary.ss_deduction),
-            float(salary.brackets_tax),
-            float(salary.fixed_tax),
-            float(salary.taxes),
-            float(salary.deductions),
-            float(salary.net),
-            float(salary.compensations_to_total_ratio),
+            salary.gross,
+            salary.compensations,
+            salary.total,
+            salary.ss_deduction,
+            salary.brackets_tax,
+            salary.fixed_tax,
+            salary.taxes,
+            salary.deductions,
+            salary.net,
+            salary.compensations_to_total_ratio,
         ]
         for idx, salary in enumerate(salaries, start=1)
     ]

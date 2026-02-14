@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 
+import typer
+
+from cli.clipboard import get_clipboard
 from cli.fuzz.processors import ProcessorFn, processors
 from cli.fuzz.readers import readers
 from cli.fuzz.scorers import ScorerFn
@@ -48,3 +51,11 @@ def get_reader_data(queries_path: QueriesPathOpt) -> list[str]:
 class WriteOptions:
     export_path: ExportPathOpt
     writer: WriterOpt
+
+
+def get_clipboard_queries() -> list[str]:
+    try:
+        return [line for line in get_clipboard().splitlines() if line]
+    except TypeError as e:
+        message = "Clipboard is empty"
+        raise typer.BadParameter(message) from e

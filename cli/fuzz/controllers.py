@@ -2,12 +2,11 @@
 
 from typer_di import Depends, TyperDI
 
-from cli.clipboard import get_clipboard
-
 from .dependencies import (
     Config,
     WriteOptions,
     get_choices,
+    get_clipboard_queries,
     get_processor_fn,
     get_reader_data,
     get_scorer_fn,
@@ -50,14 +49,13 @@ def match_list_cmd(
 
 @app.command("clip")
 def match_clip_cmd(
+    queries: list[str] = Depends(get_clipboard_queries),
     choices: list[str] = Depends(get_choices),
     processor_fn: ProcessorFn = Depends(get_processor_fn),
     scorer_fn: ScorerFn = Depends(get_scorer_fn),
     config: Config = Depends(Config),
     write_options: WriteOptions = Depends(WriteOptions),
 ):
-    queries = [line for line in get_clipboard().splitlines() if line]
-
     matches = match_list(
         queries=queries,
         choices=choices,

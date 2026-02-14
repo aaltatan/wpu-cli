@@ -55,6 +55,7 @@ FilepathOpt = Annotated[
         file_okay=True,
         dir_okay=False,
         resolve_path=True,
+        default_factory=lambda: Path.cwd().home() / "outputs",
         callback=filepath_callback,
         rich_help_panel="Single Docx Options",
     ),

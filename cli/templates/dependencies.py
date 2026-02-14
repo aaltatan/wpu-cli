@@ -24,15 +24,15 @@ class PathOptions:
 class SingleDocxOptions:
     filepath: FilepathOpt
     template_data_variable: TemplateDataVariableOpt
-    pdf: PDFOpt
+    pdf: PDFOpt = False
 
 
 @dataclass
 class MultipleDocxOptions:
     output_dir: OutputDirOpt
     filename_key: FilenameKeyOpt
-    include_idx_in_filename: IncludeIndexInFilenameOpt
-    pdf: PDFOpt
+    pdf: PDFOpt = False
+    include_idx_in_filename: IncludeIndexInFilenameOpt = True
 
 
 @dataclass

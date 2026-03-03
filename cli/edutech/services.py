@@ -51,7 +51,7 @@ class PagePipeline:
         return self
 
     def navigate_to_general_accounting(self, financial_year: str) -> Self:
-        self._page.goto("http://edu/RAS/?sc=500#/_FIN/ACT/menu.php")
+        self._page.goto("http://edu/?sc=504#/_FIN/ACT/menu.php")
         self.fill_searchbox("#financialYearId_label", financial_year)
         self.wait_for_timeout(4_000)
         return self

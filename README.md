@@ -9,6 +9,8 @@ CLI application for make some automation tasks.
 EDUTECH_USERNAME=your_username # edutech username
 EDUTECH_PASSWORD=your_password # edutech password
 EDUTECH_TIMEOUT_AFTER_INSERTING_ROWS=5000 # timeout for playwright between rows insertion
+EDUTECH_GENERAL_ACCOUNTING_URL=http://edu/?sc=504#/_FIN/ACT/menu.php
+
 
 # Fuzz App
 FUZZ_DEFAULT_ACCURACY=60 # default accuracy for fuzzy matching

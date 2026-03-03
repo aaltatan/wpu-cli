@@ -11,7 +11,7 @@ from .schemas import Row, VoucherRowSelector
 
 class VoucherPagePipeline(PagePipeline):
     def navigate_to_add_new_voucher(self) -> Self:
-        self._page.goto("http://edu/RAS/?sc=500#/_FIN/ACT/vouchers.php?id=JOV")
+        self._page.goto("http://edu/?sc=504#/_FIN/ACT/vouchers.php?id=JOV")
         self._page.wait_for_selector("#addVoucher")
         self._page.click("#addVoucher")
         self._page.wait_for_timeout(3_000)
@@ -28,7 +28,10 @@ class VoucherPagePipeline(PagePipeline):
         self.fill_input(automata_row.debit, row.debit)
         self.fill_input(automata_row.credit, row.credit)
         self.fill_searchbox(automata_row.account_id, row.account_id)
-        self.fill_searchbox(automata_row.cost_center, row.cost_center)
+
+        if row.account_id.startswith("3") or row.account_id.startswith("4"):
+            self.fill_searchbox(automata_row.cost_center, row.cost_center)
+
         self.fill_input(automata_row.notes, row.notes)
 
         return self

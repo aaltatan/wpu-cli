@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+# ruff: noqa: FBT002
 
 from .options import (
     DataFilepathOpt,
@@ -12,30 +12,42 @@ from .options import (
     TemplateDataVariableOpt,
     TemplateFilepathOpt,
 )
+from .readers import ExcelGroupedDataReader, ExcelSingleRowDataReader
+from .writers import MultipleDocxTemplateWriter, SingleDocxTemplateWriter
 
 
-@dataclass
-class PathOptions:
-    data: DataFilepathOpt
-    template: TemplateFilepathOpt
+def get_excel_single_row_reader(data: DataFilepathOpt) -> ExcelSingleRowDataReader:
+    return ExcelSingleRowDataReader(data)
 
 
-@dataclass
-class SingleDocxOptions:
-    filepath: FilepathOpt
-    template_data_variable: TemplateDataVariableOpt
-    pdf: PDFOpt = False
+def get_excel_multiple_rows_reader(
+    data: DataFilepathOpt,
+    grouped_columns: GroupedColumnsOpt,
+    group_variable: GroupKeyVariableOpt,
+) -> ExcelGroupedDataReader:
+    return ExcelGroupedDataReader(data, group_variable, *grouped_columns)
 
 
-@dataclass
-class MultipleDocxOptions:
-    output_dir: OutputDirOpt
-    filename_key: FilenameKeyOpt
-    pdf: PDFOpt = False
-    include_idx_in_filename: IncludeIndexInFilenameOpt = True
+def get_excel_multiple_rows_writer(
+    template: TemplateFilepathOpt,
+    output_dir: OutputDirOpt,
+    filename_key: FilenameKeyOpt,
+    pdf: PDFOpt = False,
+    include_index_in_filename: IncludeIndexInFilenameOpt = True,
+) -> MultipleDocxTemplateWriter:
+    return MultipleDocxTemplateWriter(
+        template,
+        output_dir,
+        filename_key,
+        pdf=pdf,
+        include_index_in_filename=include_index_in_filename,
+    )
 
 
-@dataclass
-class MultipleRowsXlsxOptions:
-    grouped_columns: GroupedColumnsOpt
-    group_variable: GroupKeyVariableOpt
+def get_excel_single_row_writer(
+    template: TemplateFilepathOpt,
+    filepath: FilepathOpt,
+    template_data_variable: TemplateDataVariableOpt,
+    pdf: PDFOpt = False,
+) -> SingleDocxTemplateWriter:
+    return SingleDocxTemplateWriter(template, filepath, template_data_variable, pdf=pdf)

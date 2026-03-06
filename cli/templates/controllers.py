@@ -1,16 +1,25 @@
 # ruff: noqa: B008, E501
 
+from typing import Protocol
+
 from typer_di import Depends, TyperDI
 
 from .dependencies import (
-    MultipleDocxOptions,
-    MultipleRowsXlsxOptions,
-    PathOptions,
-    SingleDocxOptions,
+    get_excel_multiple_rows_reader,
+    get_excel_multiple_rows_writer,
+    get_excel_single_row_reader,
+    get_excel_single_row_writer,
 )
-from .readers import ExcelGroupedDataReader, ExcelSingleRowDataReader
-from .services import write_templates
-from .writers import MultipleDocxTemplateWriter, SingleDocxTemplateWriter
+from .schemas import Data
+
+
+class Reader(Protocol):
+    def read(self) -> Data: ...
+
+
+class TemplateWriter(Protocol):
+    def write(self, data: Data) -> None: ...
+
 
 app = TyperDI()
 
@@ -96,19 +105,11 @@ def main() -> None:
     ),
 )
 def generate_multiple_docx_files_from_xlsx_single_row(
-    paths: PathOptions = Depends(PathOptions),
-    mdocx_options: MultipleDocxOptions = Depends(MultipleDocxOptions),
+    reader: Reader = Depends(get_excel_single_row_reader),
+    writer: TemplateWriter = Depends(get_excel_multiple_rows_writer),
 ):
-    reader = ExcelSingleRowDataReader(paths.data)
-    writer = MultipleDocxTemplateWriter(
-        paths.template,
-        mdocx_options.output_dir,
-        mdocx_options.filename_key,
-        pdf=mdocx_options.pdf,
-        include_index_in_filename=mdocx_options.include_idx_in_filename,
-    )
-
-    write_templates(reader, writer)
+    data = reader.read()
+    writer.write(data=data)
 
 
 @app.command(
@@ -141,18 +142,11 @@ def generate_multiple_docx_files_from_xlsx_single_row(
     ),
 )
 def generate_single_docx_file_from_xlsx_single_row(
-    paths: PathOptions = Depends(PathOptions),
-    docx_options: SingleDocxOptions = Depends(SingleDocxOptions),
+    reader: Reader = Depends(get_excel_single_row_reader),
+    writer: TemplateWriter = Depends(get_excel_single_row_writer),
 ):
-    reader = ExcelSingleRowDataReader(paths.data)
-    writer = SingleDocxTemplateWriter(
-        paths.template,
-        docx_options.filepath,
-        docx_options.template_data_variable,
-        pdf=docx_options.pdf,
-    )
-
-    write_templates(reader, writer)
+    data = reader.read()
+    writer.write(data=data)
 
 
 @app.command(
@@ -196,24 +190,11 @@ def generate_single_docx_file_from_xlsx_single_row(
     ),
 )
 def generate_docx_multiple_files_from_xlsx_multiple_rows(
-    paths: PathOptions = Depends(PathOptions),
-    mdocx_options: MultipleDocxOptions = Depends(MultipleDocxOptions),
-    mxlsx_options: MultipleRowsXlsxOptions = Depends(MultipleRowsXlsxOptions),
+    reader: Reader = Depends(get_excel_multiple_rows_reader),
+    writer: TemplateWriter = Depends(get_excel_multiple_rows_writer),
 ):
-    reader = ExcelGroupedDataReader(
-        paths.data,
-        mxlsx_options.group_variable,
-        *mxlsx_options.grouped_columns,
-    )
-    write = MultipleDocxTemplateWriter(
-        paths.template,
-        mdocx_options.output_dir,
-        mdocx_options.filename_key,
-        pdf=mdocx_options.pdf,
-        include_index_in_filename=mdocx_options.include_idx_in_filename,
-    )
-
-    write_templates(reader, write)
+    data = reader.read()
+    writer.write(data=data)
 
 
 @app.command(
@@ -253,18 +234,8 @@ def generate_docx_multiple_files_from_xlsx_multiple_rows(
     ),
 )
 def generate_single_docx_file_from_xlsx_multiple_rows(
-    paths: PathOptions = Depends(PathOptions),
-    docx_options: SingleDocxOptions = Depends(SingleDocxOptions),
-    mxlsx_options: MultipleRowsXlsxOptions = Depends(MultipleRowsXlsxOptions),
+    reader: Reader = Depends(get_excel_multiple_rows_reader),
+    writer: TemplateWriter = Depends(get_excel_single_row_writer),
 ):
-    reader = ExcelGroupedDataReader(
-        paths.data, mxlsx_options.group_variable, *mxlsx_options.grouped_columns
-    )
-    writer = SingleDocxTemplateWriter(
-        paths.template,
-        docx_options.filepath,
-        docx_options.template_data_variable,
-        pdf=docx_options.pdf,
-    )
-
-    write_templates(reader, writer)
+    data = reader.read()
+    writer.write(data=data)

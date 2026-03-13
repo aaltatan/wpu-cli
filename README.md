@@ -35,18 +35,4 @@ WHATSAPP_DESKTOP_DEFAULT_CHECKING_LOOP=15 # default checking loop in seconds for
 # Template App
 TEMPLATES_DEFAULT_SINGLE_DOCX_TEMPLATE_DATA_VARIABLE=data # default data key for generated single file
 TEMPLATES_DEFAULT_XLSX_MULTIPLE_ROWS_TEMPLATE_GROUP_VARIABLE=data # default grouped key for generated multiple rows
-
-# Taxes App
-TAXES_BRACKET_TAX_MINS=0 837000 850000 1100000 # default brackets mins for taxes app
-TAXES_BRACKET_TAX_MAXS=837000 850000 1100000 25000000 # default brackets maxes for taxes app
-TAXES_BRACKET_TAX_RATES=0 0.11 0.13 0.15 # default brackets rates for taxes app
-TAXES_MIN_ALLOWED_SALARY=837000 # default min allowed salary for taxes app
-TAXES_TAXES_ROUNDING_METHOD=ROUND_CEILING # default taxes rounding method for taxes app
-TAXES_TAXES_ROUND_TO_NEAREST=100 # default taxes round to nearest for taxes app
-TAXES_SS_ROUNDING_METHOD=ROUND_CEILING # default ss rounding method for taxes app
-TAXES_SS_ROUND_TO_NEAREST=1 # default ss round to nearest for taxes app
-TAXES_MIN_SS_ALLOWED_SALARY=750000 # default min ss allowed salary for taxes app
-TAXES_SS_DEDUCTION_RATE=0.07 # default ss deduction rate for taxes app
-TAXES_FIXED_TAX_RATE=0.05 # default fixed tax rate for taxes app
-TAXES_DEFAULT_COMPENSATIONS_RATE=0.75 # default compensations rate for taxes app
 ```

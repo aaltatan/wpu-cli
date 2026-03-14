@@ -21,6 +21,10 @@ class TemplateWriter(Protocol):
     def write(self, data: Data) -> None: ...
 
 
+def generate_template(reader: Reader, writer: TemplateWriter) -> None:
+    writer.write(data=reader.read())
+
+
 app = TyperDI()
 
 
@@ -108,8 +112,7 @@ def generate_multiple_docx_files_from_xlsx_single_row(
     reader: Reader = Depends(get_excel_single_row_reader),
     writer: TemplateWriter = Depends(get_excel_multiple_rows_writer),
 ):
-    data = reader.read()
-    writer.write(data=data)
+    generate_template(reader=reader, writer=writer)
 
 
 @app.command(
@@ -145,8 +148,7 @@ def generate_single_docx_file_from_xlsx_single_row(
     reader: Reader = Depends(get_excel_single_row_reader),
     writer: TemplateWriter = Depends(get_excel_single_row_writer),
 ):
-    data = reader.read()
-    writer.write(data=data)
+    generate_template(reader=reader, writer=writer)
 
 
 @app.command(
@@ -193,8 +195,7 @@ def generate_docx_multiple_files_from_xlsx_multiple_rows(
     reader: Reader = Depends(get_excel_multiple_rows_reader),
     writer: TemplateWriter = Depends(get_excel_multiple_rows_writer),
 ):
-    data = reader.read()
-    writer.write(data=data)
+    generate_template(reader=reader, writer=writer)
 
 
 @app.command(
@@ -237,5 +238,4 @@ def generate_single_docx_file_from_xlsx_multiple_rows(
     reader: Reader = Depends(get_excel_multiple_rows_reader),
     writer: TemplateWriter = Depends(get_excel_single_row_writer),
 ):
-    data = reader.read()
-    writer.write(data=data)
+    generate_template(reader=reader, writer=writer)

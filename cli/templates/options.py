@@ -3,8 +3,6 @@ from typing import Annotated
 
 import typer
 
-from .callbacks import create_output_dir_callback, filepath_callback
-
 DataFilepathOpt = Annotated[
     Path,
     typer.Option(
@@ -43,6 +41,14 @@ PDFOpt = Annotated[
         expose_value=True,
     ),
 ]
+
+
+def filepath_callback(value: Path) -> Path:
+    if value.exists():
+        message = f"The file {value} already exists."
+        raise typer.BadParameter(message)
+
+    return value
 
 
 FilepathOpt = Annotated[
@@ -100,6 +106,13 @@ IncludeIndexInFilenameOpt = Annotated[
         rich_help_panel="Multiple Docx Options",
     ),
 ]
+
+
+def create_output_dir_callback(output_dir: Path) -> Path:
+    if not output_dir.exists():
+        output_dir.absolute().mkdir(parents=True)
+
+    return output_dir
 
 
 OutputDirOpt = Annotated[

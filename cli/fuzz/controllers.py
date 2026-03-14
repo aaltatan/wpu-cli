@@ -1,14 +1,13 @@
-# ruff: noqa: B008, PLR0913
+# ruff: noqa: B008
 
 from typer_di import Depends, TyperDI
 
 from .dependencies import (
     Config,
-    WriteOptions,
     get_choices,
     get_clipboard_queries,
     get_processor_fn,
-    get_reader_data,
+    get_queries,
     get_scorer_fn,
 )
 from .processors import ProcessorFn
@@ -26,12 +25,11 @@ def main() -> None:
 
 @app.command("list")
 def match_list_cmd(
-    queries: list[str] = Depends(get_reader_data),
+    queries: list[str] = Depends(get_queries),
     choices: list[str] = Depends(get_choices),
     processor_fn: ProcessorFn = Depends(get_processor_fn),
     scorer_fn: ScorerFn = Depends(get_scorer_fn),
     config: Config = Depends(Config),
-    write_options: WriteOptions = Depends(WriteOptions),
 ):
     matches = match_list(
         queries=queries,
@@ -43,8 +41,8 @@ def match_list_cmd(
         remove_duplicated=config.remove_duplicated,
     )
 
-    write_fn = writers[write_options.writer]
-    write_fn(config.limit, write_options.export_path, matches)
+    write_fn = writers[config.writer]
+    write_fn(config.limit, config.export_path, matches)
 
 
 @app.command("clip")
@@ -54,7 +52,6 @@ def match_clip_cmd(
     processor_fn: ProcessorFn = Depends(get_processor_fn),
     scorer_fn: ScorerFn = Depends(get_scorer_fn),
     config: Config = Depends(Config),
-    write_options: WriteOptions = Depends(WriteOptions),
 ):
     matches = match_list(
         queries=queries,
@@ -66,5 +63,5 @@ def match_clip_cmd(
         remove_duplicated=config.remove_duplicated,
     )
 
-    write_fn = writers[write_options.writer]
-    write_fn(config.limit, write_options.export_path, matches)
+    write_fn = writers[config.writer]
+    write_fn(config.limit, config.export_path, matches)

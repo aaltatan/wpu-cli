@@ -63,6 +63,15 @@ ScorerOpt = Annotated[
     ),
 ]
 
+
+def validate_accuracy(value: int) -> int:
+    if value < 1 or value > 100:
+        message = "Accuracy must be between 1 and 100"
+        raise typer.BadParameter(message)
+
+    return value
+
+
 AccuracyOpt = Annotated[
     int,
     typer.Option(
@@ -70,8 +79,18 @@ AccuracyOpt = Annotated[
         "--accuracy",
         envvar="FUZZ_DEFAULT_ACCURACY",
         help="Accuracy for fuzzy matching 1 to 100",
+        callback=validate_accuracy,
     ),
 ]
+
+
+def validate_limit(value: int) -> int:
+    if value < 1 or value > 10:
+        message = "Limit must be between 1 and 10"
+        raise typer.BadParameter(message)
+
+    return value
+
 
 LimitOpt = Annotated[
     int,
@@ -79,7 +98,8 @@ LimitOpt = Annotated[
         "-l",
         "--limit",
         envvar="FUZZ_DEFAULT_LIMIT",
-        help="Limit for matching results",
+        help="Limit for matching results, must be between 1 and 10",
+        callback=validate_limit,
     ),
 ]
 

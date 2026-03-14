@@ -41,16 +41,12 @@ class Config:
     accuracy: AccuracyOpt
     limit: LimitOpt
     remove_duplicated: RemoveDuplicatedOpt
-
-
-def get_reader_data(queries_path: QueriesPathOpt) -> list[str]:
-    return readers.get_reader_data(queries_path)
-
-
-@dataclass
-class WriteOptions:
     export_path: ExportPathOpt
     writer: WriterOpt
+
+
+def get_queries(path: QueriesPathOpt) -> list[str]:
+    return readers.get_reader_data(path)
 
 
 def get_clipboard_queries() -> list[str]:

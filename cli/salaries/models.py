@@ -1,25 +1,24 @@
-from datetime import datetime
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel
 
 
-class SocialSecurity(BaseModel):
-    join_date: datetime
+class SocialSecuritySchema(BaseModel):
     ssid: str
     salary: Decimal
 
 
-class TeachersUnion(BaseModel):
+class TeachersUnionSchema(BaseModel):
     salary: Decimal
 
 
-class Compensation(BaseModel):
+class CompensationSchema(BaseModel):
     value: Decimal = Decimal(0)
     is_taxable: bool = False
 
 
-class SalaryIn(BaseModel):
+class SalaryInSchema(BaseModel):
     fullname: str
 
     days_of_work_count: Decimal
@@ -32,52 +31,52 @@ class SalaryIn(BaseModel):
     hour_price: Decimal
 
     fixed_salary: Decimal
-    compensation_01: Compensation
-    compensation_02: Compensation
-    compensation_03: Compensation
-    compensation_04: Compensation
-    compensation_05: Compensation
-    compensation_06: Compensation
-    compensation_07: Compensation
-    compensation_08: Compensation
-    compensation_09: Compensation
-    compensation_10: Compensation
-    compensation_11: Compensation
-    compensation_12: Compensation
-    compensation_13: Compensation
-    compensation_14: Compensation
-    compensation_15: Compensation
+    compensation_01: CompensationSchema
+    compensation_02: CompensationSchema
+    compensation_03: CompensationSchema
+    compensation_04: CompensationSchema
+    compensation_05: CompensationSchema
+    compensation_06: CompensationSchema
+    compensation_07: CompensationSchema
+    compensation_08: CompensationSchema
+    compensation_09: CompensationSchema
+    compensation_10: CompensationSchema
+    compensation_11: CompensationSchema
+    compensation_12: CompensationSchema
+    compensation_13: CompensationSchema
+    compensation_14: CompensationSchema
+    compensation_15: CompensationSchema
 
-    additional_compensation_01: Compensation | None = None
-    additional_compensation_02: Compensation | None = None
-    additional_compensation_03: Compensation | None = None
-    additional_compensation_04: Compensation | None = None
-    additional_compensation_05: Compensation | None = None
-    additional_compensation_06: Compensation | None = None
-    additional_compensation_07: Compensation | None = None
-    additional_compensation_08: Compensation | None = None
-    additional_compensation_09: Compensation | None = None
-    additional_compensation_10: Compensation | None = None
+    additional_compensation_01: CompensationSchema | None = None
+    additional_compensation_02: CompensationSchema | None = None
+    additional_compensation_03: CompensationSchema | None = None
+    additional_compensation_04: CompensationSchema | None = None
+    additional_compensation_05: CompensationSchema | None = None
+    additional_compensation_06: CompensationSchema | None = None
+    additional_compensation_07: CompensationSchema | None = None
+    additional_compensation_08: CompensationSchema | None = None
+    additional_compensation_09: CompensationSchema | None = None
+    additional_compensation_10: CompensationSchema | None = None
 
-    deduction_01: Compensation | None = None
-    deduction_02: Compensation | None = None
+    deduction_01: CompensationSchema | None = None
+    deduction_02: CompensationSchema | None = None
 
-    deduction_03: Compensation | None = None
-    deduction_04: Compensation | None = None
-    deduction_05: Compensation | None = None
-    deduction_06: Compensation | None = None
-    deduction_07: Compensation | None = None
-    deduction_08: Compensation | None = None
-    deduction_09: Compensation | None = None
-    deduction_10: Compensation | None = None
-    deduction_11: Compensation | None = None
-    deduction_12: Compensation | None = None
+    deduction_03: CompensationSchema | None = None
+    deduction_04: CompensationSchema | None = None
+    deduction_05: CompensationSchema | None = None
+    deduction_06: CompensationSchema | None = None
+    deduction_07: CompensationSchema | None = None
+    deduction_08: CompensationSchema | None = None
+    deduction_09: CompensationSchema | None = None
+    deduction_10: CompensationSchema | None = None
+    deduction_11: CompensationSchema | None = None
+    deduction_12: CompensationSchema | None = None
 
-    social_security: SocialSecurity | None = None
-    teachers_union: TeachersUnion | None = None
+    social_security: SocialSecuritySchema | None = None
+    teachers_union: TeachersUnionSchema | None = None
 
 
-class SalaryOut(BaseModel):
+class SalaryOutSchema(BaseModel):
     hours: Decimal = Decimal(0)
 
     fixed_salary: Decimal = Decimal(0)
@@ -117,3 +116,37 @@ class SalaryOut(BaseModel):
     deductions: Decimal = Decimal(0)
 
     net: Decimal = Decimal(0)
+
+
+class BracketSchema(BaseModel):
+    min: Decimal
+    max: Decimal
+    rate: Decimal
+
+
+class SettingsSchema(BaseModel):
+    fixed_tax_rate: Decimal = Decimal("0.05")
+
+    ss_deduction_rate: Decimal = Decimal("0.07")
+
+    tu_monthly_deduction_rate: Decimal = Decimal("0.02")
+    tu_pension_deduction_rate: Decimal = Decimal("0.03")
+
+    healthy_leaves_rate: Decimal = Decimal("0.3")
+    healthy_leaves_based_on: Literal["Total", "Salary"] = "Total"
+
+    days_of_month: Decimal = Decimal(30)
+
+    leaves_without_pay_rate: Decimal = Decimal(1)
+    leaves_without_pay_based_on: Literal["Total", "Salary"] = "Total"
+
+    overtime_rate: Decimal = Decimal(2)
+    overtime_based_on: Literal["Total", "Salary"] = "Total"
+
+    additional_leaves_rate: Decimal = Decimal(0)
+    additional_leaves_based_on: Literal["Total", "Salary"] = "Total"
+
+    fixed_tax_columns: list[str] = []
+    brackets: list[BracketSchema] = []
+
+    min_ss_salary: Decimal = Decimal(0)

@@ -6,7 +6,7 @@ from syriantaxes import Rounder, RoundingMethod, SocialSecurity
 from typer_di import Depends
 
 from .loaders.row import RowLoader
-from .loaders.settings import SettingsLoader
+from .loaders.settings import load_settings as _load_settings
 from .models import SalaryInSchema, SettingsSchema
 from .options import (
     CalculationRoundingMethodOpt,
@@ -22,10 +22,10 @@ from .options import (
 
 
 def _get_ss_rounder(
-    round_to_nearest: SSRoundToNearestOpt = Decimal(1),
-    rounding_method: SSRoundingMethodOpt = RoundingMethod.HALF_UP,
+    ss_round_to_nearest: SSRoundToNearestOpt = Decimal(1),
+    ss_rounding_method: SSRoundingMethodOpt = RoundingMethod.HALF_UP,
 ) -> Rounder:
-    return Rounder(method=rounding_method, to_nearest=round_to_nearest)
+    return Rounder(method=ss_rounding_method, to_nearest=ss_round_to_nearest)
 
 
 def _load_salaries_book(path: SalariesFilePathArg, password: SalariesFilePasswordOpt) -> xw.Book:
@@ -38,14 +38,14 @@ def _load_last_row(book: xw.Book = Depends(_load_salaries_book)) -> int:
 
 
 def load_settings(book: xw.Book = Depends(_load_salaries_book)) -> SettingsSchema:
-    return SettingsLoader(book).load()
+    return _load_settings(book)
 
 
 def load_rows(
     book: xw.Book = Depends(_load_salaries_book),
     settings: SettingsSchema = Depends(load_settings),
     start_row: StartRowOpt = 3,
-    last_row: int = Depends(_load_last_row),
+    last_row: int = 600,
 ) -> list[SalaryInSchema]:
     return [
         RowLoader(book, idx, settings.fixed_tax_columns).load()
@@ -54,17 +54,17 @@ def load_rows(
 
 
 def get_calculation_rounder(
-    round_to_nearest: CalculationRoundToNearestOpt = Decimal(1),
-    rounding_method: CalculationRoundingMethodOpt = RoundingMethod.HALF_UP,
+    calc_round_to_nearest: CalculationRoundToNearestOpt = Decimal(1),
+    calc_rounding_method: CalculationRoundingMethodOpt = RoundingMethod.HALF_UP,
 ) -> Rounder:
-    return Rounder(method=rounding_method, to_nearest=round_to_nearest)
+    return Rounder(method=calc_rounding_method, to_nearest=calc_round_to_nearest)
 
 
 def get_taxes_rounder(
-    round_to_nearest: TaxesRoundToNearestOpt = Decimal(100),
-    rounding_method: TaxesRoundingMethodOpt = RoundingMethod.HALF_UP,
+    tax_round_to_nearest: TaxesRoundToNearestOpt = Decimal(100),
+    tax_rounding_method: TaxesRoundingMethodOpt = RoundingMethod.HALF_UP,
 ) -> Rounder:
-    return Rounder(method=rounding_method, to_nearest=round_to_nearest)
+    return Rounder(method=tax_rounding_method, to_nearest=tax_round_to_nearest)
 
 
 def get_ss_obj(

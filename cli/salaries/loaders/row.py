@@ -1,28 +1,17 @@
 from decimal import Decimal
-
-import xlwings as xw
+from typing import Any
 
 from cli.salaries.enums import RawColumn
 from cli.salaries.mappers import RAW_COLUMNS_MAPPER
-from cli.salaries.models import (
-    CompensationSchema,
-    SalaryInSchema,
-    SocialSecuritySchema,
-    TeachersUnionSchema,
-)
-
-DATA_SHEET_NAME = "Data"
+from cli.salaries.models import CompensationSchema, SalaryInSchema
 
 
 class RowLoader:
-    def __init__(self, wb: xw.Book, idx: int, fixed_tax_columns: list[str]) -> None:
-        self._ws: xw.Sheet = wb.sheets[DATA_SHEET_NAME]
-        self._idx = idx
+    def __init__(self, row: list[Any], fixed_tax_columns: list[int]) -> None:
+        self._row = row
         self._fixed_tax_columns = fixed_tax_columns
 
     def load(self) -> SalaryInSchema:
-        fullname = self._get_cell_value(RawColumn.FULLNAME, str)
-
         days_of_work_count = self._get_cell_value(RawColumn.DAYS_OF_WORK_COUNT)
         overtime_days_count = self._get_cell_value(RawColumn.OVERTIME_DAYS_COUNT)
         healthy_leaves_count = self._get_cell_value(RawColumn.HEALTHY_LEAVES_COUNT)
@@ -75,11 +64,10 @@ class RowLoader:
         deduction_11 = self._get_compensation(RawColumn.DEDUCTION_11)
         deduction_12 = self._get_compensation(RawColumn.DEDUCTION_12)
 
-        ss = self._get_social_security()
-        tu = self._get_teachers_union()
+        ss = self._get_cell_value(RawColumn.SS_SALARY)
+        tu = self._get_cell_value(RawColumn.TU_SALARY)
 
         return SalaryInSchema(
-            fullname=fullname,
             days_of_work_count=days_of_work_count,
             overtime_days_count=overtime_days_count,
             healthy_leaves_count=healthy_leaves_count,
@@ -129,28 +117,17 @@ class RowLoader:
             teachers_union=tu,
         )
 
-    def _get_social_security(self) -> SocialSecuritySchema:
-        return SocialSecuritySchema(
-            ssid=self._get_cell_value(RawColumn.SS_ID, str),
-            salary=self._get_cell_value(RawColumn.SS_SALARY),
-        )
-
-    def _get_teachers_union(self) -> TeachersUnionSchema:
-        return TeachersUnionSchema(
-            salary=self._get_cell_value(RawColumn.TU_SALARY),
-        )
-
-    def _get_cell(self, column: RawColumn) -> str:
-        return RAW_COLUMNS_MAPPER[column] + str(self._idx)
+    def _get_idx(self, column: RawColumn) -> int:
+        return RAW_COLUMNS_MAPPER[column]
 
     def _get_compensation(self, column: RawColumn) -> CompensationSchema:
-        cell = self._get_cell(column)
+        idx = self._get_idx(column)
         value = self._get_cell_value(column)
 
-        return CompensationSchema(value=value, is_taxable=cell in self._fixed_tax_columns)
+        return CompensationSchema(value=value, is_taxable=idx in self._fixed_tax_columns)
 
-    def _get_cell_value[T: (Decimal, str)](self, column: RawColumn, cast: type[T] = Decimal) -> T:
-        value = self._ws.range(self._get_cell(column)).value
+    def _get_cell_value[T: Decimal](self, column: RawColumn, cast: type[T] = Decimal) -> T:
+        value = self._row[self._get_idx(column)]
 
         if value is None:
             value = Decimal(0)

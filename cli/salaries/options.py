@@ -77,11 +77,3 @@ TaxesRoundingMethodOpt = Annotated[
         help="Rounding method for taxes",
     ),
 ]
-
-StartRowOpt = Annotated[
-    int,
-    typer.Option(
-        "--start-row",
-        help="Start row",
-    ),
-]

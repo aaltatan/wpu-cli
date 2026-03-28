@@ -6,8 +6,6 @@ from cli.salaries.enums import SettingCell
 from cli.salaries.mappers import BRACKETS_RANGE, FIXED_TAX_COLUMNS_RANGE, SETTINGS_CELLS_MAPPER
 from cli.salaries.models import BracketSchema, SettingsSchema
 
-SETTINGS_SHEET_NAME = "STS"
-
 
 class SettingNotInitializedError(Exception):
     def __init__(self, setting: SettingCell, *args: object) -> None:
@@ -15,10 +13,8 @@ class SettingNotInitializedError(Exception):
         super().__init__(message, *args)
 
 
-def load_settings(wb: xw.Book) -> SettingsSchema:
+def load_settings(ws: xw.Sheet) -> SettingsSchema:
     frc = Decimal("0.01")
-
-    ws = wb.sheets[SETTINGS_SHEET_NAME]
 
     fixed_tax_rate = _load_cell(ws, SettingCell.FIXED_TAX_RATE).quantize(frc)
     ss_deduction_rate = _load_cell(ws, SettingCell.SS_DEDUCTION_RATE).quantize(frc)
@@ -90,9 +86,9 @@ def _load_brackets(ws: xw.Sheet) -> list[BracketSchema]:
     return brackets
 
 
-def _load_fixed_tax_columns(ws: xw.Sheet) -> list[str]:
+def _load_fixed_tax_columns(ws: xw.Sheet) -> list[int]:
     rg = ws.range(FIXED_TAX_COLUMNS_RANGE)
-    return [str(cell.value) for cell in rg if cell.value is not None]
+    return [generate_column_idx(str(cell.value)) for cell in rg if cell.value is not None]
 
 
 def _load_cell[T: (Decimal, str)](ws: xw.Sheet, setting: SettingCell, cast: type[T] = Decimal) -> T:
@@ -102,3 +98,21 @@ def _load_cell[T: (Decimal, str)](ws: xw.Sheet, setting: SettingCell, cast: type
         raise SettingNotInitializedError(setting)
 
     return cast(value)
+
+
+def generate_column_idx(column_name: str) -> int:
+    """Convert Excel column letters to a 1-based column index.
+
+    Args:
+        column_name: Excel column letters (e.g., 'A', 'AA', 'ZZ')
+
+    Returns:
+        int: 1-based column index
+
+    """
+    result = 0
+    for char in column_name.upper():
+        value = ord(char) - ord("A") + 1
+        result = result * 26 + value
+
+    return result

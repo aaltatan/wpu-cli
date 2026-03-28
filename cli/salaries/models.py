@@ -4,23 +4,12 @@ from typing import Literal
 from pydantic import BaseModel
 
 
-class SocialSecuritySchema(BaseModel):
-    ssid: str
-    salary: Decimal
-
-
-class TeachersUnionSchema(BaseModel):
-    salary: Decimal
-
-
 class CompensationSchema(BaseModel):
     value: Decimal = Decimal(0)
     is_taxable: bool = False
 
 
 class SalaryInSchema(BaseModel):
-    fullname: str
-
     days_of_work_count: Decimal
     overtime_days_count: Decimal
     healthy_leaves_count: Decimal
@@ -72,8 +61,8 @@ class SalaryInSchema(BaseModel):
     deduction_11: CompensationSchema | None = None
     deduction_12: CompensationSchema | None = None
 
-    social_security: SocialSecuritySchema | None = None
-    teachers_union: TeachersUnionSchema | None = None
+    social_security: Decimal = Decimal(0)
+    teachers_union: Decimal = Decimal(0)
 
 
 class SalaryOutSchema(BaseModel):
@@ -97,15 +86,33 @@ class SalaryOutSchema(BaseModel):
     compensation_14: Decimal = Decimal(0)
     compensation_15: Decimal = Decimal(0)
 
+    unused: Decimal = Decimal(0)
+
     overtime: Decimal = Decimal(0)
     leaves: Decimal = Decimal(0)
+
+    additional_compensation_01: Decimal = Decimal(0)
+    additional_compensation_02: Decimal = Decimal(0)
+    additional_compensation_03: Decimal = Decimal(0)
+    additional_compensation_04: Decimal = Decimal(0)
+    additional_compensation_05: Decimal = Decimal(0)
+    additional_compensation_06: Decimal = Decimal(0)
+    additional_compensation_07: Decimal = Decimal(0)
+    additional_compensation_08: Decimal = Decimal(0)
+    additional_compensation_09: Decimal = Decimal(0)
+    additional_compensation_10: Decimal = Decimal(0)
 
     total: Decimal = Decimal(0)
 
     ss_deduction: Decimal = Decimal(0)
 
+    unused_2: Decimal = Decimal(0)
+
     tu_monthly_deduction: Decimal = Decimal(0)
     tu_pension_deduction: Decimal = Decimal(0)
+
+    deduction_01: Decimal = Decimal(0)
+    deduction_02: Decimal = Decimal(0)
 
     brackets_tax: Decimal = Decimal(0)
     fixed_tax: Decimal = Decimal(0)
@@ -113,9 +120,77 @@ class SalaryOutSchema(BaseModel):
     healthy_leaves: Decimal = Decimal(0)
     without_pay_leaves: Decimal = Decimal(0)
 
+    deduction_03: Decimal = Decimal(0)
+    deduction_04: Decimal = Decimal(0)
+    deduction_05: Decimal = Decimal(0)
+    deduction_06: Decimal = Decimal(0)
+    deduction_07: Decimal = Decimal(0)
+    deduction_08: Decimal = Decimal(0)
+    deduction_09: Decimal = Decimal(0)
+    deduction_10: Decimal = Decimal(0)
+    deduction_11: Decimal = Decimal(0)
+    deduction_12: Decimal = Decimal(0)
+
     deductions: Decimal = Decimal(0)
 
     net: Decimal = Decimal(0)
+
+    def as_row(self) -> list[Decimal]:
+        return [
+            self.hours,
+            self.fixed_salary,
+            self.compensation_01,
+            self.compensation_02,
+            self.compensation_03,
+            self.compensation_04,
+            self.compensation_05,
+            self.compensation_06,
+            self.compensation_07,
+            self.compensation_08,
+            self.compensation_09,
+            self.compensation_10,
+            self.compensation_11,
+            self.compensation_12,
+            self.compensation_13,
+            self.compensation_14,
+            self.compensation_15,
+            self.unused,
+            self.overtime,
+            self.leaves,
+            self.additional_compensation_01,
+            self.additional_compensation_02,
+            self.additional_compensation_03,
+            self.additional_compensation_04,
+            self.additional_compensation_05,
+            self.additional_compensation_06,
+            self.additional_compensation_07,
+            self.additional_compensation_08,
+            self.additional_compensation_09,
+            self.additional_compensation_10,
+            self.total,
+            self.ss_deduction,
+            self.unused_2,
+            self.tu_monthly_deduction,
+            self.tu_pension_deduction,
+            self.deduction_01,
+            self.deduction_02,
+            self.brackets_tax,
+            self.fixed_tax,
+            self.healthy_leaves,
+            self.without_pay_leaves,
+            self.deduction_03,
+            self.deduction_04,
+            self.deduction_05,
+            self.deduction_06,
+            self.deduction_07,
+            self.deduction_08,
+            self.deduction_09,
+            self.deduction_10,
+            self.deduction_11,
+            self.deduction_12,
+            self.deductions,
+            self.net,
+        ]
 
 
 class BracketSchema(BaseModel):
@@ -146,7 +221,7 @@ class SettingsSchema(BaseModel):
     additional_leaves_rate: Decimal
     additional_leaves_based_on: Literal["Total", "Salary"]
 
-    fixed_tax_columns: list[str]
+    fixed_tax_columns: list[int]
     brackets: list[BracketSchema]
 
     min_ss_salary: Decimal

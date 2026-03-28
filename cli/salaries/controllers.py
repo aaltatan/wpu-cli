@@ -1,4 +1,5 @@
 # ruff: noqa: B008
+from devtools import debug
 from syriantaxes import Rounder, SocialSecurity
 from typer_di import Depends, TyperDI
 
@@ -10,7 +11,6 @@ from .dependencies import (
     load_settings,
 )
 from .models import SalaryInSchema, SettingsSchema
-from .services import calculate
 
 app = TyperDI()
 
@@ -23,4 +23,6 @@ def calculate_cmd(
     tax_rounder: Rounder = Depends(get_taxes_rounder),
     calculation_rounder: Rounder = Depends(get_calculation_rounder),
 ) -> None:
-    calculate(rows, settings, ss_obj, tax_rounder, calculation_rounder)
+    for salary in rows:
+        debug(salary)
+        print("#" * 100)

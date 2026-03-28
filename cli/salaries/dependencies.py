@@ -15,10 +15,13 @@ from .options import (
     SalariesFilePathArg,
     SSRoundingMethodOpt,
     SSRoundToNearestOpt,
-    StartRowOpt,
     TaxesRoundingMethodOpt,
     TaxesRoundToNearestOpt,
 )
+
+DATA_SHEET_NAME = "Data"
+DATA_TABLE_NAME = "Data"
+SETTINGS_SHEET_NAME = "STS"
 
 
 def _get_ss_rounder(
@@ -32,25 +35,30 @@ def _load_salaries_book(path: SalariesFilePathArg, password: SalariesFilePasswor
     return xw.Book(path, password=password)
 
 
-def _load_last_row(book: xw.Book = Depends(_load_salaries_book)) -> int:
-    # TODO: implement
-    return 10
+def _load_data_sheet(book: xw.Book = Depends(_load_salaries_book)) -> xw.Sheet:
+    return book.sheets[DATA_SHEET_NAME]
 
 
-def load_settings(book: xw.Book = Depends(_load_salaries_book)) -> SettingsSchema:
-    return _load_settings(book)
+def _load_settings_sheet(book: xw.Book = Depends(_load_salaries_book)) -> xw.Sheet:
+    return book.sheets[SETTINGS_SHEET_NAME]
+
+
+def load_settings(ws: xw.Sheet = Depends(_load_settings_sheet)) -> SettingsSchema:
+    return _load_settings(ws)
 
 
 def load_rows(
     book: xw.Book = Depends(_load_salaries_book),
     settings: SettingsSchema = Depends(load_settings),
-    start_row: StartRowOpt = 3,
-    last_row: int = 600,
 ) -> list[SalaryInSchema]:
-    return [
-        RowLoader(book, idx, settings.fixed_tax_columns).load()
-        for idx in range(start_row, last_row + 1)
-    ]
+    ws: xw.Sheet = book.sheets[DATA_SHEET_NAME]
+    rg = ws.range(DATA_TABLE_NAME)
+
+    if rg.value is None and not isinstance(rg.value, list):
+        message = f"Range value is not a list: {rg.value}"
+        raise TypeError(message)
+
+    return [RowLoader(row, settings.fixed_tax_columns).load() for row in rg.value]
 
 
 def get_calculation_rounder(

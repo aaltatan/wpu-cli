@@ -1,102 +1,64 @@
-from .enums import CalculatedColumn, RawColumn, SettingCell
+from .enums import RawColumn, SettingCell
+
+# column index - 5 in Salaries.xlsb
 
 RAW_COLUMNS_MAPPER = {
-    RawColumn.FULLNAME: "E",
+    RawColumn.FULLNAME: 0,
     ######
-    RawColumn.SS_JOIN_DATE: "L",
-    RawColumn.SS_ID: "T",
-    RawColumn.SS_SALARY: "U",
+    RawColumn.SS_ID: 15,
+    RawColumn.SS_SALARY: 16,
     ######
-    RawColumn.TU_SALARY: "W",
+    RawColumn.TU_SALARY: 18,
     ######
-    RawColumn.DAYS_OF_WORK_COUNT: "X",
-    RawColumn.OVERTIME_DAYS_COUNT: "Y",
-    RawColumn.HEALTHY_LEAVES_COUNT: "Z",
-    RawColumn.WITHOUT_PAY_LEAVES_COUNT: "AA",
-    RawColumn.ADDITIONAL_LEAVES_COUNT: "AB",
-    RawColumn.HOURS_COUNT: "AC",
-    RawColumn.HOUR_PRICE: "AD",
+    RawColumn.DAYS_OF_WORK_COUNT: 19,
+    RawColumn.OVERTIME_DAYS_COUNT: 20,
+    RawColumn.HEALTHY_LEAVES_COUNT: 21,
+    RawColumn.WITHOUT_PAY_LEAVES_COUNT: 22,
+    RawColumn.ADDITIONAL_LEAVES_COUNT: 23,
+    RawColumn.HOURS_COUNT: 24,
+    RawColumn.HOUR_PRICE: 25,
     ######
-    RawColumn.FIXED_SALARY: "AE",
+    RawColumn.FIXED_SALARY: 26,
     ######
-    RawColumn.COMPENSATION_01: "AF",
-    RawColumn.COMPENSATION_02: "AG",
-    RawColumn.COMPENSATION_03: "AH",
-    RawColumn.COMPENSATION_04: "AI",
-    RawColumn.COMPENSATION_05: "AJ",
-    RawColumn.COMPENSATION_06: "AK",
-    RawColumn.COMPENSATION_07: "AL",
-    RawColumn.COMPENSATION_08: "AM",
-    RawColumn.COMPENSATION_09: "AN",
-    RawColumn.COMPENSATION_10: "AO",
-    RawColumn.COMPENSATION_11: "AP",
-    RawColumn.COMPENSATION_12: "AQ",
-    RawColumn.COMPENSATION_13: "AR",
-    RawColumn.COMPENSATION_14: "AS",
-    RawColumn.COMPENSATION_15: "AT",
+    RawColumn.COMPENSATION_01: 27,
+    RawColumn.COMPENSATION_02: 28,
+    RawColumn.COMPENSATION_03: 29,
+    RawColumn.COMPENSATION_04: 30,
+    RawColumn.COMPENSATION_05: 31,
+    RawColumn.COMPENSATION_06: 32,
+    RawColumn.COMPENSATION_07: 33,
+    RawColumn.COMPENSATION_08: 34,
+    RawColumn.COMPENSATION_09: 35,
+    RawColumn.COMPENSATION_10: 36,
+    RawColumn.COMPENSATION_11: 37,
+    RawColumn.COMPENSATION_12: 38,
+    RawColumn.COMPENSATION_13: 39,
+    RawColumn.COMPENSATION_14: 40,
+    RawColumn.COMPENSATION_15: 41,
     ######
-    RawColumn.ADDITIONAL_COMPENSATION_02: "BR",
-    RawColumn.ADDITIONAL_COMPENSATION_01: "BQ",
-    RawColumn.ADDITIONAL_COMPENSATION_03: "BS",
-    RawColumn.ADDITIONAL_COMPENSATION_04: "BT",
-    RawColumn.ADDITIONAL_COMPENSATION_05: "BU",
-    RawColumn.ADDITIONAL_COMPENSATION_06: "BV",
-    RawColumn.ADDITIONAL_COMPENSATION_07: "BW",
-    RawColumn.ADDITIONAL_COMPENSATION_08: "BX",
-    RawColumn.ADDITIONAL_COMPENSATION_09: "BY",
-    RawColumn.ADDITIONAL_COMPENSATION_10: "BZ",
+    RawColumn.ADDITIONAL_COMPENSATION_01: 64,
+    RawColumn.ADDITIONAL_COMPENSATION_02: 65,
+    RawColumn.ADDITIONAL_COMPENSATION_03: 66,
+    RawColumn.ADDITIONAL_COMPENSATION_04: 67,
+    RawColumn.ADDITIONAL_COMPENSATION_05: 68,
+    RawColumn.ADDITIONAL_COMPENSATION_06: 69,
+    RawColumn.ADDITIONAL_COMPENSATION_07: 70,
+    RawColumn.ADDITIONAL_COMPENSATION_08: 71,
+    RawColumn.ADDITIONAL_COMPENSATION_09: 72,
+    RawColumn.ADDITIONAL_COMPENSATION_10: 73,
     ######
-    RawColumn.DEDUCTION_01: "CF",
-    RawColumn.DEDUCTION_02: "CG",
-    RawColumn.DEDUCTION_03: "CL",
-    RawColumn.DEDUCTION_04: "CM",
-    RawColumn.DEDUCTION_05: "CN",
-    RawColumn.DEDUCTION_06: "CO",
-    RawColumn.DEDUCTION_07: "CP",
-    RawColumn.DEDUCTION_08: "CQ",
-    RawColumn.DEDUCTION_09: "CR",
-    RawColumn.DEDUCTION_10: "CS",
-    RawColumn.DEDUCTION_11: "CT",
-    RawColumn.DEDUCTION_12: "CU",
-}
-
-CALCULATED_COLUMNS_MAPPER = {
-    CalculatedColumn.HOURS: "AW",
-    CalculatedColumn.FIXED_SALARY: "AX",
-    ######
-    CalculatedColumn.COMPENSATION_01: "AY",
-    CalculatedColumn.COMPENSATION_02: "AZ",
-    CalculatedColumn.COMPENSATION_03: "BA",
-    CalculatedColumn.COMPENSATION_04: "BB",
-    CalculatedColumn.COMPENSATION_05: "BC",
-    CalculatedColumn.COMPENSATION_06: "BD",
-    CalculatedColumn.COMPENSATION_07: "BE",
-    CalculatedColumn.COMPENSATION_08: "BF",
-    CalculatedColumn.COMPENSATION_09: "BG",
-    CalculatedColumn.COMPENSATION_10: "BH",
-    CalculatedColumn.COMPENSATION_11: "BI",
-    CalculatedColumn.COMPENSATION_12: "BJ",
-    CalculatedColumn.COMPENSATION_13: "BK",
-    CalculatedColumn.COMPENSATION_14: "BL",
-    CalculatedColumn.COMPENSATION_15: "BM",
-    ######
-    CalculatedColumn.OVERTIME: "BO",
-    CalculatedColumn.LEAVES: "BP",
-    ######
-    CalculatedColumn.TOTAL: "CA",
-    ######
-    CalculatedColumn.SS_DEDUCTION: "CB",
-    ######
-    CalculatedColumn.TU_MONTHLY_DEDUCTION: "CD",
-    CalculatedColumn.TU_PENSION_DEDUCTION: "CE",
-    ######
-    CalculatedColumn.BRACKETS_TAX: "CH",
-    CalculatedColumn.FIXED_TAX: "CI",
-    ######
-    CalculatedColumn.HEALTHY_LEAVES: "CJ",
-    CalculatedColumn.WITHOUT_PAY_LEAVES: "CK",
-    ######
-    CalculatedColumn.DEDUCTIONS: "CL",
+    RawColumn.DEDUCTION_01: 79,
+    RawColumn.DEDUCTION_02: 80,
+    RawColumn.DEDUCTION_03: 85,
+    RawColumn.DEDUCTION_04: 86,
+    RawColumn.DEDUCTION_05: 87,
+    RawColumn.DEDUCTION_06: 88,
+    RawColumn.DEDUCTION_07: 89,
+    RawColumn.DEDUCTION_08: 90,
+    RawColumn.DEDUCTION_09: 91,
+    RawColumn.DEDUCTION_10: 92,
+    RawColumn.DEDUCTION_11: 93,
+    RawColumn.DEDUCTION_12: 94,
 }
 
 
@@ -122,4 +84,5 @@ FIXED_TAX_COLUMNS_RANGE = "I13:I25"
 
 BRACKETS_RANGE = "I28:K38"
 
-SALARY_STATUS_COL = "H"
+CALCULATED_START_COLUMN = "AW"
+CALCULATED_END_COLUMN = "CW"

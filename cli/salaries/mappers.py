@@ -3,8 +3,6 @@ from .enums import RawColumn, SettingCell
 # column index - 5 in Salaries.xlsb
 
 RAW_COLUMNS_MAPPER = {
-    RawColumn.FULLNAME: 0,
-    ######
     RawColumn.SS_ID: 15,
     RawColumn.SS_SALARY: 16,
     ######

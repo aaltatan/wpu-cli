@@ -125,28 +125,28 @@ class BracketSchema(BaseModel):
 
 
 class SettingsSchema(BaseModel):
-    fixed_tax_rate: Decimal = Decimal("0.05")
+    fixed_tax_rate: Decimal
 
-    ss_deduction_rate: Decimal = Decimal("0.07")
+    ss_deduction_rate: Decimal
 
-    tu_monthly_deduction_rate: Decimal = Decimal("0.02")
-    tu_pension_deduction_rate: Decimal = Decimal("0.03")
+    tu_monthly_deduction_rate: Decimal
+    tu_pension_deduction_rate: Decimal
 
-    healthy_leaves_rate: Decimal = Decimal("0.3")
-    healthy_leaves_based_on: Literal["Total", "Salary"] = "Total"
+    healthy_leaves_rate: Decimal
+    healthy_leaves_based_on: Literal["Total", "Salary"]
 
-    days_of_month: Decimal = Decimal(30)
+    days_of_month: Decimal
 
-    leaves_without_pay_rate: Decimal = Decimal(1)
-    leaves_without_pay_based_on: Literal["Total", "Salary"] = "Total"
+    leaves_without_pay_rate: Decimal
+    leaves_without_pay_based_on: Literal["Total", "Salary"]
 
-    overtime_rate: Decimal = Decimal(2)
-    overtime_based_on: Literal["Total", "Salary"] = "Total"
+    overtime_rate: Decimal
+    overtime_based_on: Literal["Total", "Salary"]
 
-    additional_leaves_rate: Decimal = Decimal(0)
-    additional_leaves_based_on: Literal["Total", "Salary"] = "Total"
+    additional_leaves_rate: Decimal
+    additional_leaves_based_on: Literal["Total", "Salary"]
 
-    fixed_tax_columns: list[str] = []
-    brackets: list[BracketSchema] = []
+    fixed_tax_columns: list[str]
+    brackets: list[BracketSchema]
 
-    min_ss_salary: Decimal = Decimal(0)
+    min_ss_salary: Decimal

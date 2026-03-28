@@ -2,8 +2,6 @@ from enum import StrEnum, auto
 
 
 class RawColumn(StrEnum):
-    FULLNAME = auto()
-
     SS_JOIN_DATE = auto()
     SS_ID = auto()
     SS_SALARY = auto()

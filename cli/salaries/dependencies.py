@@ -48,10 +48,9 @@ def load_settings(ws: xw.Sheet = Depends(_load_settings_sheet)) -> SettingsSchem
 
 
 def load_rows(
-    book: xw.Book = Depends(_load_salaries_book),
+    ws: xw.Sheet = Depends(_load_data_sheet),
     settings: SettingsSchema = Depends(load_settings),
 ) -> list[SalaryInSchema]:
-    ws: xw.Sheet = book.sheets[DATA_SHEET_NAME]
     rg = ws.range(DATA_TABLE_NAME)
 
     if rg.value is None and not isinstance(rg.value, list):

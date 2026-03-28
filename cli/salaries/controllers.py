@@ -1,5 +1,4 @@
 # ruff: noqa: B008
-from devtools import debug
 from syriantaxes import Rounder, SocialSecurity
 from typer_di import Depends, TyperDI
 
@@ -15,7 +14,7 @@ from .models import SalaryInSchema, SettingsSchema
 app = TyperDI()
 
 
-@app.command(name="calc")
+@app.command(name="calc", no_args_is_help=True)
 def calculate_cmd(
     rows: list[SalaryInSchema] = Depends(load_rows),
     settings: SettingsSchema = Depends(load_settings),
@@ -24,5 +23,7 @@ def calculate_cmd(
     calculation_rounder: Rounder = Depends(get_calculation_rounder),
 ) -> None:
     for salary in rows:
-        debug(salary)
+        print(salary)
         print("#" * 100)
+
+    print(len(rows))

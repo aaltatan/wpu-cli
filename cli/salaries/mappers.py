@@ -2,7 +2,7 @@ from .enums import RawColumn, SettingCell
 
 # column index - 5 in Salaries.xlsb
 
-RAW_COLUMNS_MAPPER = {
+RAW_COLUMNS_MAPPER: dict[RawColumn, int | tuple[int, int]] = {
     RawColumn.SS_ID: 15,
     RawColumn.SS_SALARY: 16,
     ######
@@ -18,21 +18,21 @@ RAW_COLUMNS_MAPPER = {
     ######
     RawColumn.FIXED_SALARY: 26,
     ######
-    RawColumn.COMPENSATION_01: 27,
-    RawColumn.COMPENSATION_02: 28,
-    RawColumn.COMPENSATION_03: 29,
-    RawColumn.COMPENSATION_04: 30,
-    RawColumn.COMPENSATION_05: 31,
-    RawColumn.COMPENSATION_06: 32,
-    RawColumn.COMPENSATION_07: 33,
-    RawColumn.COMPENSATION_08: 34,
-    RawColumn.COMPENSATION_09: 35,
-    RawColumn.COMPENSATION_10: 36,
-    RawColumn.COMPENSATION_11: 37,
-    RawColumn.COMPENSATION_12: 38,
-    RawColumn.COMPENSATION_13: 39,
-    RawColumn.COMPENSATION_14: 40,
-    RawColumn.COMPENSATION_15: 41,
+    RawColumn.COMPENSATION_01: (27, 46),
+    RawColumn.COMPENSATION_02: (28, 47),
+    RawColumn.COMPENSATION_03: (29, 48),
+    RawColumn.COMPENSATION_04: (30, 49),
+    RawColumn.COMPENSATION_05: (31, 50),
+    RawColumn.COMPENSATION_06: (32, 51),
+    RawColumn.COMPENSATION_07: (33, 52),
+    RawColumn.COMPENSATION_08: (34, 53),
+    RawColumn.COMPENSATION_09: (35, 54),
+    RawColumn.COMPENSATION_10: (36, 55),
+    RawColumn.COMPENSATION_11: (37, 56),
+    RawColumn.COMPENSATION_12: (38, 57),
+    RawColumn.COMPENSATION_13: (39, 58),
+    RawColumn.COMPENSATION_14: (40, 59),
+    RawColumn.COMPENSATION_15: (41, 60),
     ######
     RawColumn.ADDITIONAL_COMPENSATION_01: 64,
     RawColumn.ADDITIONAL_COMPENSATION_02: 65,

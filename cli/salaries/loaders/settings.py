@@ -31,6 +31,9 @@ def load_settings(ws: xw.Sheet) -> SettingsSchema:
     additional_leaves_based_on = _load_cell(ws, SettingCell.ADDITIONAL_LEAVES_BASED_ON, str)
     min_ss_salary = _load_cell(ws, SettingCell.MIN_SS_SALARY).quantize(frc)
 
+    fixed_tax_columns = _load_fixed_tax_columns(ws)
+    brackets = _load_brackets(ws)
+
     return SettingsSchema(
         fixed_tax_rate=fixed_tax_rate,
         ss_deduction_rate=ss_deduction_rate,
@@ -45,8 +48,8 @@ def load_settings(ws: xw.Sheet) -> SettingsSchema:
         overtime_based_on=overtime_based_on,  # type: ignore  # noqa: PGH003
         additional_leaves_rate=additional_leaves_rate,
         additional_leaves_based_on=additional_leaves_based_on,  # type: ignore  # noqa: PGH003
-        fixed_tax_columns=_load_fixed_tax_columns(ws),
-        brackets=_load_brackets(ws),
+        fixed_tax_columns=fixed_tax_columns,
+        brackets=brackets,
         min_ss_salary=min_ss_salary,
     )
 
@@ -88,7 +91,8 @@ def _load_brackets(ws: xw.Sheet) -> list[BracketSchema]:
 
 def _load_fixed_tax_columns(ws: xw.Sheet) -> list[int]:
     rg = ws.range(FIXED_TAX_COLUMNS_RANGE)
-    return [generate_column_idx(str(cell.value)) for cell in rg if cell.value is not None]
+    # 5 is the first column index
+    return [generate_column_idx(str(cell.value)) - 5 for cell in rg if cell.value is not None]
 
 
 def _load_cell[T: (Decimal, str)](ws: xw.Sheet, setting: SettingCell, cast: type[T] = Decimal) -> T:

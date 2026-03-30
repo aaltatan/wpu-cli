@@ -117,17 +117,27 @@ class RowLoader:
             teachers_union=tu,
         )
 
-    def _get_idx(self, column: RawColumn) -> int:
-        return RAW_COLUMNS_MAPPER[column]
+    def _get_idx(self, column: RawColumn, *, is_taxable: bool) -> int:
+        value = RAW_COLUMNS_MAPPER[column]
+
+        if isinstance(value, int):
+            return value
+
+        idx, taxable_idx = value
+
+        if is_taxable:
+            return taxable_idx
+
+        return idx
 
     def _get_compensation(self, column: RawColumn) -> CompensationSchema:
-        idx = self._get_idx(column)
+        idx = self._get_idx(column, is_taxable=True)
         value = self._get_cell_value(column)
 
         return CompensationSchema(value=value, is_taxable=idx in self._fixed_tax_columns)
 
     def _get_cell_value[T: Decimal](self, column: RawColumn, cast: type[T] = Decimal) -> T:
-        value = self._row[self._get_idx(column)]
+        value = self._row[self._get_idx(column, is_taxable=False)]
 
         if value is None:
             value = Decimal(0)

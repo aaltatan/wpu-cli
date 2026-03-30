@@ -86,33 +86,33 @@ class SalaryOutSchema(BaseModel):
     compensation_14: Decimal = Decimal(0)
     compensation_15: Decimal = Decimal(0)
 
-    unused: Decimal = Decimal(0)
+    unused: Decimal | None = None
 
     overtime: Decimal = Decimal(0)
     leaves: Decimal = Decimal(0)
 
-    additional_compensation_01: Decimal = Decimal(0)
-    additional_compensation_02: Decimal = Decimal(0)
-    additional_compensation_03: Decimal = Decimal(0)
-    additional_compensation_04: Decimal = Decimal(0)
-    additional_compensation_05: Decimal = Decimal(0)
-    additional_compensation_06: Decimal = Decimal(0)
-    additional_compensation_07: Decimal = Decimal(0)
-    additional_compensation_08: Decimal = Decimal(0)
-    additional_compensation_09: Decimal = Decimal(0)
-    additional_compensation_10: Decimal = Decimal(0)
+    additional_compensation_01: Decimal | None = None
+    additional_compensation_02: Decimal | None = None
+    additional_compensation_03: Decimal | None = None
+    additional_compensation_04: Decimal | None = None
+    additional_compensation_05: Decimal | None = None
+    additional_compensation_06: Decimal | None = None
+    additional_compensation_07: Decimal | None = None
+    additional_compensation_08: Decimal | None = None
+    additional_compensation_09: Decimal | None = None
+    additional_compensation_10: Decimal | None = None
 
     total: Decimal = Decimal(0)
 
     ss_deduction: Decimal = Decimal(0)
 
-    unused_2: Decimal = Decimal(0)
+    unused_2: Decimal | None = None
 
     tu_monthly_deduction: Decimal = Decimal(0)
     tu_pension_deduction: Decimal = Decimal(0)
 
-    deduction_01: Decimal = Decimal(0)
-    deduction_02: Decimal = Decimal(0)
+    deduction_01: Decimal | None = None
+    deduction_02: Decimal | None = None
 
     brackets_tax: Decimal = Decimal(0)
     fixed_tax: Decimal = Decimal(0)
@@ -120,22 +120,22 @@ class SalaryOutSchema(BaseModel):
     healthy_leaves: Decimal = Decimal(0)
     without_pay_leaves: Decimal = Decimal(0)
 
-    deduction_03: Decimal = Decimal(0)
-    deduction_04: Decimal = Decimal(0)
-    deduction_05: Decimal = Decimal(0)
-    deduction_06: Decimal = Decimal(0)
-    deduction_07: Decimal = Decimal(0)
-    deduction_08: Decimal = Decimal(0)
-    deduction_09: Decimal = Decimal(0)
-    deduction_10: Decimal = Decimal(0)
-    deduction_11: Decimal = Decimal(0)
-    deduction_12: Decimal = Decimal(0)
+    deduction_03: Decimal | None = None
+    deduction_04: Decimal | None = None
+    deduction_05: Decimal | None = None
+    deduction_06: Decimal | None = None
+    deduction_07: Decimal | None = None
+    deduction_08: Decimal | None = None
+    deduction_09: Decimal | None = None
+    deduction_10: Decimal | None = None
+    deduction_11: Decimal | None = None
+    deduction_12: Decimal | None = None
 
     deductions: Decimal = Decimal(0)
 
     net: Decimal = Decimal(0)
 
-    def as_row(self) -> list[Decimal]:
+    def as_row(self) -> list[Decimal | None]:
         return [
             self.hours,
             self.fixed_salary,

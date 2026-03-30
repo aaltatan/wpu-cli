@@ -5,8 +5,6 @@ import xlwings as xw
 from syriantaxes import Rounder, RoundingMethod, SocialSecurity
 from typer_di import Depends
 
-from .loaders.row import RowLoader
-from .loaders.settings import load_settings as _load_settings
 from .models import SalaryInSchema, SettingsSchema
 from .options import (
     CalculationRoundingMethodOpt,
@@ -18,6 +16,8 @@ from .options import (
     TaxesRoundingMethodOpt,
     TaxesRoundToNearestOpt,
 )
+from .readers.row import RowReader
+from .readers.settings import read_settings as _read_settings
 
 DATA_SHEET_NAME = "Data"
 DATA_TABLE_NAME = "Data"
@@ -35,7 +35,7 @@ def _load_salaries_book(path: SalariesFilePathArg, password: SalariesFilePasswor
     return xw.Book(path, password=password)
 
 
-def _load_data_sheet(book: xw.Book = Depends(_load_salaries_book)) -> xw.Sheet:
+def _get_data_sheet(book: xw.Book = Depends(_load_salaries_book)) -> xw.Sheet:
     return book.sheets[DATA_SHEET_NAME]
 
 
@@ -43,13 +43,13 @@ def _load_settings_sheet(book: xw.Book = Depends(_load_salaries_book)) -> xw.She
     return book.sheets[SETTINGS_SHEET_NAME]
 
 
-def load_settings(ws: xw.Sheet = Depends(_load_settings_sheet)) -> SettingsSchema:
-    return _load_settings(ws)
+def read_settings(ws: xw.Sheet = Depends(_load_settings_sheet)) -> SettingsSchema:
+    return _read_settings(ws)
 
 
-def load_rows(
-    ws: xw.Sheet = Depends(_load_data_sheet),
-    settings: SettingsSchema = Depends(load_settings),
+def read_rows(
+    ws: xw.Sheet = Depends(_get_data_sheet),
+    settings: SettingsSchema = Depends(read_settings),
 ) -> list[SalaryInSchema]:
     rg = ws.range(DATA_TABLE_NAME)
 
@@ -57,7 +57,7 @@ def load_rows(
         message = f"Range value is not a list: {rg.value}"
         raise TypeError(message)
 
-    return [RowLoader(row, settings.fixed_tax_columns).load() for row in rg.value]
+    return [RowReader(row, settings.fixed_tax_columns).read() for row in rg.value]
 
 
 def get_calculation_rounder(
@@ -75,7 +75,7 @@ def get_taxes_rounder(
 
 
 def get_ss_obj(
-    settings: SettingsSchema = Depends(load_settings),
+    settings: SettingsSchema = Depends(read_settings),
     rounder: Rounder = Depends(_get_ss_rounder),
 ) -> SocialSecurity:
     return SocialSecurity(

@@ -6,12 +6,12 @@ from cli.salaries.mappers import RAW_COLUMNS_MAPPER
 from cli.salaries.models import CompensationSchema, SalaryInSchema
 
 
-class RowLoader:
+class RowReader:
     def __init__(self, row: list[Any], fixed_tax_columns: list[int]) -> None:
         self._row = row
         self._fixed_tax_columns = fixed_tax_columns
 
-    def load(self) -> SalaryInSchema:
+    def read(self) -> SalaryInSchema:
         days_of_work_count = self._get_cell_value(RawColumn.DAYS_OF_WORK_COUNT)
         overtime_days_count = self._get_cell_value(RawColumn.OVERTIME_DAYS_COUNT)
         healthy_leaves_count = self._get_cell_value(RawColumn.HEALTHY_LEAVES_COUNT)

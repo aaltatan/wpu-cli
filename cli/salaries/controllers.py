@@ -6,8 +6,8 @@ from .dependencies import (
     get_calculation_rounder,
     get_ss_obj,
     get_taxes_rounder,
-    load_rows,
-    load_settings,
+    read_rows,
+    read_settings,
 )
 from .models import SalaryInSchema, SettingsSchema
 
@@ -16,8 +16,8 @@ app = TyperDI()
 
 @app.command(name="calc", no_args_is_help=True)
 def calculate_cmd(
-    rows: list[SalaryInSchema] = Depends(load_rows),
-    settings: SettingsSchema = Depends(load_settings),
+    rows: list[SalaryInSchema] = Depends(read_rows),
+    settings: SettingsSchema = Depends(read_settings),
     ss_obj: SocialSecurity = Depends(get_ss_obj),
     tax_rounder: Rounder = Depends(get_taxes_rounder),
     calculation_rounder: Rounder = Depends(get_calculation_rounder),

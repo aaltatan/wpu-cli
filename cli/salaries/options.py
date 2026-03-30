@@ -5,10 +5,10 @@ from typing import Annotated
 import typer
 from syriantaxes import RoundingMethod
 
-SalariesFilePathArg = Annotated[
+SalariesWorkbookPathArg = Annotated[
     Path,
     typer.Argument(
-        help="Path to salaries file",
+        help="Path to salaries workbook",
         exists=True,
         file_okay=True,
         dir_okay=False,
@@ -17,11 +17,11 @@ SalariesFilePathArg = Annotated[
     ),
 ]
 
-SalariesFilePasswordOpt = Annotated[
+SalariesWorkbookPasswordOpt = Annotated[
     str,
     typer.Option(
         "--password",
-        help="Password to open salaries file",
+        help="Password to open salaries workbook",
         prompt=True,
         hide_input=True,
     ),

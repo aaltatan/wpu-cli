@@ -9,8 +9,8 @@ from .models import SalaryInSchema, SettingsSchema
 from .options import (
     CalculationRoundingMethodOpt,
     CalculationRoundToNearestOpt,
-    SalariesFilePasswordOpt,
-    SalariesFilePathArg,
+    SalariesWorkbookPasswordOpt,
+    SalariesWorkbookPathArg,
     SSRoundingMethodOpt,
     SSRoundToNearestOpt,
     TaxesRoundingMethodOpt,
@@ -31,24 +31,26 @@ def _get_ss_rounder(
     return Rounder(method=ss_rounding_method, to_nearest=ss_round_to_nearest)
 
 
-def _load_salaries_book(path: SalariesFilePathArg, password: SalariesFilePasswordOpt) -> xw.Book:
+def _get_salaries_workbook(
+    path: SalariesWorkbookPathArg, password: SalariesWorkbookPasswordOpt
+) -> xw.Book:
     return xw.Book(path, password=password)
 
 
-def _get_data_sheet(book: xw.Book = Depends(_load_salaries_book)) -> xw.Sheet:
+def _get_data_worksheet(book: xw.Book = Depends(_get_salaries_workbook)) -> xw.Sheet:
     return book.sheets[DATA_SHEET_NAME]
 
 
-def _load_settings_sheet(book: xw.Book = Depends(_load_salaries_book)) -> xw.Sheet:
+def _get_settings_worksheet(book: xw.Book = Depends(_get_salaries_workbook)) -> xw.Sheet:
     return book.sheets[SETTINGS_SHEET_NAME]
 
 
-def read_settings(ws: xw.Sheet = Depends(_load_settings_sheet)) -> SettingsSchema:
+def read_settings(ws: xw.Sheet = Depends(_get_settings_worksheet)) -> SettingsSchema:
     return _read_settings(ws)
 
 
 def read_rows(
-    ws: xw.Sheet = Depends(_get_data_sheet),
+    ws: xw.Sheet = Depends(_get_data_worksheet),
     settings: SettingsSchema = Depends(read_settings),
 ) -> list[SalaryInSchema]:
     rg = ws.range(DATA_TABLE_NAME)

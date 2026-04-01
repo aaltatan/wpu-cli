@@ -129,14 +129,18 @@ class SalaryCalculator:
             based_on=self._settings.leaves_without_pay_based_on,
         )
 
-        brackets_tax = calculate_brackets_tax(
-            amount=self._row.fixed_salary,
-            brackets=self._settings.brackets,
-            min_allowed_salary=self._settings.min_allowed_salary,
-            rounder=self._taxes_rounder,
-            ss_obj=self._ss_obj,
-            ss_salary=self._row.social_security or None,
-        )
+        brackets_tax_kwargs = {
+            "amount": self._row.fixed_salary,
+            "brackets": self._settings.brackets,
+            "min_allowed_salary": self._settings.min_allowed_salary,
+            "rounder": self._taxes_rounder,
+        }
+
+        if self._row.social_security:
+            brackets_tax_kwargs["ss_obj"] = self._ss_obj
+            brackets_tax_kwargs["ss_salary"] = self._row.social_security
+
+        brackets_tax = calculate_brackets_tax(**brackets_tax_kwargs)
 
         fixed_tax = (
             self._calc_fixed_tax(hours, self._row.hour_price)

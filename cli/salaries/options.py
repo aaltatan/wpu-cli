@@ -20,6 +20,7 @@ SalariesWorkbookPathArg = Annotated[
 SalariesWorkbookPasswordOpt = Annotated[
     str,
     typer.Option(
+        "-p",
         "--password",
         help="Password to open salaries workbook",
         prompt=True,
@@ -75,5 +76,39 @@ TaxesRoundingMethodOpt = Annotated[
     typer.Option(
         "--taxes-rounding-method",
         help="Rounding method for taxes",
+    ),
+]
+
+CalculatedStartColumnOpt = Annotated[
+    str,
+    typer.Option(
+        "--calculated-start-column",
+        help="Calculated start column",
+    ),
+]
+
+CalculatedEndColumnOpt = Annotated[
+    str,
+    typer.Option(
+        "--calculated-end-column",
+        help="Calculated end column",
+    ),
+]
+
+StartRowOpt = Annotated[
+    int,
+    typer.Option(
+        "--start-row",
+        help="Start row",
+        parser=int,
+    ),
+]
+
+WriteConfirmationOpt = Annotated[
+    bool,
+    typer.Option(
+        "-w",
+        "--write-confirmation",
+        help="Write confirmation",
     ),
 ]

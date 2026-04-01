@@ -85,3 +85,6 @@ class SettingCell(StrEnum):
     MIN_SS_SALARY = auto()
 
     MIN_ALLOWED_SALARY = auto()
+
+    FIXED_TAX_COLUMNS_RANGE = auto()
+    BRACKETS_RANGE = auto()

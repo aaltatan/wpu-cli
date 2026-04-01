@@ -3,7 +3,7 @@ from decimal import Decimal
 import xlwings as xw
 
 from cli.salaries.enums import SettingCell
-from cli.salaries.mappers import BRACKETS_RANGE, FIXED_TAX_COLUMNS_RANGE, SETTINGS_CELLS_MAPPER
+from cli.salaries.mappers import SETTINGS_CELLS_MAPPER
 from cli.salaries.models import BracketSchema, SettingsSchema
 from cli.salaries.utils import generate_column_idx
 
@@ -58,7 +58,7 @@ def read_settings(ws: xw.Sheet) -> SettingsSchema:
 
 
 def _read_brackets(ws: xw.Sheet) -> list[BracketSchema]:
-    rg = ws.range(BRACKETS_RANGE)
+    rg = ws.range(SettingCell.BRACKETS_RANGE)
 
     brackets: list[BracketSchema] = []
 
@@ -93,7 +93,7 @@ def _read_brackets(ws: xw.Sheet) -> list[BracketSchema]:
 
 
 def _read_fixed_tax_columns(ws: xw.Sheet) -> list[int]:
-    rg = ws.range(FIXED_TAX_COLUMNS_RANGE)
+    rg = ws.range(SettingCell.FIXED_TAX_COLUMNS_RANGE)
     # 5 is the first column index
     return [generate_column_idx(str(cell.value)) - 5 for cell in rg if cell.value is not None]
 

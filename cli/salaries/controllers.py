@@ -7,12 +7,12 @@ from .dependencies import Array, WriterFn, get_calculated_data, get_writer_fn
 app = TyperDI()
 
 
-@app.callback(no_args_is_help=True)
+@app.callback()
 def main() -> None:
     """Salaries excel (xlsb) file commands."""
 
 
-@app.command(name="calc", no_args_is_help=True)
+@app.command(name="calc")
 def calculate(
     data: Array[float] = Depends(get_calculated_data),
     writer_fn: WriterFn | None = Depends(get_writer_fn),

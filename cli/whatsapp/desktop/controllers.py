@@ -38,7 +38,7 @@ def get_desktop_whatsapp_hyperlinks_send(filepath: FilepathArg) -> list[str]:
     return get_desktop_whatsapp_hyperlinks(messages, include_text=True)
 
 
-app = TyperDI()
+app = TyperDI(no_args_is_help=True)
 
 
 @app.callback()

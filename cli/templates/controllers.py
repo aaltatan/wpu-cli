@@ -25,7 +25,7 @@ def generate_template(reader: Reader, writer: TemplateWriter) -> None:
     writer.write(data=reader.read())
 
 
-app = TyperDI()
+app = TyperDI(no_args_is_help=True)
 
 
 @app.callback()
@@ -79,6 +79,7 @@ def main() -> None:
 
 @app.command(
     name="xlsx2mdocx",
+    no_args_is_help=True,
     help=(
         "Generate multiple docx files from xlsx file (single row)\n"
         "Usage:\n"
@@ -117,6 +118,7 @@ def generate_multiple_docx_files_from_xlsx_single_row(
 
 @app.command(
     name="xlsx2docx",
+    no_args_is_help=True,
     help=(
         "Generate docx files from xlsx file (single row)\n"
         "Usage:\n"
@@ -153,6 +155,7 @@ def generate_single_docx_file_from_xlsx_single_row(
 
 @app.command(
     name="mxlsx2mdocx",
+    no_args_is_help=True,
     help=(
         "Generate multiple docx files from xlsx file (multiple rows)\n"
         "Usage:\n"
@@ -200,6 +203,7 @@ def generate_docx_multiple_files_from_xlsx_multiple_rows(
 
 @app.command(
     name="mxlsx2docx",
+    no_args_is_help=True,
     help=(
         "Generate multiple docx files from xlsx file (multiple rows)\n"
         "Usage:\n"

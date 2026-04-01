@@ -15,7 +15,7 @@ from .scorers import ScorerFn
 from .services import match_list
 from .writers import writers
 
-app = TyperDI()
+app = TyperDI(no_args_is_help=True)
 
 
 @app.callback()
@@ -23,7 +23,7 @@ def main() -> None:
     """Fuzz search in a given choices file."""
 
 
-@app.command("list")
+@app.command("list", no_args_is_help=True)
 def match_list_cmd(
     queries: list[str] = Depends(get_queries),
     choices: list[str] = Depends(get_choices),
@@ -45,7 +45,7 @@ def match_list_cmd(
     write_fn(config.limit, config.export_path, matches)
 
 
-@app.command("clip")
+@app.command("clip", no_args_is_help=True)
 def match_clip_cmd(
     queries: list[str] = Depends(get_clipboard_queries),
     choices: list[str] = Depends(get_choices),

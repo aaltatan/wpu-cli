@@ -2,7 +2,7 @@ import typer
 
 from . import desktop, web
 
-app = typer.Typer()
+app = typer.Typer(no_args_is_help=True)
 
 
 @app.callback()

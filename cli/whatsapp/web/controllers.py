@@ -18,7 +18,7 @@ from .readers import get_messages
 from .schemas import Message
 from .services import open_whatsapp_web_page, send_whatsapp_messages_web
 
-app = TyperDI()
+app = TyperDI(no_args_is_help=True)
 
 
 @dataclass

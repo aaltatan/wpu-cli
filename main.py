@@ -12,7 +12,7 @@ def main() -> None:
     load_dotenv()
     init_logger()
 
-    app = typer.Typer(name="wpu", callback=callback)
+    app = typer.Typer(name="wpu", callback=callback, no_args_is_help=True)
 
     app.add_typer(whatsapp.app, name="whatsapp")
     app.add_typer(edutech.app, name="edutech")

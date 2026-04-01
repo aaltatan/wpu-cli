@@ -18,7 +18,7 @@ class VoucherPageFilters:
     grid_columns: GridColumnsOpt
 
 
-app = TyperDI()
+app = TyperDI(no_args_is_help=True)
 
 
 @app.callback()
@@ -26,7 +26,7 @@ def main() -> None:
     """Generate reports from edutech."""
 
 
-@app.command(name="cash")
+@app.command(name="cash", no_args_is_help=True)
 def generate_cash_report(
     edutech: Edutech = Depends(Edutech), filters: VoucherPageFilters = Depends(VoucherPageFilters)
 ) -> None:

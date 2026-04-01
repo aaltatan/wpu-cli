@@ -15,7 +15,7 @@ def read_voucher(filepath: VoucherFilepathOpt, chapter: ChapterOpt) -> list[Row]
     return read_voucher_from_xlsx(filepath, chapter)
 
 
-app = TyperDI()
+app = TyperDI(no_args_is_help=True)
 
 
 @app.callback()
@@ -23,7 +23,7 @@ def main() -> None:
     """Add vouchers to edutech."""
 
 
-@app.command()
+@app.command(no_args_is_help=True)
 def add_salaries(
     timeout_after_inserting_rows: TimeoutAfterInsertingRowsOpt,
     edutech: Edutech = Depends(Edutech),

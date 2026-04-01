@@ -2,7 +2,7 @@ from typer import Typer
 
 from . import reports, vouchers
 
-app = Typer()
+app = Typer(no_args_is_help=True)
 
 
 @app.callback()

@@ -2,14 +2,13 @@ from decimal import Decimal
 
 import xlwings as xw
 
-from cli.salaries.enums import SettingCell
-from cli.salaries.mappers import SETTINGS_CELLS_MAPPER
+from cli.salaries.mappers import SETTINGS_MAPPER
 from cli.salaries.models import BracketSchema, SettingsSchema
 from cli.salaries.utils import generate_column_idx
 
 
 class SettingNotInitializedError(Exception):
-    def __init__(self, setting: SettingCell, *args: object) -> None:
+    def __init__(self, setting: str, *args: object) -> None:
         message = f"Setting {setting} is not initialized"
         super().__init__(message, *args)
 
@@ -17,21 +16,21 @@ class SettingNotInitializedError(Exception):
 def read_settings(ws: xw.Sheet) -> SettingsSchema:
     frc = Decimal("0.01")
 
-    fixed_tax_rate = _read_cell(ws, SettingCell.FIXED_TAX_RATE).quantize(frc)
-    ss_deduction_rate = _read_cell(ws, SettingCell.SS_DEDUCTION_RATE).quantize(frc)
-    tu_monthly_deduction_rate = _read_cell(ws, SettingCell.TU_MONTHLY_DEDUCTION_RATE).quantize(frc)
-    tu_pension_deduction_rate = _read_cell(ws, SettingCell.TU_PENSION_DEDUCTION_RATE).quantize(frc)
-    healthy_leaves_rate = _read_cell(ws, SettingCell.HEALTHY_LEAVES_RATE).quantize(frc)
-    healthy_leaves_based_on = _read_cell(ws, SettingCell.HEALTHY_LEAVES_BASED_ON, str)
-    days_of_month = _read_cell(ws, SettingCell.DAYS_OF_MONTH).quantize(frc)
-    leaves_without_pay_rate = _read_cell(ws, SettingCell.LEAVES_WITHOUT_PAY_RATE)
-    leaves_without_pay_based_on = _read_cell(ws, SettingCell.LEAVES_WITHOUT_PAY_BASED_ON, str)
-    overtime_rate = _read_cell(ws, SettingCell.OVERTIME_RATE).quantize(frc)
-    overtime_based_on = _read_cell(ws, SettingCell.OVERTIME_BASED_ON, str)
-    additional_leaves_rate = _read_cell(ws, SettingCell.ADDITIONAL_LEAVES_RATE).quantize(frc)
-    additional_leaves_based_on = _read_cell(ws, SettingCell.ADDITIONAL_LEAVES_BASED_ON, str)
-    min_ss_salary = _read_cell(ws, SettingCell.MIN_SS_SALARY).quantize(frc)
-    min_allowed_salary = _read_cell(ws, SettingCell.MIN_ALLOWED_SALARY).quantize(frc)
+    fixed_tax_rate = _read_cell(ws, "fixed_tax_rate").quantize(frc)
+    ss_deduction_rate = _read_cell(ws, "ss_deduction_rate").quantize(frc)
+    tu_monthly_deduction_rate = _read_cell(ws, "tu_monthly_deduction_rate").quantize(frc)
+    tu_pension_deduction_rate = _read_cell(ws, "tu_pension_deduction_rate").quantize(frc)
+    healthy_leaves_rate = _read_cell(ws, "healthy_leaves_rate").quantize(frc)
+    healthy_leaves_based_on = _read_cell(ws, "healthy_leaves_based_on", str)
+    days_of_month = _read_cell(ws, "days_of_month").quantize(frc)
+    leaves_without_pay_rate = _read_cell(ws, "leaves_without_pay_rate")
+    leaves_without_pay_based_on = _read_cell(ws, "leaves_without_pay_based_on", str)
+    overtime_rate = _read_cell(ws, "overtime_rate").quantize(frc)
+    overtime_based_on = _read_cell(ws, "overtime_based_on", str)
+    additional_leaves_rate = _read_cell(ws, "additional_leaves_rate").quantize(frc)
+    additional_leaves_based_on = _read_cell(ws, "additional_leaves_based_on", str)
+    min_ss_salary = _read_cell(ws, "min_ss_salary").quantize(frc)
+    min_allowed_salary = _read_cell(ws, "min_allowed_salary").quantize(frc)
 
     fixed_tax_columns = _read_fixed_tax_columns(ws)
     brackets = _read_brackets(ws)
@@ -58,7 +57,7 @@ def read_settings(ws: xw.Sheet) -> SettingsSchema:
 
 
 def _read_brackets(ws: xw.Sheet) -> list[BracketSchema]:
-    rg = ws.range(SettingCell.BRACKETS_RANGE)
+    rg = ws.range(SETTINGS_MAPPER["brackets_range"])
 
     brackets: list[BracketSchema] = []
 
@@ -93,13 +92,13 @@ def _read_brackets(ws: xw.Sheet) -> list[BracketSchema]:
 
 
 def _read_fixed_tax_columns(ws: xw.Sheet) -> list[int]:
-    rg = ws.range(SettingCell.FIXED_TAX_COLUMNS_RANGE)
+    rg = ws.range(SETTINGS_MAPPER["fixed_tax_columns_range"])
     # 5 is the first column index
     return [generate_column_idx(str(cell.value)) - 5 for cell in rg if cell.value is not None]
 
 
-def _read_cell[T: (Decimal, str)](ws: xw.Sheet, setting: SettingCell, cast: type[T] = Decimal) -> T:
-    value = ws.range(SETTINGS_CELLS_MAPPER[setting]).value
+def _read_cell[T: (Decimal, str)](ws: xw.Sheet, setting: str, cast: type[T] = Decimal) -> T:
+    value = ws.range(SETTINGS_MAPPER[setting]).value
 
     if value is None:
         raise SettingNotInitializedError(setting)

@@ -19,9 +19,14 @@ from .options import (
     StartRowOpt,
     TaxesRoundingMethodOpt,
     TaxesRoundToNearestOpt,
+    WriteConfirmationOpt,
 )
 from .readers.row import RowReader
-from .readers.settings import read_settings as _read_settings
+from .readers.settings import read_settings
+from .services import SalaryCalculator
+
+type Array[T] = list[list[T]]
+type WriterFn = Callable[[Array[float]], xw.Sheet]
 
 DATA_SHEET_NAME = "Data"
 DATA_TABLE_NAME = "Data"
@@ -53,26 +58,13 @@ def _get_settings_worksheet(book: xw.Book = Depends(_get_salaries_workbook)) -> 
     return book.sheets[SETTINGS_SHEET_NAME]
 
 
-def read_settings(ws: xw.Sheet = Depends(_get_settings_worksheet)) -> SettingsSchema:
-    return _read_settings(ws)
+def _read_settings(ws: xw.Sheet = Depends(_get_settings_worksheet)) -> SettingsSchema:
+    return read_settings(ws)
 
 
-def get_writer_fn(
+def _read_raw_data(
     ws: xw.Sheet = Depends(_get_data_worksheet),
-    start_col: CalculatedStartColumnOpt = CALCULATED_START_COLUMN,
-    end_col: CalculatedEndColumnOpt = CALCULATED_END_COLUMN,
-    start_row: StartRowOpt = START_ROW,
-) -> Callable[[list[list[float]]], xw.Sheet]:
-    def wrapper(data: list[list[float]]) -> xw.Sheet:
-        ws.range(f"{start_col}{start_row}:{end_col}{len(data)}").options(index=False).value = data
-        return ws
-
-    return wrapper
-
-
-def read_rows(
-    ws: xw.Sheet = Depends(_get_data_worksheet),
-    settings: SettingsSchema = Depends(read_settings),
+    settings: SettingsSchema = Depends(_read_settings),
 ) -> list[SalaryInSchema]:
     rg = ws.range(DATA_TABLE_NAME)
 
@@ -83,22 +75,22 @@ def read_rows(
     return [RowReader(row, settings.fixed_tax_columns).read() for row in rg.value]
 
 
-def get_calculation_rounder(
+def _get_calculation_rounder(
     calc_round_to_nearest: CalculationRoundToNearestOpt = Decimal(1),
     calc_rounding_method: CalculationRoundingMethodOpt = RoundingMethod.HALF_UP,
 ) -> Rounder:
     return Rounder(method=calc_rounding_method, to_nearest=calc_round_to_nearest)
 
 
-def get_taxes_rounder(
+def _get_taxes_rounder(
     tax_round_to_nearest: TaxesRoundToNearestOpt = Decimal(100),
     tax_rounding_method: TaxesRoundingMethodOpt = RoundingMethod.HALF_UP,
 ) -> Rounder:
     return Rounder(method=tax_rounding_method, to_nearest=tax_round_to_nearest)
 
 
-def get_ss_obj(
-    settings: SettingsSchema = Depends(read_settings),
+def _get_ss_obj(
+    settings: SettingsSchema = Depends(_read_settings),
     rounder: Rounder = Depends(_get_ss_rounder),
 ) -> SocialSecurity:
     return SocialSecurity(
@@ -106,3 +98,35 @@ def get_ss_obj(
         deduction_rate=settings.ss_deduction_rate,
         rounder=rounder,
     )
+
+
+def get_calculated_data(
+    rows: list[SalaryInSchema] = Depends(_read_raw_data),
+    settings: SettingsSchema = Depends(_read_settings),
+    calculation_rounder: Rounder = Depends(_get_calculation_rounder),
+    tax_rounder: Rounder = Depends(_get_taxes_rounder),
+    ss_obj: SocialSecurity = Depends(_get_ss_obj),
+) -> Array[float]:
+    return [
+        SalaryCalculator(row, settings, calculation_rounder, tax_rounder, ss_obj)
+        .calculate()
+        .as_row()
+        for row in rows
+    ]
+
+
+def get_writer_fn(
+    ws: xw.Sheet = Depends(_get_data_worksheet),
+    start_col: CalculatedStartColumnOpt = CALCULATED_START_COLUMN,
+    end_col: CalculatedEndColumnOpt = CALCULATED_END_COLUMN,
+    start_row: StartRowOpt = START_ROW,
+    write: WriteConfirmationOpt = False,  # noqa: FBT002
+) -> WriterFn | None:
+    def wrapper(data: Array[float]) -> xw.Sheet:
+        ws.range(f"{start_col}{start_row}:{end_col}{len(data)}").options(index=False).value = data
+        return ws
+
+    if write:
+        return wrapper
+
+    return None

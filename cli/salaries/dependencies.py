@@ -37,7 +37,7 @@ def _get_salaries_workbook(
     return xw.Book(path, password=password)
 
 
-def _get_data_worksheet(book: xw.Book = Depends(_get_salaries_workbook)) -> xw.Sheet:
+def get_data_worksheet(book: xw.Book = Depends(_get_salaries_workbook)) -> xw.Sheet:
     return book.sheets[DATA_SHEET_NAME]
 
 
@@ -50,7 +50,7 @@ def read_settings(ws: xw.Sheet = Depends(_get_settings_worksheet)) -> SettingsSc
 
 
 def read_rows(
-    ws: xw.Sheet = Depends(_get_data_worksheet),
+    ws: xw.Sheet = Depends(get_data_worksheet),
     settings: SettingsSchema = Depends(read_settings),
 ) -> list[SalaryInSchema]:
     rg = ws.range(DATA_TABLE_NAME)

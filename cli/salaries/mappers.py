@@ -9,11 +9,11 @@ RAW_COLUMNS_MAPPER: dict[RawColumn, int | tuple[int, int]] = {
     RawColumn.TU_SALARY: 18,
     ######
     RawColumn.DAYS_OF_WORK_COUNT: 19,
-    RawColumn.OVERTIME_DAYS_COUNT: 20,
-    RawColumn.HEALTHY_LEAVES_COUNT: 21,
-    RawColumn.WITHOUT_PAY_LEAVES_COUNT: 22,
-    RawColumn.ADDITIONAL_LEAVES_COUNT: 23,
-    RawColumn.HOURS_COUNT: 24,
+    RawColumn.OVERTIME_DAYS_COUNT: (20, 62),
+    RawColumn.HEALTHY_LEAVES_COUNT: (21, 83),
+    RawColumn.WITHOUT_PAY_LEAVES_COUNT: (22, 84),
+    RawColumn.ADDITIONAL_LEAVES_COUNT: (23, 63),
+    RawColumn.HOURS_COUNT: (24, 44),
     RawColumn.HOUR_PRICE: 25,
     ######
     RawColumn.FIXED_SALARY: 26,
@@ -75,6 +75,7 @@ SETTINGS_CELLS_MAPPER = {
     SettingCell.ADDITIONAL_LEAVES_RATE: "F25",
     SettingCell.ADDITIONAL_LEAVES_BASED_ON: "G25",
     SettingCell.MIN_SS_SALARY: "F29",
+    SettingCell.MIN_ALLOWED_SALARY: "F33",
 }
 
 
@@ -84,3 +85,5 @@ BRACKETS_RANGE = "I28:K38"
 
 CALCULATED_START_COLUMN = "AW"
 CALCULATED_END_COLUMN = "CW"
+
+START_ROW = 3

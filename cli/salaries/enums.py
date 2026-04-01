@@ -83,3 +83,5 @@ class SettingCell(StrEnum):
     ADDITIONAL_LEAVES_BASED_ON = auto()
 
     MIN_SS_SALARY = auto()
+
+    MIN_ALLOWED_SALARY = auto()

@@ -13,13 +13,13 @@ class RowReader:
 
     def read(self) -> SalaryInSchema:
         days_of_work_count = self._get_cell_value(RawColumn.DAYS_OF_WORK_COUNT)
-        overtime_days_count = self._get_cell_value(RawColumn.OVERTIME_DAYS_COUNT)
-        healthy_leaves_count = self._get_cell_value(RawColumn.HEALTHY_LEAVES_COUNT)
-        without_pay_leaves_count = self._get_cell_value(RawColumn.WITHOUT_PAY_LEAVES_COUNT)
-        additional_leaves_count = self._get_cell_value(RawColumn.ADDITIONAL_LEAVES_COUNT)
+        overtime_days_count = self._get_compensation(RawColumn.OVERTIME_DAYS_COUNT)
+        healthy_leaves_count = self._get_compensation(RawColumn.HEALTHY_LEAVES_COUNT)
+        without_pay_leaves_count = self._get_compensation(RawColumn.WITHOUT_PAY_LEAVES_COUNT)
+        additional_leaves_count = self._get_compensation(RawColumn.ADDITIONAL_LEAVES_COUNT)
 
         hours_count = self._get_cell_value(RawColumn.HOURS_COUNT)
-        hour_price = self._get_cell_value(RawColumn.HOUR_PRICE)
+        hour_price = self._get_compensation(RawColumn.HOUR_PRICE)
 
         fixed_salary = self._get_cell_value(RawColumn.FIXED_SALARY)
 
@@ -117,29 +117,29 @@ class RowReader:
             teachers_union=tu,
         )
 
-    def _get_idx(self, column: RawColumn, *, is_taxable: bool) -> int:
+    def _get_idx(self, column: RawColumn, *, calculated: bool) -> int:
         value = RAW_COLUMNS_MAPPER[column]
 
         if isinstance(value, int):
             return value
 
-        idx, taxable_idx = value
+        raw_input, calculated_value = value
 
-        if is_taxable:
-            return taxable_idx
+        if calculated:
+            return calculated_value
 
-        return idx
+        return raw_input
 
     def _get_compensation(self, column: RawColumn) -> CompensationSchema:
-        idx = self._get_idx(column, is_taxable=True)
+        idx = self._get_idx(column, calculated=True)
         value = self._get_cell_value(column)
 
         return CompensationSchema(value=value, is_taxable=idx in self._fixed_tax_columns)
 
-    def _get_cell_value[T: Decimal](self, column: RawColumn, cast: type[T] = Decimal) -> T:
-        value = self._row[self._get_idx(column, is_taxable=False)]
+    def _get_cell_value(self, column: RawColumn) -> Decimal:
+        value = self._row[self._get_idx(column, calculated=False)]
 
         if value is None:
             value = Decimal(0)
 
-        return cast(value)
+        return Decimal(value)

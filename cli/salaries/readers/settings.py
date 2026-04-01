@@ -31,6 +31,7 @@ def read_settings(ws: xw.Sheet) -> SettingsSchema:
     additional_leaves_rate = _read_cell(ws, SettingCell.ADDITIONAL_LEAVES_RATE).quantize(frc)
     additional_leaves_based_on = _read_cell(ws, SettingCell.ADDITIONAL_LEAVES_BASED_ON, str)
     min_ss_salary = _read_cell(ws, SettingCell.MIN_SS_SALARY).quantize(frc)
+    min_allowed_salary = _read_cell(ws, SettingCell.MIN_ALLOWED_SALARY).quantize(frc)
 
     fixed_tax_columns = _read_fixed_tax_columns(ws)
     brackets = _read_brackets(ws)
@@ -52,6 +53,7 @@ def read_settings(ws: xw.Sheet) -> SettingsSchema:
         fixed_tax_columns=fixed_tax_columns,
         brackets=brackets,
         min_ss_salary=min_ss_salary,
+        min_allowed_salary=min_allowed_salary,
     )
 
 

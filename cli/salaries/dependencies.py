@@ -12,6 +12,8 @@ from .options import (
     CalculatedStartColumnOpt,
     CalculationRoundingMethodOpt,
     CalculationRoundToNearestOpt,
+    NetRoundingMethodOpt,
+    NetRoundToNearestOpt,
     SalariesWorkbookPasswordOpt,
     SalariesWorkbookPathArg,
     SSRoundingMethodOpt,
@@ -64,13 +66,6 @@ def _read_raw_data(
     return [RowReader(row, settings.fixed_tax_columns).read() for row in rg.value]
 
 
-def _get_ss_rounder(
-    ss_round_to_nearest: SSRoundToNearestOpt = Decimal(1),
-    ss_rounding_method: SSRoundingMethodOpt = RoundingMethod.HALF_UP,
-) -> Rounder:
-    return Rounder(ss_rounding_method, ss_round_to_nearest)
-
-
 def _get_taxes_rounder(
     tax_round_to_nearest: TaxesRoundToNearestOpt = Decimal(100),
     tax_rounding_method: TaxesRoundingMethodOpt = RoundingMethod.HALF_UP,
@@ -85,6 +80,20 @@ def _get_calculation_rounder(
     return Rounder(calc_rounding_method, calc_round_to_nearest)
 
 
+def _get_net_rounder(
+    net_round_to_nearest: NetRoundToNearestOpt = Decimal(1_000),
+    net_rounding_method: NetRoundingMethodOpt = RoundingMethod.HALF_UP,
+) -> Rounder:
+    return Rounder(net_rounding_method, net_round_to_nearest)
+
+
+def _get_ss_rounder(
+    ss_round_to_nearest: SSRoundToNearestOpt = Decimal(1),
+    ss_rounding_method: SSRoundingMethodOpt = RoundingMethod.HALF_UP,
+) -> Rounder:
+    return Rounder(ss_rounding_method, ss_round_to_nearest)
+
+
 def _get_ss_obj(
     settings: SettingsSchema = Depends(_read_settings),
     rounder: Rounder = Depends(_get_ss_rounder),
@@ -92,15 +101,16 @@ def _get_ss_obj(
     return SocialSecurity(settings.min_ss_salary, settings.ss_deduction_rate, rounder)
 
 
-def get_calculated_array(
+def get_calculated_array(  # noqa: PLR0913
     rows: list[RowSchema] = Depends(_read_raw_data),
     settings: SettingsSchema = Depends(_read_settings),
     calculation_rounder: Rounder = Depends(_get_calculation_rounder),
     tax_rounder: Rounder = Depends(_get_taxes_rounder),
+    net_rounder: Rounder = Depends(_get_net_rounder),
     ss_obj: SocialSecurity = Depends(_get_ss_obj),
 ) -> Array[float]:
     return [
-        SalaryCalculator(row, settings, calculation_rounder, tax_rounder, ss_obj)
+        SalaryCalculator(row, settings, calculation_rounder, tax_rounder, net_rounder, ss_obj)
         .calculate()
         .as_row()
         for row in rows

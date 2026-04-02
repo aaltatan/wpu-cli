@@ -80,6 +80,23 @@ TaxesRoundingMethodOpt = Annotated[
     ),
 ]
 
+NetRoundToNearestOpt = Annotated[
+    Decimal,
+    typer.Option(
+        "--net-round-to-nearest",
+        help="Round net",
+        parser=Decimal,
+    ),
+]
+
+NetRoundingMethodOpt = Annotated[
+    RoundingMethod,
+    typer.Option(
+        "--net-rounding-method",
+        help="Rounding method for net",
+    ),
+]
+
 CalculatedStartColumnOpt = Annotated[
     str,
     typer.Option(

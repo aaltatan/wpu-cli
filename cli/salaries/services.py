@@ -6,18 +6,20 @@ from .models import BasedOnType, CompensationSchema, RowSchema, SalaryOutSchema,
 
 
 class SalaryCalculator:
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         row: RowSchema,
         settings: SettingsSchema,
         calculation_rounder: Rounder,
         taxes_rounder: Rounder,
+        net_rounder: Rounder,
         ss_obj: SocialSecurity,
     ) -> None:
         self._row = row
         self._settings = settings
         self._calculation_rounder = calculation_rounder
         self._taxes_rounder = taxes_rounder
+        self._net_rounder = net_rounder
         self._ss_obj = ss_obj
         self._fixed_tax = Decimal(0)
 
@@ -209,6 +211,22 @@ class SalaryCalculator:
             + without_pay_leaves
         )
 
+        net = total - deductions
+
+        rounded_net = self._net_rounder.round(net)
+
+        difference = rounded_net - net
+
+        if difference and fixed_tax >= difference:
+            fixed_tax = fixed_tax - difference
+            deductions = deductions - difference
+
+        if difference and fixed_tax < difference:
+            fixed_tax = fixed_tax + difference
+            deductions = deductions + difference
+
+        net = rounded_net
+
         return SalaryOutSchema(
             hours=hours,
             fixed_salary=fixed_salary,
@@ -260,7 +278,7 @@ class SalaryCalculator:
             deduction_11=deduction_11,
             deduction_12=deduction_12,
             deductions=deductions,
-            net=total - deductions,
+            net=net,
         )
 
     def _calc_qty(self, qty: Decimal, value: Decimal) -> Decimal:

@@ -6,7 +6,7 @@ import xlwings as xw
 from syriantaxes import Rounder, RoundingMethod, SocialSecurity
 from typer_di import Depends
 
-from .models import SalaryInSchema, SettingsSchema
+from .models import RowSchema, SettingsSchema
 from .options import (
     CalculatedEndColumnOpt,
     CalculatedStartColumnOpt,
@@ -37,35 +37,24 @@ CALCULATED_END_COLUMN = "CW"
 START_ROW = 3
 
 
-def _get_ss_rounder(
-    ss_round_to_nearest: SSRoundToNearestOpt = Decimal(1),
-    ss_rounding_method: SSRoundingMethodOpt = RoundingMethod.HALF_UP,
-) -> Rounder:
-    return Rounder(method=ss_rounding_method, to_nearest=ss_round_to_nearest)
-
-
 def _get_salaries_workbook(
     path: SalariesWorkbookPathArg, password: SalariesWorkbookPasswordOpt
 ) -> xw.Book:
     return xw.Book(path, password=password)
 
 
-def _get_data_worksheet(book: xw.Book = Depends(_get_salaries_workbook)) -> xw.Sheet:
-    return book.sheets[DATA_SHEET_NAME]
+def _get_data_worksheet(wb: xw.Book = Depends(_get_salaries_workbook)) -> xw.Sheet:
+    return wb.sheets[DATA_SHEET_NAME]
 
 
-def _get_settings_worksheet(book: xw.Book = Depends(_get_salaries_workbook)) -> xw.Sheet:
-    return book.sheets[SETTINGS_SHEET_NAME]
-
-
-def _read_settings(ws: xw.Sheet = Depends(_get_settings_worksheet)) -> SettingsSchema:
-    return read_settings(ws)
+def _read_settings(wb: xw.Book = Depends(_get_salaries_workbook)) -> SettingsSchema:
+    return read_settings(wb.sheets[SETTINGS_SHEET_NAME])
 
 
 def _read_raw_data(
     ws: xw.Sheet = Depends(_get_data_worksheet),
     settings: SettingsSchema = Depends(_read_settings),
-) -> list[SalaryInSchema]:
+) -> list[RowSchema]:
     rg = ws.range(DATA_TABLE_NAME)
 
     if rg.value is None and not isinstance(rg.value, list):
@@ -75,33 +64,36 @@ def _read_raw_data(
     return [RowReader(row, settings.fixed_tax_columns).read() for row in rg.value]
 
 
-def _get_calculation_rounder(
-    calc_round_to_nearest: CalculationRoundToNearestOpt = Decimal(1),
-    calc_rounding_method: CalculationRoundingMethodOpt = RoundingMethod.HALF_UP,
+def _get_ss_rounder(
+    ss_round_to_nearest: SSRoundToNearestOpt = Decimal(1),
+    ss_rounding_method: SSRoundingMethodOpt = RoundingMethod.HALF_UP,
 ) -> Rounder:
-    return Rounder(method=calc_rounding_method, to_nearest=calc_round_to_nearest)
+    return Rounder(ss_rounding_method, ss_round_to_nearest)
 
 
 def _get_taxes_rounder(
     tax_round_to_nearest: TaxesRoundToNearestOpt = Decimal(100),
     tax_rounding_method: TaxesRoundingMethodOpt = RoundingMethod.HALF_UP,
 ) -> Rounder:
-    return Rounder(method=tax_rounding_method, to_nearest=tax_round_to_nearest)
+    return Rounder(tax_rounding_method, tax_round_to_nearest)
+
+
+def _get_calculation_rounder(
+    calc_round_to_nearest: CalculationRoundToNearestOpt = Decimal(1),
+    calc_rounding_method: CalculationRoundingMethodOpt = RoundingMethod.HALF_UP,
+) -> Rounder:
+    return Rounder(calc_rounding_method, calc_round_to_nearest)
 
 
 def _get_ss_obj(
     settings: SettingsSchema = Depends(_read_settings),
     rounder: Rounder = Depends(_get_ss_rounder),
 ) -> SocialSecurity:
-    return SocialSecurity(
-        min_salary=settings.min_ss_salary,
-        deduction_rate=settings.ss_deduction_rate,
-        rounder=rounder,
-    )
+    return SocialSecurity(settings.min_ss_salary, settings.ss_deduction_rate, rounder)
 
 
-def get_calculated_data(
-    rows: list[SalaryInSchema] = Depends(_read_raw_data),
+def get_calculated_array(
+    rows: list[RowSchema] = Depends(_read_raw_data),
     settings: SettingsSchema = Depends(_read_settings),
     calculation_rounder: Rounder = Depends(_get_calculation_rounder),
     tax_rounder: Rounder = Depends(_get_taxes_rounder),

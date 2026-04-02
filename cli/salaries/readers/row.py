@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Any
 
 from cli.salaries.mappers import COLUMNS_MAPPER
-from cli.salaries.models import CompensationSchema, SalaryInSchema
+from cli.salaries.models import CompensationSchema, RowSchema
 
 
 class RowReader:
@@ -10,7 +10,7 @@ class RowReader:
         self._row = row
         self._fixed_tax_columns = fixed_tax_columns
 
-    def read(self) -> SalaryInSchema:
+    def read(self) -> RowSchema:
         days_of_work_count = self._get_cell_value("days_of_work_count")
         overtime_days_count = self._get_compensation("overtime_days_count")
         healthy_leaves_count = self._get_compensation("healthy_leaves_count")
@@ -66,7 +66,7 @@ class RowReader:
         ss = self._get_cell_value("ss_salary")
         tu = self._get_cell_value("tu_salary")
 
-        return SalaryInSchema(
+        return RowSchema(
             days_of_work_count=days_of_work_count,
             overtime_days_count=overtime_days_count,
             healthy_leaves_count=healthy_leaves_count,

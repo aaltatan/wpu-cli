@@ -11,7 +11,7 @@ class CompensationSchema(BaseModel):
     is_taxable: bool = False
 
 
-class SalaryInSchema(BaseModel):
+class RowSchema(BaseModel):
     days_of_work_count: Decimal
     overtime_days_count: CompensationSchema
     healthy_leaves_count: CompensationSchema

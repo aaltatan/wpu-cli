@@ -2,19 +2,19 @@ from decimal import Decimal
 
 from syriantaxes import Rounder, SocialSecurity, calculate_brackets_tax, calculate_fixed_tax
 
-from .models import BasedOnType, CompensationSchema, SalaryInSchema, SalaryOutSchema, SettingsSchema
+from .models import BasedOnType, CompensationSchema, RowSchema, SalaryOutSchema, SettingsSchema
 
 
 class SalaryCalculator:
     def __init__(
         self,
-        in_schema: SalaryInSchema,
+        row: RowSchema,
         settings: SettingsSchema,
         calculation_rounder: Rounder,
         taxes_rounder: Rounder,
         ss_obj: SocialSecurity,
     ) -> None:
-        self._row = in_schema
+        self._row = row
         self._settings = settings
         self._calculation_rounder = calculation_rounder
         self._taxes_rounder = taxes_rounder

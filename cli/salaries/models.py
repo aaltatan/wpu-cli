@@ -12,6 +12,9 @@ class CompensationSchema(BaseModel):
 
 
 class RowSchema(BaseModel):
+    fullname: str
+    status: bool
+
     days_of_work_count: Decimal
     overtime_days_count: CompensationSchema
     healthy_leaves_count: CompensationSchema

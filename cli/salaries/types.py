@@ -2,6 +2,9 @@ from typing import TypedDict
 
 
 class Column(TypedDict):
+    fullname: int
+    status: int
+
     ss_id: int
     ss_salary: int
 

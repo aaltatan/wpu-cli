@@ -24,6 +24,9 @@ class SalaryCalculator:
         self._fixed_tax = Decimal(0)
 
     def calculate(self) -> SalaryOutSchema:  # noqa: PLR0915
+        if not self._row.status:
+            return SalaryOutSchema()
+
         hours = self._calc_qty(self._row.hours_count, self._row.hour_price.value)
         fixed_salary = self._calc_days_based_compensation(self._row.fixed_salary)
         compensation_01 = self._calc_days_based_compensation(self._row.compensation_01.value)

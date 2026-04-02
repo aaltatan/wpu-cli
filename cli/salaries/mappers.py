@@ -3,6 +3,9 @@ from .types import Column, SettingsSheetAddress
 # column index - 5 in Salaries.xlsb
 
 COLUMNS_MAPPER: Column = {
+    "fullname": 0,
+    "status": 3,
+    ######
     "ss_id": 15,
     "ss_salary": 16,
     ######

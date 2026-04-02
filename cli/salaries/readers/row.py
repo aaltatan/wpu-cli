@@ -11,16 +11,19 @@ class RowReader:
         self._fixed_tax_columns = fixed_tax_columns
 
     def read(self) -> RowSchema:
-        days_of_work_count = self._get_cell_value("days_of_work_count")
+        fullname = self._get_cell_value("fullname", str)
+        status = self._get_cell_value("status", bool)
+
+        days_of_work_count = self._get_cell_value("days_of_work_count", Decimal)
         overtime_days_count = self._get_compensation("overtime_days_count")
         healthy_leaves_count = self._get_compensation("healthy_leaves_count")
         without_pay_leaves_count = self._get_compensation("without_pay_leaves_count")
         additional_leaves_count = self._get_compensation("additional_leaves_count")
 
-        hours_count = self._get_cell_value("hours_count")
+        hours_count = self._get_cell_value("hours_count", Decimal)
         hour_price = self._get_compensation("hour_price")
 
-        fixed_salary = self._get_cell_value("fixed_salary")
+        fixed_salary = self._get_cell_value("fixed_salary", Decimal)
 
         compensation_01 = self._get_compensation("compensation_01")
         compensation_02 = self._get_compensation("compensation_02")
@@ -63,10 +66,12 @@ class RowReader:
         deduction_11 = self._get_compensation("deduction_11")
         deduction_12 = self._get_compensation("deduction_12")
 
-        ss = self._get_cell_value("ss_salary")
-        tu = self._get_cell_value("tu_salary")
+        ss = self._get_cell_value("ss_salary", Decimal)
+        tu = self._get_cell_value("tu_salary", Decimal)
 
         return RowSchema(
+            fullname=fullname,
+            status=status,
             days_of_work_count=days_of_work_count,
             overtime_days_count=overtime_days_count,
             healthy_leaves_count=healthy_leaves_count,
@@ -135,14 +140,14 @@ class RowReader:
 
     def _get_compensation(self, column: str) -> CompensationSchema:
         idx = self._get_idx(column, calculated=True)
-        value = self._get_cell_value(column)
+        value = self._get_cell_value(column, Decimal)
 
         return CompensationSchema(value=value, is_taxable=idx in self._fixed_tax_columns)
 
-    def _get_cell_value(self, column: str) -> Decimal:
-        value = self._row[self._get_idx(column, calculated=False)]
+    def _get_cell_value[T: (str, Decimal, bool)](self, column_name: str, cast: type[T]) -> T:
+        value = self._row[self._get_idx(column_name, calculated=False)]
 
         if value is None:
             value = Decimal(0)
 
-        return Decimal(value)
+        return cast(value)

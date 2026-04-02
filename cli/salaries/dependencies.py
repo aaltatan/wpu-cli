@@ -12,8 +12,10 @@ from .options import (
     CalculatedStartColumnOpt,
     CalculationRoundingMethodOpt,
     CalculationRoundToNearestOpt,
-    NetRoundingMethodOpt,
-    NetRoundToNearestOpt,
+    NetBankRoundingMethodOpt,
+    NetBankRoundToNearestOpt,
+    NetCashRoundingMethodOpt,
+    NetCashRoundToNearestOpt,
     SalariesWorkbookPasswordOpt,
     SalariesWorkbookPathArg,
     SSRoundingMethodOpt,
@@ -25,7 +27,7 @@ from .options import (
 )
 from .readers.row import RowReader
 from .readers.settings import read_settings
-from .services import SalaryCalculator
+from .services import SalaryCalculator, SalaryRounder
 
 type Array[T] = list[list[T]]
 type WriterFn = Callable[[Array[float]], xw.Sheet]
@@ -80,11 +82,32 @@ def _get_calculation_rounder(
     return Rounder(calc_rounding_method, calc_round_to_nearest)
 
 
-def _get_net_rounder(
-    net_round_to_nearest: NetRoundToNearestOpt = Decimal(1_000),
-    net_rounding_method: NetRoundingMethodOpt = RoundingMethod.HALF_UP,
+def _get_bank_net_rounder(
+    net_bank_round_to_nearest: NetBankRoundToNearestOpt = Decimal(100),
+    net_bank_rounding_method: NetBankRoundingMethodOpt = RoundingMethod.HALF_UP,
 ) -> Rounder:
-    return Rounder(net_rounding_method, net_round_to_nearest)
+    return Rounder(net_bank_rounding_method, net_bank_round_to_nearest)
+
+
+def _get_cash_net_rounder(
+    net_cash_round_to_nearest: NetCashRoundToNearestOpt = Decimal(100),
+    net_cash_rounding_method: NetCashRoundingMethodOpt = RoundingMethod.HALF_UP,
+) -> Rounder:
+    return Rounder(net_cash_rounding_method, net_cash_round_to_nearest)
+
+
+def _get_salary_rounder(
+    taxes_rounder: Rounder = Depends(_get_taxes_rounder),
+    calculation_rounder: Rounder = Depends(_get_calculation_rounder),
+    net_cash_rounder: Rounder = Depends(_get_cash_net_rounder),
+    net_bank_rounder: Rounder = Depends(_get_bank_net_rounder),
+) -> SalaryRounder:
+    return SalaryRounder(
+        taxes=taxes_rounder,
+        calculation=calculation_rounder,
+        net_cash=net_cash_rounder,
+        net_bank=net_bank_rounder,
+    )
 
 
 def _get_ss_rounder(
@@ -101,20 +124,13 @@ def _get_ss_obj(
     return SocialSecurity(settings.min_ss_salary, settings.ss_deduction_rate, rounder)
 
 
-def get_calculated_array(  # noqa: PLR0913
+def get_calculated_array(
     rows: list[RowSchema] = Depends(_read_raw_data),
     settings: SettingsSchema = Depends(_read_settings),
-    calculation_rounder: Rounder = Depends(_get_calculation_rounder),
-    tax_rounder: Rounder = Depends(_get_taxes_rounder),
-    net_rounder: Rounder = Depends(_get_net_rounder),
+    rounder: SalaryRounder = Depends(_get_salary_rounder),
     ss_obj: SocialSecurity = Depends(_get_ss_obj),
 ) -> Array[float]:
-    return [
-        SalaryCalculator(row, settings, calculation_rounder, tax_rounder, net_rounder, ss_obj)
-        .calculate()
-        .as_row()
-        for row in rows
-    ]
+    return [SalaryCalculator(row, settings, rounder, ss_obj).calculate().as_row() for row in rows]
 
 
 def get_writer_fn(

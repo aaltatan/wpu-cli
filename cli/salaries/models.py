@@ -15,6 +15,8 @@ class RowSchema(BaseModel):
     fullname: str
     status: bool
 
+    transfer_type: str
+
     days_of_work_count: Decimal
     overtime_days_count: CompensationSchema
     healthy_leaves_count: CompensationSchema

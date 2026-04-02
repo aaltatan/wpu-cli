@@ -80,20 +80,37 @@ TaxesRoundingMethodOpt = Annotated[
     ),
 ]
 
-NetRoundToNearestOpt = Annotated[
+NetBankRoundToNearestOpt = Annotated[
     Decimal,
     typer.Option(
-        "--net-round-to-nearest",
-        help="Round net",
+        "--net-bank-round-to-nearest",
+        help="Round net bank",
         parser=Decimal,
     ),
 ]
 
-NetRoundingMethodOpt = Annotated[
+NetBankRoundingMethodOpt = Annotated[
     RoundingMethod,
     typer.Option(
-        "--net-rounding-method",
-        help="Rounding method for net",
+        "--net-bank-rounding-method",
+        help="Rounding method for net bank",
+    ),
+]
+
+NetCashRoundToNearestOpt = Annotated[
+    Decimal,
+    typer.Option(
+        "--net-cash-round-to-nearest",
+        help="Round net cash",
+        parser=Decimal,
+    ),
+]
+
+NetCashRoundingMethodOpt = Annotated[
+    RoundingMethod,
+    typer.Option(
+        "--net-cash-rounding-method",
+        help="Rounding method for net cash",
     ),
 ]
 

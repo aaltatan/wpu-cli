@@ -14,6 +14,8 @@ class RowReader:
         fullname = self._get_cell_value("fullname", str)
         status = self._get_cell_value("status", bool)
 
+        transfer_type = self._get_cell_value("transfer_type", str)
+
         days_of_work_count = self._get_cell_value("days_of_work_count", Decimal)
         overtime_days_count = self._get_compensation("overtime_days_count")
         healthy_leaves_count = self._get_compensation("healthy_leaves_count")
@@ -72,6 +74,7 @@ class RowReader:
         return RowSchema(
             fullname=fullname,
             status=status,
+            transfer_type=transfer_type,
             days_of_work_count=days_of_work_count,
             overtime_days_count=overtime_days_count,
             healthy_leaves_count=healthy_leaves_count,

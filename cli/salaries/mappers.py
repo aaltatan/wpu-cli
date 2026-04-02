@@ -6,6 +6,8 @@ COLUMNS_MAPPER: Column = {
     "fullname": 0,
     "status": 3,
     ######
+    "transfer_type": 8,
+    ######
     "ss_id": 15,
     "ss_salary": 16,
     ######
@@ -16,8 +18,8 @@ COLUMNS_MAPPER: Column = {
     "healthy_leaves_count": (21, 83),
     "without_pay_leaves_count": (22, 84),
     "additional_leaves_count": (23, 63),
-    "hours_count": (24, 44),
-    "hour_price": 25,
+    "hours_count": 24,
+    "hour_price": (25, 44),
     ######
     "fixed_salary": 26,
     ######

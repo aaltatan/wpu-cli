@@ -5,6 +5,8 @@ class Column(TypedDict):
     fullname: int
     status: int
 
+    transfer_type: int
+
     ss_id: int
     ss_salary: int
 
@@ -16,8 +18,8 @@ class Column(TypedDict):
     without_pay_leaves_count: tuple[int, int]
     additional_leaves_count: tuple[int, int]
 
-    hours_count: tuple[int, int]
-    hour_price: int
+    hours_count: int
+    hour_price: tuple[int, int]
 
     fixed_salary: int
 

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from decimal import Decimal
 
 from syriantaxes import Rounder, SocialSecurity, calculate_brackets_tax, calculate_fixed_tax
@@ -5,21 +6,25 @@ from syriantaxes import Rounder, SocialSecurity, calculate_brackets_tax, calcula
 from .models import BasedOnType, CompensationSchema, RowSchema, SalaryOutSchema, SettingsSchema
 
 
+@dataclass
+class SalaryRounder:
+    taxes: Rounder
+    calculation: Rounder
+    net_cash: Rounder
+    net_bank: Rounder
+
+
 class SalaryCalculator:
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         row: RowSchema,
         settings: SettingsSchema,
-        calculation_rounder: Rounder,
-        taxes_rounder: Rounder,
-        net_rounder: Rounder,
+        rounder: SalaryRounder,
         ss_obj: SocialSecurity,
     ) -> None:
         self._row = row
         self._settings = settings
-        self._calculation_rounder = calculation_rounder
-        self._taxes_rounder = taxes_rounder
-        self._net_rounder = net_rounder
+        self._rounder = rounder
         self._ss_obj = ss_obj
         self._fixed_tax = Decimal(0)
 
@@ -102,10 +107,10 @@ class SalaryCalculator:
         else:
             ss_deduction = Decimal(0)
 
-        tu_monthly_deduction = self._calculation_rounder.round(
+        tu_monthly_deduction = self._rounder.calculation.round(
             self._row.teachers_union * self._settings.tu_monthly_deduction_rate
         )
-        tu_pension_deduction = self._calculation_rounder.round(
+        tu_pension_deduction = self._rounder.calculation.round(
             self._row.teachers_union * self._settings.tu_pension_deduction_rate
         )
 
@@ -138,7 +143,7 @@ class SalaryCalculator:
             "amount": self._row.fixed_salary,
             "brackets": self._settings.brackets,
             "min_allowed_salary": self._settings.min_allowed_salary,
-            "rounder": self._taxes_rounder,
+            "rounder": self._rounder.taxes,
         }
 
         if self._row.social_security:
@@ -147,8 +152,17 @@ class SalaryCalculator:
 
         brackets_tax = calculate_brackets_tax(**brackets_tax_kwargs)
 
+        hours_fixed_tax = Decimal(0)
+
+        if self._row.hour_price.is_taxable:
+            hours_fixed_tax = calculate_fixed_tax(
+                self._row.hour_price.value * self._row.hours_count,
+                self._settings.fixed_tax_rate,
+                self._rounder.taxes,
+            )
+
         fixed_tax = (
-            self._calc_fixed_tax(hours, self._row.hour_price)
+            hours_fixed_tax
             + self._calc_fixed_tax(compensation_01, self._row.compensation_01)
             + self._calc_fixed_tax(compensation_02, self._row.compensation_02)
             + self._calc_fixed_tax(compensation_03, self._row.compensation_03)
@@ -216,7 +230,10 @@ class SalaryCalculator:
 
         net = total - deductions
 
-        rounded_net = self._net_rounder.round(net)
+        rounded_net = self._rounder.net_cash.round(net)
+
+        if self._row.transfer_type.lower() == "transfer":
+            rounded_net = self._rounder.net_bank.round(net)
 
         difference = rounded_net - net
 
@@ -285,7 +302,7 @@ class SalaryCalculator:
         )
 
     def _calc_qty(self, qty: Decimal, value: Decimal) -> Decimal:
-        return self._calculation_rounder.round(qty * value)
+        return self._rounder.calculation.round(qty * value)
 
     def _calc_fixed_tax(
         self, value: Decimal | None, compensation: CompensationSchema | None
@@ -303,20 +320,20 @@ class SalaryCalculator:
         return calculate_fixed_tax(
             compensation.value,  # type: ignore  # noqa: PGH003
             self._settings.fixed_tax_rate,
-            self._taxes_rounder,
+            self._rounder.taxes,
         )
 
     def _calc_comp(self, compensation: CompensationSchema | None) -> Decimal | None:
         if compensation is None:
             return None
 
-        return self._calculation_rounder.round(compensation.value)
+        return self._rounder.calculation.round(compensation.value)
 
     def _calc_days_based_compensation(self, value: Decimal) -> Decimal:
         if self._row.days_of_work_count == self._settings.days_of_month:
             return value
 
-        return self._calculation_rounder.round(
+        return self._rounder.calculation.round(
             (value / self._settings.days_of_month) * self._row.days_of_work_count
         )
 

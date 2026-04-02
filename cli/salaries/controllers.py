@@ -27,9 +27,10 @@ def calculate(
         ) as progress:
             progress.add_task("Writing ... ", total=None)
             ws = writer_fn(data)
+            console.print("[green]Done! 👍[/green]")
             console.print(
-                f'[green]Results have been written to "{ws.name}" sheet in {ws.book.name}[/green]'
+                f'Results have been written to "{ws.name}" sheet in "{ws.book.name}" workbook.'
             )
 
     total = sum(row[-1] for row in data)
-    console.print(f"[red]{total = :,.2f}[/red]")
+    console.print(f"[green]{total = :,.2f}[/green]")

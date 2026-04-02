@@ -23,6 +23,7 @@ SalariesWorkbookPasswordOpt = Annotated[
         "-p",
         "--password",
         help="Password to open salaries workbook",
+        envvar="SALARY_WORKBOOK_PASSWORD",
         prompt=True,
         hide_input=True,
     ),
